@@ -1,0 +1,59 @@
+[device info]
+model_name  = MX-28
+device_type = Dynamixel
+
+[type info]
+0_radian_position_value   = 2048
+min_radian_position_value = 0
+max_radian_position_value = 4095
+min_radian                = -3.14159265
+max_radian                =  3.14159265
+torque_enable_address     = 24
+position_d_gain_address   = 26
+position_i_gain_address   = 27
+position_p_gain_address   = 28
+goal_position_address     = 30
+goal_velocity_address     = 32
+goal_torque_address       = 34
+present_position_address  = 36
+present_velocity_address  = 38
+present_load_address      = 40
+is_moving_address         = 46
+
+[control table]
+# addr | item name                | length | access | memory |   min value   |  max value  | signed
+   0   | model_number             | 2      | R      | EEPROM | 0             | 65535       | N
+   2   | version_of_firmware      | 1      | R      | EEPROM | 0             | 254         | N
+   3   | ID                       | 1      | RW     | EEPROM | 0             | 252         | N
+   4   | baudrate                 | 1      | RW     | EEPROM | 0             | 252         | N
+   5   | return_delay_time        | 1      | RW     | EEPROM | 0             | 254         | N
+   6   | CW_angle_limit           | 2      | RW     | EEPROM | 0             | 4095        | N
+   8   | CCW_angle_limit          | 2      | RW     | EEPROM | 0             | 4095        | N
+   10  | drive_mode               | 1      | RW     | EEPROM | 0             | 3           | N
+   11  | max_temperature_limit    | 1      | RW     | EEPROM | 0             | 99          | N
+   12  | min_voltage_limit        | 1      | RW     | EEPROM | 0             | 250         | N
+   13  | max_voltage_limit        | 1      | RW     | EEPROM | 0             | 250         | N
+   14  | max_torque               | 2      | RW     | EEPROM | 0             | 1023        | N
+   16  | status_return_level      | 1      | RW     | EEPROM | 0             | 2           | N
+   17  | alarm_LED                | 1      | RW     | EEPROM | 0             | 127         | N
+   18  | alarm_shutdown           | 1      | RW     | EEPROM | 0             | 127         | N
+   20  | multi_turn_offset        | 2      | RW     | EEPROM | -26624        | 26624       | Y
+   22  | resolution_dividor       | 1      | RW     | EEPROM | 1             | 255         | N
+   24  | torque_enable            | 1      | RW     | RAM    | 0             | 1           | N
+   25  | LED                      | 1      | RW     | RAM    | 0             | 1           | N
+   26  | position_D_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   27  | position_I_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   28  | position_P_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   30  | goal_position            | 2      | RW     | RAM    | -28672        | 28672       | Y
+   32  | goal_velocity            | 2      | RW     | RAM    | 0             | 1023        | N
+   34  | goal_torque              | 2      | RW     | RAM    | 0             | 1023        | N
+   36  | present_position         | 2      | R      | RAM    | 0             | 4095        | N
+   38  | present_velocity         | 2      | R      | RAM    | 0             | 2048        | N
+   40  | present_load             | 2      | R      | RAM    | 0             | 2048        | N
+   42  | present_voltage          | 1      | R      | RAM    | 50            | 250         | N
+   43  | present_temperature      | 1      | R      | RAM    | 0             | 99          | N
+   44  | registered_instruction   | 1      | R      | RAM    | 0             | 1           | N
+   46  | is_moving                | 1      | R      | RAM    | 0             | 1           | N
+   47  | EEPROM_lock              | 1      | RW     | RAM    | 0             | 1           | N
+   48  | punch                    | 2      | RW     | RAM    | 0             | 1023        | N
+   73  | goal_acceleration        | 1      | RW     | RAM    | 0             | 254         | N
