@@ -303,7 +303,7 @@ void *RobotisController::ThreadProc(void *param)
 
 	    clock_gettime(CLOCK_MONOTONIC, &curr_time);
 	    long delta_nsec = (next_time.tv_sec - curr_time.tv_sec) * 1000000000 + (next_time.tv_nsec - curr_time.tv_nsec);
-	    if(delta_nsec < -0.3 )
+	    if(delta_nsec < -100000 )
 	    {
 	        if(controller->DEBUG_PRINT == true)
 	            ROS_WARN("[RobotisController::ThreadProc] NEXT TIME < CURR TIME.. (%f)[%ld.%09ld / %ld.%09ld]", delta_nsec/1000000.0, (long)next_time.tv_sec, (long)next_time.tv_nsec, (long)curr_time.tv_sec, (long)curr_time.tv_nsec);
