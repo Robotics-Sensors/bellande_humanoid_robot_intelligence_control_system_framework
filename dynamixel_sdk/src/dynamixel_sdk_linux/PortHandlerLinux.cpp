@@ -77,8 +77,6 @@ bool PortHandlerLinux::SetBaudRate(const int baudrate)
         baudrate_ = baudrate;
         return SetupPort(_baud);
     }
-
-    return true;
 }
 
 int PortHandlerLinux::GetBaudRate()
@@ -127,12 +125,6 @@ bool PortHandlerLinux::IsPacketTimeout()
 
 double PortHandlerLinux::GetCurrentTime()
 {
-//    struct timeval _tv;
-//
-//    gettimeofday(&_tv, 0);
-//
-//    return ((double)_tv.tv_sec * 1000.0 + (double)_tv.tv_usec / 1000.0);
-
 	struct timespec _tv;
 	clock_gettime( CLOCK_REALTIME, &_tv);
 	return ((double)_tv.tv_sec*1000.0 + (double)_tv.tv_nsec*0.001*0.001);

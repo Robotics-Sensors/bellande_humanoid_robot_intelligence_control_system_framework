@@ -11,7 +11,7 @@
   #include "dynamixel_sdk_linux/PortHandlerLinux.h"
 #endif
 
-#ifdef _WIN32 || _WIN64
+#if defined(_WIN32) || defined(_WIN64)
   #include "dynamixel_sdk_windows/PortHandlerWindows.h"
 #endif
 
@@ -23,7 +23,7 @@ PortHandler *PortHandler::GetPortHandler(const char *port_name)
     return (PortHandler *)(new PortHandlerLinux(port_name));
 #endif
 
-#ifdef _WIN32 || _WIN64
+#if defined(_WIN32) || defined(_WIN64)
     return (PortHandler *)(new PortHandlerWindows(port_name));
 #endif
 }

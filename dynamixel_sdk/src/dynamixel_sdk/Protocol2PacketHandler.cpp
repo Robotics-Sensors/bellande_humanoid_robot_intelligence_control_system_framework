@@ -213,11 +213,6 @@ int Protocol2PacketHandler::RxPacket(PortHandler *port, UINT8_T *rxpacket)
             UINT16_T _idx = 0;
 
             // find packet header
-//            for(_idx = 0; _idx < (_rx_length - 2); _idx++)
-//            {
-//                if(rxpacket[_idx] == 0xFF && rxpacket[_idx+1] == 0xFF && rxpacket[_idx+2] == 0xFD)
-//                    break;
-//            }
             for(_idx = 0; _idx < (_rx_length - 3); _idx++)
             {
                 if((rxpacket[_idx] == 0xFF) && (rxpacket[_idx+1] == 0xFF) && (rxpacket[_idx+2] == 0xFD) && (rxpacket[_idx+3] != 0xFD))
@@ -228,9 +223,6 @@ int Protocol2PacketHandler::RxPacket(PortHandler *port, UINT8_T *rxpacket)
             {
                 // re-calculate the exact length of the rx packet
                 _wait_length = DXL_MAKEWORD(rxpacket[PKT_LENGTH_L], rxpacket[PKT_LENGTH_H]) + PKT_LENGTH_H + 1;
-                if(_wait_length > 100)
-                	fprintf(stderr, "id : %d , _wait_length : %d \n", rxpacket[PKT_ID], _wait_length);
-
 				if(_wait_length > RXPACKET_MAX_LEN - 10)
 				{
 					_result = COMM_RX_CORRUPT;
@@ -244,18 +236,10 @@ int Protocol2PacketHandler::RxPacket(PortHandler *port, UINT8_T *rxpacket)
                     {
                         if(_rx_length == 0)
                             _result = COMM_RX_TIMEOUT;
-                        else {
+                        else
                             _result = COMM_RX_CORRUPT;
-//                        	fprintf(stderr, "Fail Rx Packet(short_length1) : ");
-//                        	for(int _i = 0; _i < _rx_length + 11; _i++)
-//                        	{
-//                        		fprintf(stderr, " %x", rxpacket[_i]);
-//                        	}
-//                        	fprintf(stderr, "\n");
-                        }
                         break;
                     }
-
                     else
                         continue;
                 }
@@ -264,15 +248,8 @@ int Protocol2PacketHandler::RxPacket(PortHandler *port, UINT8_T *rxpacket)
                 UINT16_T crc = DXL_MAKEWORD(rxpacket[_wait_length-2], rxpacket[_wait_length-1]);
                 if(UpdateCRC(0, rxpacket, _wait_length - 2) == crc)
                     _result = COMM_SUCCESS;
-                else {
+                else
                     _result = COMM_RX_CORRUPT;
-//                	fprintf(stderr, "Rx Packet(crc_error) : ");
-//                	for(int _i = 0; _i < _rx_length + 11; _i++)
-//                	{
-//                		fprintf(stderr, " %x", rxpacket[_i]);
-//                	}
-//                	fprintf(stderr, "\n");
-                }
                 break;
             }
             else
@@ -291,15 +268,8 @@ int Protocol2PacketHandler::RxPacket(PortHandler *port, UINT8_T *rxpacket)
             {
                 if(_rx_length == 0)
                     _result = COMM_RX_TIMEOUT;
-                else {
+                else
                     _result = COMM_RX_CORRUPT;
-//                	fprintf(stderr, "Fail Rx Packet(short_length2): ");
-//                	for(int _i = 0; _i < _rx_length + 11; _i++)
-//                	{
-//                		fprintf(stderr, " %x", rxpacket[_i]);
-//                	}
-//                	fprintf(stderr, "\n");
-                }
                 break;
             }
         }
@@ -474,8 +444,6 @@ int Protocol2PacketHandler::BroadcastPing(PortHandler *port, std::vector<UINT8_T
 
 int Protocol2PacketHandler::Action(PortHandler *port, UINT8_T id)
 {
-    int _result                 = COMM_TX_FAIL;
-
     UINT8_T txpacket[10]        = {0};
 
     txpacket[PKT_ID]            = id;
@@ -543,8 +511,7 @@ int Protocol2PacketHandler::ReadTx(PortHandler *port, UINT8_T id, UINT16_T addre
 int Protocol2PacketHandler::ReadRx(PortHandler *port, UINT16_T length, UINT8_T *data, UINT8_T *error)
 {
     int _result                 = COMM_TX_FAIL;
-    //UINT8_T *rxpacket           = (UINT8_T *)malloc(RXPACKET_MAX_LEN);//(length + 11 + (length/3));  // (length/3): consider stuffing
-    UINT8_T *rxpacket           = ( UINT8_T* )calloc(RXPACKET_MAX_LEN, sizeof(UINT8_T));//(length + 11 + (length/3));  // (length/3): consider stuffing
+    UINT8_T *rxpacket           = (UINT8_T *)malloc(RXPACKET_MAX_LEN);//(length + 11 + (length/3));  // (length/3): consider stuffing
     //UINT8_T *rxpacket           = new UINT8_T[length + 11 + (length/3)];    // (length/3): consider stuffing
 
     _result = RxPacket(port, rxpacket);
@@ -556,15 +523,6 @@ int Protocol2PacketHandler::ReadRx(PortHandler *port, UINT16_T length, UINT8_T *
             data[_s] = rxpacket[PKT_PARAMETER0 + 1 + _s];
         //memcpy(data, &rxpacket[PKT_PARAMETER0+1], length);
     }
-//    else
-//    {
-//    	fprintf(stderr, "Fail Rx Packet : ");
-//    	for(int _i = 0; _i < length + 11; _i++)
-//    	{
-//    		fprintf(stderr, " %x", rxpacket[_i]);
-//    	}
-//    	fprintf(stderr, "\n");
-//    }
 
     free(rxpacket);
     //delete[] rxpacket;
