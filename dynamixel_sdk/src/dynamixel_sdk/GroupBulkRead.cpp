@@ -34,7 +34,7 @@ void GroupBulkRead::MakeParam()
         param_ = new UINT8_T[id_list_.size() * 5];  // ID(1) + ADDR(2) + LENGTH(2)
 
     int _idx = 0;
-    for(int _i = 0; _i < id_list_.size(); _i++)
+    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
     {
         UINT8_T _id = id_list_[_i];
         if(ph_->GetProtocolVersion() == 1.0)
@@ -87,7 +87,7 @@ void GroupBulkRead::ClearParam()
 {
     if(id_list_.size() != 0)
     {
-        for(int _i = 0; _i < id_list_.size(); _i++)
+        for(unsigned int _i = 0; _i < id_list_.size(); _i++)
             delete[] data_list_[id_list_[_i]];
     }
 

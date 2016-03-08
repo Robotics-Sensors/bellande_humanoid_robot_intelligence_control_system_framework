@@ -29,13 +29,13 @@ void GroupBulkWrite::MakeParam()
     param_ = 0;
 
     param_length_ = 0;
-    for(int _i = 0; _i < id_list_.size(); _i++)
+    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
         param_length_ += 1 + 2 + 2 + length_list_[id_list_[_i]];
 
     param_ = new UINT8_T[param_length_];
 
     int _idx = 0;
-    for(int _i = 0; _i < id_list_.size(); _i++)
+    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
     {
         UINT8_T _id = id_list_[_i];
         if(data_list_[_id] == 0)
@@ -112,7 +112,7 @@ void GroupBulkWrite::ClearParam()
 
     if(id_list_.size() != 0)
     {
-        for(int _i = 0; _i < id_list_.size(); _i++)
+        for(unsigned int _i = 0; _i < id_list_.size(); _i++)
             delete[] data_list_[id_list_[_i]];
     }
 

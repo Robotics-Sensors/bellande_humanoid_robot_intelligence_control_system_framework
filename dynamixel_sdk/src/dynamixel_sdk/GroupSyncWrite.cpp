@@ -32,7 +32,7 @@ void GroupSyncWrite::MakeParam()
     param_ = new UINT8_T[id_list_.size() * (1 + data_length_)]; // ID(1) + DATA(data_length)
 
     int _idx = 0;
-    for(int _i = 0; _i < id_list_.size(); _i++)
+    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
     {
         UINT8_T _id = id_list_[_i];
         if(data_list_[_id] == 0)
@@ -90,7 +90,7 @@ void GroupSyncWrite::ClearParam()
 {
     if(id_list_.size() != 0)
     {
-        for(int _i = 0; _i < id_list_.size(); _i++)
+        for(unsigned int _i = 0; _i < id_list_.size(); _i++)
             delete[] data_list_[id_list_[_i]];
     }
 
