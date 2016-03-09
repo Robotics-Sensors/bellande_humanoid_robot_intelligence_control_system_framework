@@ -52,9 +52,20 @@ void RobotisController::InitSyncWrite()
 	// bulkread twice
 	for(std::map<std::string, GroupBulkRead *>::iterator _it = port_to_bulk_read.begin(); _it != port_to_bulk_read.end(); _it++)
 		_it->second->TxRxPacket();
-	usleep(50*1000);
 	for(std::map<std::string, GroupBulkRead *>::iterator _it = port_to_bulk_read.begin(); _it != port_to_bulk_read.end(); _it++)
-		_it->second->TxRxPacket();
+	{
+	    int _error_cnt = 0;
+	    int _result = COMM_SUCCESS;
+        do {
+            if(++_error_cnt > 10)
+            {
+                ROS_ERROR("[RobotisController] bulk read fail!!");
+                exit(-1);
+            }
+            usleep(10*1000);
+            _result = _it->second->TxRxPacket();
+        } while (_result != COMM_SUCCESS);
+	}
 	ROS_INFO("FIRST BULKREAD END");
 
 	// clear syncwrite param setting
