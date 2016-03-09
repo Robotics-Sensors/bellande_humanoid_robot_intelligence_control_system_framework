@@ -9,6 +9,7 @@
 #define DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_PACKETHANDLER_H_
 
 
+#include <stdio.h>
 #include <vector>
 #include "RobotisDef.h"
 #include "PortHandler.h"
@@ -64,6 +65,9 @@ public:
     virtual ~PacketHandler() { }
 
     virtual float   GetProtocolVersion() = 0;
+
+    virtual void    PrintTxRxResult(int result) = 0;
+    virtual void    PrintRxPacketError(UINT8_T error) = 0;
 
     virtual int TxPacket        (PortHandler *port, UINT8_T *txpacket) = 0;
     virtual int RxPacket        (PortHandler *port, UINT8_T *rxpacket) = 0;

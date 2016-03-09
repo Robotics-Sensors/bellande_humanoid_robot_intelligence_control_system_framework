@@ -36,6 +36,75 @@ Protocol1PacketHandler *Protocol1PacketHandler::unique_instance_ = new Protocol1
 
 Protocol1PacketHandler::Protocol1PacketHandler() { }
 
+void Protocol1PacketHandler::PrintTxRxResult(int result)
+{
+    switch(result)
+    {
+    case COMM_SUCCESS:
+        printf("[TxRxResult] Communication success.\n");
+        break;
+
+    case COMM_PORT_BUSY:
+        printf("[TxRxResult] Port is in use!\n");
+        break;
+
+    case COMM_TX_FAIL:
+        printf("[TxRxResult] Failed transmit instruction packet!\n");
+        break;
+
+    case COMM_RX_FAIL:
+        printf("[TxRxResult] Failed get status packet from device!\n");
+        break;
+
+    case COMM_TX_ERROR:
+        printf("[TxRxResult] Incorrect instruction packet!\n");
+        break;
+
+    case COMM_RX_WAITING:
+        printf("[TxRxResult] Now recieving status packet!\n");
+        break;
+
+    case COMM_RX_TIMEOUT:
+        printf("[TxRxResult] There is no status packet!\n");
+        break;
+
+    case COMM_RX_CORRUPT:
+        printf("[TxRxResult] Incorrect status packet!\n");
+        break;
+
+    case COMM_NOT_AVAILABLE:
+        printf("[TxRxResult] Protocol does not support This function!\n");
+        break;
+
+    default:
+        break;
+    }
+}
+
+void Protocol1PacketHandler::PrintRxPacketError(UINT8_T error)
+{
+    if(error & ERRBIT_VOLTAGE)
+        printf("[RxPacketError] Input voltage error!\n");
+
+    if(error & ERRBIT_ANGLE)
+        printf("[RxPacketError] Angle limit error!\n");
+
+    if(error & ERRBIT_OVERHEAT)
+        printf("[RxPacketError] Overheat error!\n");
+
+    if(error & ERRBIT_RANGE)
+        printf("[RxPacketError] Out of range error!\n");
+
+    if(error & ERRBIT_CHECKSUM)
+        printf("[RxPacketError] Checksum error!\n");
+
+    if(error & ERRBIT_OVERLOAD)
+        printf("[RxPacketError] Overload error!\n");
+
+    if(error & ERRBIT_INSTRUCTION)
+        printf("[RxPacketError] Instruction code error!\n");
+}
+
 int Protocol1PacketHandler::TxPacket(PortHandler *port, UINT8_T *txpacket)
 {
     UINT8_T _checksum               = 0;

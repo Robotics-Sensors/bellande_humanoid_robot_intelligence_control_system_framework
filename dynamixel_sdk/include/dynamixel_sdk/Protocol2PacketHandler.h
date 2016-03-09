@@ -32,6 +32,9 @@ public:
 
     float   GetProtocolVersion() { return 2.0; }
 
+    void    PrintTxRxResult(int result);
+    void    PrintRxPacketError(UINT8_T error);
+
     int TxPacket        (PortHandler *port, UINT8_T *txpacket);
     int RxPacket        (PortHandler *port, UINT8_T *rxpacket);
     int TxRxPacket      (PortHandler *port, UINT8_T *txpacket, UINT8_T *rxpacket, UINT8_T *error = 0);

@@ -42,6 +42,97 @@ Protocol2PacketHandler *Protocol2PacketHandler::unique_instance_ = new Protocol2
 
 Protocol2PacketHandler::Protocol2PacketHandler() { }
 
+void Protocol2PacketHandler::PrintTxRxResult(int result)
+{
+    switch(result)
+    {
+    case COMM_SUCCESS:
+        printf("[TxRxResult] Communication success.\n");
+        break;
+
+    case COMM_PORT_BUSY:
+        printf("[TxRxResult] Port is in use!\n");
+        break;
+
+    case COMM_TX_FAIL:
+        printf("[TxRxResult] Failed transmit instruction packet!\n");
+        break;
+
+    case COMM_RX_FAIL:
+        printf("[TxRxResult] Failed get status packet from device!\n");
+        break;
+
+    case COMM_TX_ERROR:
+        printf("[TxRxResult] Incorrect instruction packet!\n");
+        break;
+
+    case COMM_RX_WAITING:
+        printf("[TxRxResult] Now recieving status packet!\n");
+        break;
+
+    case COMM_RX_TIMEOUT:
+        printf("[TxRxResult] There is no status packet!\n");
+        break;
+
+    case COMM_RX_CORRUPT:
+        printf("[TxRxResult] Incorrect status packet!\n");
+        break;
+
+    case COMM_NOT_AVAILABLE:
+        printf("[TxRxResult] Protocol does not support This function!\n");
+        break;
+
+    default:
+        break;
+    }
+}
+
+void Protocol2PacketHandler::PrintRxPacketError(UINT8_T error)
+{
+    if(error & ERRBIT_ALERT)
+        printf("[RxPacketError] Hardware error occurred. Check the error at Control Table (Hardware Error Status)!\n");
+
+    int _error = error & ~ERRBIT_ALERT;
+
+    switch(_error)
+    {
+    case 0:
+        break;
+
+    case ERRNUM_RESULT_FAIL:
+        printf("[RxPacketError] Failed to process the instruction packet!\n");
+        break;
+
+    case ERRNUM_INSTRUCTION:
+        printf("[RxPacketError] Undefined instruction or incorrect instruction!\n");
+        break;
+
+    case ERRNUM_CRC:
+        printf("[RxPacketError] CRC doesn't match!\n");
+        break;
+
+    case ERRNUM_DATA_RANGE:
+        printf("[RxPacketError] The data value is out of range!\n");
+        break;
+
+    case ERRNUM_DATA_LENGTH:
+        printf("[RxPacketError] The data length does not match as expected!\n");
+        break;
+
+    case ERRNUM_DATA_LIMIT:
+        printf("[RxPacketError] The data value exceeds the limit value!\n");
+        break;
+
+    case ERRNUM_ACCESS:
+        printf("[RxPacketError] Writing or Reading is not available to target address!\n");
+        break;
+
+    default:
+        printf("[RxPacketError] Unknown error code!\n");
+        break;
+    }
+}
+
 unsigned short Protocol2PacketHandler::UpdateCRC(UINT16_T crc_accum, UINT8_T *data_blk_ptr, UINT16_T data_blk_size)
 {
     UINT16_T i, j;
