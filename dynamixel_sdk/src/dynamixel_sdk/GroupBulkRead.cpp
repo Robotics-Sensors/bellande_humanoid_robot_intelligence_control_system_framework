@@ -123,7 +123,6 @@ int GroupBulkRead::RxPacket()
     {
         UINT8_T _id = id_list_[_i];
 
-        port_->SetPacketTimeout((UINT16_T)(length_list_[_id] + 11));
         _result = ph_->ReadRx(port_, length_list_[_id], data_list_[_id]);
         if(_result != COMM_SUCCESS)
         {
