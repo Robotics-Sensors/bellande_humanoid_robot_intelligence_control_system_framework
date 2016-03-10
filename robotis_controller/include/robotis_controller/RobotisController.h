@@ -13,6 +13,7 @@
 #include <boost/thread.hpp>
 #include <yaml-cpp/yaml.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float64.h>
 #include <sensor_msgs/JointState.h>
 
 #include "robotis_device/Robot.h"
@@ -41,8 +42,10 @@ private:
     static RobotisController   *unique_instance_;
 
     boost::thread               queue_thread_;
-    boost::mutex				queue_mutex_;
+    boost::thread               gazebo_thread_;
+    boost::mutex                queue_mutex_;
 
+    bool                        init_pose_loaded_;
     bool                        is_timer_running_;
     bool                        stop_timer_;
     pthread_t                   timer_thread_;
@@ -54,6 +57,7 @@ private:
     RobotisController();
 
     void QueueThread();
+    void GazeboThread();
 
     bool CheckTimerStop();
     void InitSyncWrite();
@@ -64,6 +68,9 @@ public:
     bool                        DEBUG_PRINT;
     Robot                      *robot;
 
+    bool                        gazebo_mode;
+    std::string                 gazebo_robot_name;
+
     // TODO: TEMPORARY CODE !!
     std::map<std::string, GroupBulkRead *>  port_to_bulk_read;
     std::map<std::string, GroupSyncWrite *> port_to_sync_write;
@@ -72,6 +79,8 @@ public:
     ros::Publisher  goal_joint_state_pub;
     ros::Publisher  present_joint_state_pub;
     ros::Publisher  current_module_pub;
+
+    std::map<std::string, ros::Publisher> gazebo_joint_pub;
 
     static void *ThreadProc(void *param);
     static RobotisController *GetInstance() { return unique_instance_; }
@@ -93,6 +102,8 @@ public:
     void    SetJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
     void    SetCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
     bool    GetCtrlModuleCallback(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
+
+    void    GazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
 
     int     Ping        (const std::string joint_name, UINT8_T *error = 0);
     int     Ping        (const std::string joint_name, UINT16_T* model_number, UINT8_T *error = 0);

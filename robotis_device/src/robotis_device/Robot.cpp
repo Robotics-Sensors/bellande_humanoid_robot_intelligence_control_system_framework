@@ -77,9 +77,7 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
                 std::cout << tokens[0] << " added. (baudrate: " << tokens[1] << ")" << std::endl;
 
                 ports[tokens[0]] = (PortHandler*)PortHandler::GetPortHandler(tokens[0].c_str());
-                bool _port_result = ports[tokens[0]]->SetBaudRate(std::atoi(tokens[1].c_str()));
-                if(_port_result == false)
-                    exit(-1);
+                ports[tokens[0]]->SetBaudRate(std::atoi(tokens[1].c_str()));
             }
             else if(session == "device info")
             {
