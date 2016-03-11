@@ -27,6 +27,8 @@ private:
     std::vector<UINT8_T>            id_list_;
     std::map<UINT8_T, UINT8_T* >    data_list_; // <id, data>
 
+    bool            last_result_;
+
     UINT8_T        *param_;
     UINT16_T        start_address_;
     UINT16_T        data_length_;

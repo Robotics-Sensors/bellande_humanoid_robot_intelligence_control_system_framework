@@ -13,6 +13,7 @@ using namespace ROBOTIS;
 GroupSyncRead::GroupSyncRead(PortHandler *port, PacketHandler *ph, UINT16_T start_address, UINT16_T data_length)
     : port_(port),
       ph_(ph),
+      last_result_(false),
       param_(0),
       start_address_(start_address),
       data_length_(data_length)
@@ -93,6 +94,8 @@ int GroupSyncRead::TxPacket()
 
 int GroupSyncRead::RxPacket()
 {
+    last_result_ = false;
+
     if(ph_->GetProtocolVersion() == 1.0)
         return COMM_NOT_AVAILABLE;
 
@@ -110,6 +113,9 @@ int GroupSyncRead::RxPacket()
         if(_result != COMM_SUCCESS)
             return _result;
     }
+
+    if(_result == COMM_SUCCESS)
+        last_result_ = true;
 
     return _result;
 }
@@ -130,7 +136,7 @@ int GroupSyncRead::TxRxPacket()
 
 bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT8_T *data)
 {
-    if(ph_->GetProtocolVersion() == 1.0)
+    if(last_result_ == false || ph_->GetProtocolVersion() == 1.0)
         return false;
 
     if(data_list_.find(id) == data_list_.end())
@@ -145,7 +151,7 @@ bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT8_T *data)
 }
 bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT16_T *data)
 {
-    if(ph_->GetProtocolVersion() == 1.0)
+    if(last_result_ == false || ph_->GetProtocolVersion() == 1.0)
         return false;
 
     if(data_list_.find(id) == data_list_.end())
@@ -160,7 +166,7 @@ bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT16_T *data)
 }
 bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT32_T *data)
 {
-    if(ph_->GetProtocolVersion() == 1.0)
+    if(last_result_ == false || ph_->GetProtocolVersion() == 1.0)
         return false;
 
     if(data_list_.find(id) == data_list_.end())

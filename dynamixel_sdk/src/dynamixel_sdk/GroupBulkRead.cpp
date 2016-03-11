@@ -14,6 +14,7 @@ using namespace ROBOTIS;
 GroupBulkRead::GroupBulkRead(PortHandler *port, PacketHandler *ph)
     : port_(port),
       ph_(ph),
+      last_result_(false),
       param_(0)
 {
     ClearParam();
@@ -116,6 +117,8 @@ int GroupBulkRead::RxPacket()
     int _cnt            = id_list_.size();
     int _result         = COMM_RX_FAIL;
 
+    last_result_ = false;
+
     if(_cnt == 0)
         return COMM_NOT_AVAILABLE;
 
@@ -130,6 +133,9 @@ int GroupBulkRead::RxPacket()
             return _result;
         }
     }
+
+    if(_result == COMM_SUCCESS)
+        last_result_ = true;
 
     return _result;
 }
@@ -149,7 +155,7 @@ bool GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT8_T *data)
 {
     UINT16_T _start_addr, _data_length;
 
-    if(data_list_.find(id) == data_list_.end())
+    if(last_result_ == false || data_list_.find(id) == data_list_.end())
         return false;
 
     _start_addr = address_list_[id];
@@ -167,7 +173,7 @@ bool GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT16_T *data)
 {
     UINT16_T _start_addr, _data_length;
 
-    if(data_list_.find(id) == data_list_.end())
+    if(last_result_ == false || data_list_.find(id) == data_list_.end())
         return false;
 
     _start_addr = address_list_[id];
@@ -185,7 +191,7 @@ bool GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT32_T *data)
 {
     UINT16_T _start_addr, _data_length;
 
-    if(data_list_.find(id) == data_list_.end())
+    if(last_result_ == false || data_list_.find(id) == data_list_.end())
         return false;
 
     _start_addr = address_list_[id];
