@@ -30,9 +30,9 @@ public:
     std::string ctrl_module_name;
     DynamixelState *dxl_state;
 
-    INT32_T     zero_radian_position_value;
-    INT32_T     min_radian_position_value;
-    INT32_T     max_radian_position_value;
+    INT32_T     value_of_0_radian_position;
+    INT32_T     value_of_min_radian_position;
+    INT32_T     value_of_max_radian_position;
     double      min_radian;
     double      max_radian;
 
@@ -50,8 +50,8 @@ public:
 
     Dynamixel(int id, std::string model_name, float protocol_version);
 
-    double      ConvertValue2Radian(int32_t value)  { return value * max_radian / max_radian_position_value; }
-    INT32_T     ConvertRadian2Value(double radian)  { return radian * max_radian_position_value / max_radian; }
+    double      ConvertValue2Radian(INT32_T value);
+    INT32_T     ConvertRadian2Value(double radian);
 };
 
 }

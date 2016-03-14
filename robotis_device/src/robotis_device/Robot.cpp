@@ -152,12 +152,12 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
                 if(tokens.size() != 2)
                     continue;
 
-                if(tokens[0] == "0_radian_position_value")
-                    dxl->zero_radian_position_value = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "min_radian_position_value")
-                    dxl->min_radian_position_value = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "max_radian_position_value")
-                    dxl->max_radian_position_value = std::atoi(tokens[1].c_str());
+                if(tokens[0] == "value_of_0_radian_position")
+                    dxl->value_of_0_radian_position = std::atoi(tokens[1].c_str());
+                else if(tokens[0] == "value_of_min_radian_position")
+                    dxl->value_of_min_radian_position = std::atoi(tokens[1].c_str());
+                else if(tokens[0] == "value_of_max_radian_position")
+                    dxl->value_of_max_radian_position = std::atoi(tokens[1].c_str());
                 else if(tokens[0] == "min_radian")
                     dxl->min_radian = std::atof(tokens[1].c_str());
                 else if(tokens[0] == "max_radian")

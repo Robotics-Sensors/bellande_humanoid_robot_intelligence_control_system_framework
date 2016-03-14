@@ -3,22 +3,22 @@ model_name  = GRIPPER
 device_type = Dynamixel
 
 [type info]
-0_radian_position_value   = 0
-min_radian_position_value = 0
-max_radian_position_value = 750
-min_radian                = 0
-max_radian                = 1.150767
-torque_enable_address     = 562
-position_d_gain_address   =
-position_i_gain_address   =
-position_p_gain_address   = 594
-goal_position_address     = 596
-goal_velocity_address     = 600
-goal_torque_address       = 604
-present_position_address  = 611
-present_velocity_address  = 615
-present_load_address      = 621
-is_moving_address         = 610
+value_of_0_radian_position      = 0
+value_of_min_radian_position    = 0
+value_of_max_radian_position    = 750
+min_radian                      = 0
+max_radian                      = 1.150767
+torque_enable_address           = 562
+position_d_gain_address         =
+position_i_gain_address         =
+position_p_gain_address         = 594
+goal_position_address           = 596
+goal_velocity_address           = 600
+goal_torque_address             = 604
+present_position_address        = 611
+present_velocity_address        = 615
+present_load_address            = 621
+is_moving_address               = 610
 
 [control table]
 # addr | item name                | length | access | memory |   min value   |  max value  | signed

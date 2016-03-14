@@ -3,22 +3,22 @@ model_name  = MX-28
 device_type = Dynamixel
 
 [type info]
-0_radian_position_value   = 2048
-min_radian_position_value = 0
-max_radian_position_value = 4095
-min_radian                = -3.14159265
-max_radian                =  3.14159265
-torque_enable_address     = 24
-position_d_gain_address   = 26
-position_i_gain_address   = 27
-position_p_gain_address   = 28
-goal_position_address     = 30
-goal_velocity_address     = 32
-goal_torque_address       = 34
-present_position_address  = 36
-present_velocity_address  = 38
-present_load_address      = 40
-is_moving_address         = 46
+value_of_0_radian_position      = 2048
+value_of_min_radian_position    = 0
+value_of_max_radian_position    = 4095
+min_radian                      = -3.14159265
+max_radian                      =  3.14159265
+torque_enable_address           = 24
+position_d_gain_address         = 26
+position_i_gain_address         = 27
+position_p_gain_address         = 28
+goal_position_address           = 30
+goal_velocity_address           = 32
+goal_torque_address             = 34
+present_position_address        = 36
+present_velocity_address        = 38
+present_load_address            = 40
+is_moving_address               = 46
 
 [control table]
 # addr | item name                | length | access | memory |   min value   |  max value  | signed
