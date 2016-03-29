@@ -167,6 +167,18 @@ int Protocol1PacketHandler::RxPacket(PortHandler *port, UINT8_T *rxpacket)
 
             if(_idx == 0)   // found at the beginning of the packet
             {
+                if(rxpacket[PKT_ID] > 0xFD ||                   // unavailable ID
+                   rxpacket[PKT_LENGTH] > RXPACKET_MAX_LEN ||   // unavailable Length
+                   rxpacket[PKT_ERROR] >= 0x64)                 // unavailable Error
+                {
+                    // remove the first byte in the packet
+                    for(UINT8_T _s = 0; _s < _rx_length - 1; _s++)
+                        rxpacket[_s] = rxpacket[1 + _s];
+                    //memcpy(&rxpacket[0], &rxpacket[_idx], _rx_length - _idx);
+                    _rx_length -= 1;
+                    continue;
+                }
+
                 // re-calculate the exact length of the rx packet
                 _wait_length = rxpacket[PKT_LENGTH] + PKT_LENGTH + 1;
                 if(_rx_length < _wait_length)
@@ -250,7 +262,9 @@ int Protocol1PacketHandler::TxRxPacket(PortHandler *port, UINT8_T *txpacket, UIN
 
     // rx packet
     _result = RxPacket(port, rxpacket);
-    // TODO: check txpacket ID == rxpacket ID
+    // check txpacket ID == rxpacket ID
+    if(txpacket[PKT_ID] != rxpacket[PKT_ID])
+        _result = RxPacket(port, rxpacket);
 
     if(_result == COMM_SUCCESS && txpacket[PKT_ID] != BROADCAST_ID)
     {
@@ -374,11 +388,31 @@ int Protocol1PacketHandler::ReadTxRx(PortHandler *port, UINT8_T id, UINT16_T add
 {
     int _result = COMM_TX_FAIL;
 
-    _result = ReadTx(port, id, address, length);
-    if(_result != COMM_SUCCESS)
-        return _result;
+    UINT8_T txpacket[8]         = {0};
+    UINT8_T *rxpacket           = (UINT8_T *)malloc(RXPACKET_MAX_LEN);//(length+6);
 
-    return ReadRx(port, length, data, error);
+    if(id >= BROADCAST_ID)
+        return COMM_NOT_AVAILABLE;
+
+    txpacket[PKT_ID]            = id;
+    txpacket[PKT_LENGTH]        = 4;
+    txpacket[PKT_INSTRUCTION]   = INST_READ;
+    txpacket[PKT_PARAMETER0+0]  = (UINT8_T)address;
+    txpacket[PKT_PARAMETER0+1]  = (UINT8_T)length;
+
+    _result = TxRxPacket(port, txpacket, rxpacket, error);
+    if(_result == COMM_SUCCESS)
+    {
+        if(error != 0)
+            *error = (UINT8_T)rxpacket[PKT_ERROR];
+        for(UINT8_T _s = 0; _s < length; _s++)
+            data[_s] = rxpacket[PKT_PARAMETER0 + _s];
+        //memcpy(data, &rxpacket[PKT_PARAMETER0], length);
+    }
+
+    free(rxpacket);
+    //delete[] rxpacket;
+    return _result;
 }
 
 int Protocol1PacketHandler::Read1ByteTx(PortHandler *port, UINT8_T id, UINT16_T address)
@@ -389,18 +423,17 @@ int Protocol1PacketHandler::Read1ByteRx(PortHandler *port, UINT8_T *data, UINT8_
 {
     UINT8_T _data[1] = {0};
     int _result = ReadRx(port, 1, _data, error);
-    *data = _data[0];
+    if(_result == COMM_SUCCESS)
+        *data = _data[0];
     return _result;
 }
 int Protocol1PacketHandler::Read1ByteTxRx(PortHandler *port, UINT8_T id, UINT16_T address, UINT8_T *data, UINT8_T *error)
 {
-    int _result = COMM_TX_FAIL;
-
-    _result = Read1ByteTx(port, id, address);
-    if(_result != COMM_SUCCESS)
-        return _result;
-
-    return Read1ByteRx(port, data, error);
+    UINT8_T _data[1] = {0};
+    int _result = ReadTxRx(port, id, address, 1, _data, error);
+    if(_result == COMM_SUCCESS)
+        *data = _data[0];
+    return _result;
 }
 
 int Protocol1PacketHandler::Read2ByteTx(PortHandler *port, UINT8_T id, UINT16_T address)
@@ -411,18 +444,17 @@ int Protocol1PacketHandler::Read2ByteRx(PortHandler *port, UINT16_T *data, UINT8
 {
     UINT8_T _data[2] = {0};
     int _result = ReadRx(port, 2, _data, error);
-    *data = DXL_MAKEWORD(_data[0], _data[1]);
+    if(_result == COMM_SUCCESS)
+        *data = DXL_MAKEWORD(_data[0], _data[1]);
     return _result;
 }
 int Protocol1PacketHandler::Read2ByteTxRx(PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T *data, UINT8_T *error)
 {
-    int _result = COMM_TX_FAIL;
-
-    _result = Read2ByteTx(port, id, address);
-    if(_result != COMM_SUCCESS)
-        return _result;
-
-    return Read2ByteRx(port, data, error);
+    UINT8_T _data[2] = {0};
+    int _result = ReadTxRx(port, id, address, 2, _data, error);
+    if(_result == COMM_SUCCESS)
+        *data = DXL_MAKEWORD(_data[0], _data[1]);
+    return _result;
 }
 
 int Protocol1PacketHandler::Read4ByteTx(PortHandler *port, UINT8_T id, UINT16_T address)
