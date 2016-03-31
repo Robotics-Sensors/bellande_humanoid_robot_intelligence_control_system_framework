@@ -13,6 +13,7 @@ using namespace ROBOTIS;
 GroupBulkWrite::GroupBulkWrite(PortHandler *port, PacketHandler *ph)
     : port_(port),
       ph_(ph),
+      is_param_changed_(false),
       param_(0),
       param_length_(0)
 {
@@ -66,7 +67,7 @@ bool GroupBulkWrite::AddParam(UINT8_T id, UINT16_T start_address, UINT16_T data_
     for(int _c = 0; _c < data_length; _c++)
         data_list_[id][_c] = data[_c];
 
-    MakeParam();
+    is_param_changed_   = true;
     return true;
 }
 void GroupBulkWrite::RemoveParam(UINT8_T id)
@@ -84,7 +85,7 @@ void GroupBulkWrite::RemoveParam(UINT8_T id)
     delete[] data_list_[id];
     data_list_.erase(id);
 
-    MakeParam();
+    is_param_changed_   = true;
 }
 bool GroupBulkWrite::ChangeParam(UINT8_T id, UINT16_T start_address, UINT16_T data_length, UINT8_T *data)
 {
@@ -102,7 +103,7 @@ bool GroupBulkWrite::ChangeParam(UINT8_T id, UINT16_T start_address, UINT16_T da
     for(int _c = 0; _c < data_length; _c++)
         data_list_[id][_c] = data[_c];
 
-    MakeParam();
+    is_param_changed_   = true;
     return true;
 }
 void GroupBulkWrite::ClearParam()
@@ -128,6 +129,9 @@ int GroupBulkWrite::TxPacket()
 {
     if(ph_->GetProtocolVersion() == 1.0 || id_list_.size() == 0)
         return COMM_NOT_AVAILABLE;
+
+    if(is_param_changed_ == true)
+        MakeParam();
 
     return ph_->BulkWriteTxOnly(port_, param_, param_length_);
 }

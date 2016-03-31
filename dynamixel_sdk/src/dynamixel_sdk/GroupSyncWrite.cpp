@@ -13,6 +13,7 @@ using namespace ROBOTIS;
 GroupSyncWrite::GroupSyncWrite(PortHandler *port, PacketHandler *ph, UINT16_T start_address, UINT16_T data_length)
     : port_(port),
       ph_(ph),
+      is_param_changed_(false),
       param_(0),
       start_address_(start_address),
       data_length_(data_length)
@@ -54,7 +55,7 @@ bool GroupSyncWrite::AddParam(UINT8_T id, UINT8_T *data)
     for(int _c = 0; _c < data_length_; _c++)
         data_list_[id][_c] = data[_c];
 
-    MakeParam();
+    is_param_changed_   = true;
     return true;
 }
 
@@ -68,7 +69,7 @@ void GroupSyncWrite::RemoveParam(UINT8_T id)
     delete[] data_list_[id];
     data_list_.erase(id);
 
-    MakeParam();
+    is_param_changed_   = true;
 }
 
 bool GroupSyncWrite::ChangeParam(UINT8_T id, UINT8_T *data)
@@ -82,7 +83,7 @@ bool GroupSyncWrite::ChangeParam(UINT8_T id, UINT8_T *data)
     for(int _c = 0; _c < data_length_; _c++)
         data_list_[id][_c] = data[_c];
 
-    MakeParam();
+    is_param_changed_   = true;
     return true;
 }
 
@@ -105,6 +106,9 @@ int GroupSyncWrite::TxPacket()
 {
     if(id_list_.size() == 0)
         return COMM_NOT_AVAILABLE;
+
+    if(is_param_changed_ == true)
+        MakeParam();
 
     return ph_->SyncWriteTxOnly(port_, start_address_, data_length_, param_, id_list_.size() * (1 + data_length_));
 }

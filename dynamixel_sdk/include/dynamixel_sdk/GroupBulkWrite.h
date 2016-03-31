@@ -29,6 +29,8 @@ private:
     std::map<UINT8_T, UINT16_T>     length_list_;   // <id, data_length>
     std::map<UINT8_T, UINT8_T *>    data_list_;     // <id, data>
 
+    bool            is_param_changed_;
+
     UINT8_T        *param_;
     UINT16_T        param_length_;
 

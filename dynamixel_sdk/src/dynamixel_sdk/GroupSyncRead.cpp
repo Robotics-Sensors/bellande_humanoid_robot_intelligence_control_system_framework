@@ -14,6 +14,7 @@ GroupSyncRead::GroupSyncRead(PortHandler *port, PacketHandler *ph, UINT16_T star
     : port_(port),
       ph_(ph),
       last_result_(false),
+      is_param_changed_(false),
       param_(0),
       start_address_(start_address),
       data_length_(data_length)
@@ -48,7 +49,7 @@ bool GroupSyncRead::AddParam(UINT8_T id)
     id_list_.push_back(id);
     data_list_[id] = new UINT8_T[data_length_];
 
-    MakeParam();
+    is_param_changed_   = true;
     return true;
 }
 void GroupSyncRead::RemoveParam(UINT8_T id)
@@ -64,7 +65,7 @@ void GroupSyncRead::RemoveParam(UINT8_T id)
     delete[] data_list_[id];
     data_list_.erase(id);
 
-    MakeParam();
+    is_param_changed_   = true;
 }
 void GroupSyncRead::ClearParam()
 {
@@ -88,6 +89,9 @@ int GroupSyncRead::TxPacket()
 {
     if(ph_->GetProtocolVersion() == 1.0 || id_list_.size() == 0)
         return COMM_NOT_AVAILABLE;
+
+    if(is_param_changed_ == true)
+        MakeParam();
 
     return ph_->SyncReadTx(port_, start_address_, data_length_, param_, (UINT16_T)id_list_.size() * 1);
 }

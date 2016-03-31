@@ -30,6 +30,7 @@ private:
     std::map<UINT8_T, UINT8_T *>    data_list_;     // <id, data>
 
     bool            last_result_;
+    bool            is_param_changed_;
 
     UINT8_T        *param_;
 

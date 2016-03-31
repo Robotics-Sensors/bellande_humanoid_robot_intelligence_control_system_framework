@@ -15,6 +15,7 @@ GroupBulkRead::GroupBulkRead(PortHandler *port, PacketHandler *ph)
     : port_(port),
       ph_(ph),
       last_result_(false),
+      is_param_changed_(false),
       param_(0)
 {
     ClearParam();
@@ -65,7 +66,7 @@ bool GroupBulkRead::AddParam(UINT8_T id, UINT16_T start_address, UINT16_T data_l
     address_list_[id]   = start_address;
     data_list_[id]      = new UINT8_T[data_length];
 
-    MakeParam();
+    is_param_changed_   = true;
     return true;
 }
 
@@ -81,7 +82,7 @@ void GroupBulkRead::RemoveParam(UINT8_T id)
     delete[] data_list_[id];
     data_list_.erase(id);
 
-    MakeParam();
+    is_param_changed_   = true;
 }
 
 void GroupBulkRead::ClearParam()
@@ -105,6 +106,9 @@ int GroupBulkRead::TxPacket()
 {
     if(id_list_.size() == 0)
         return COMM_NOT_AVAILABLE;
+
+    if(is_param_changed_ == true)
+        MakeParam();
 
     if(ph_->GetProtocolVersion() == 1.0)
         return ph_->BulkReadTx(port_, param_, id_list_.size() * 3);
