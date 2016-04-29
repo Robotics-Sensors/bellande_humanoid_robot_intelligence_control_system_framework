@@ -2,8 +2,11 @@
  * GroupBulkWrite.cpp
  *
  *  Created on: 2016. 2. 2.
- *      Author: zerom
+ *      Author: zerom, leon
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define WINDLLEXPORT
+#endif
 
 #include <algorithm>
 #include "dynamixel_sdk/GroupBulkWrite.h"

@@ -10,6 +10,7 @@
 
 
 #include <map>
+#include <vector>
 #include <string>
 #include "DynamixelState.h"
 #include "ControlTableItem.h"
@@ -30,28 +31,36 @@ public:
     std::string ctrl_module_name;
     DynamixelState *dxl_state;
 
+    double      current_ratio;
+    double      velocity_ratio;
+
     INT32_T     value_of_0_radian_position;
     INT32_T     value_of_min_radian_position;
     INT32_T     value_of_max_radian_position;
     double      min_radian;
     double      max_radian;
 
-    UINT16_T    torque_enable_address;
-    UINT16_T    position_d_gain_address;
-    UINT16_T    position_i_gain_address;
-    UINT16_T    position_p_gain_address;
-    UINT16_T    goal_position_address;
-    UINT16_T    goal_velocity_address;
-    UINT16_T    goal_torque_address;
-    UINT16_T    present_position_address;
-    UINT16_T    present_velocity_address;
-    UINT16_T    present_load_address;
-    UINT16_T    is_moving_address;
+    ControlTableItem   *torque_enable_item;
+    ControlTableItem   *present_position_item;
+    ControlTableItem   *present_velocity_item;
+    ControlTableItem   *present_current_item;
+    ControlTableItem   *goal_position_item;
+    ControlTableItem   *goal_velocity_item;
+    ControlTableItem   *goal_current_item;
+
+    std::vector<ControlTableItem *> bulk_read_items;
+    std::map<std::string, UINT16_T> indirect_address_table;
 
     Dynamixel(int id, std::string model_name, float protocol_version);
 
     double      ConvertValue2Radian(INT32_T value);
     INT32_T     ConvertRadian2Value(double radian);
+
+    double      ConvertValue2Velocity(INT32_T value);
+    INT32_T     ConvertVelocity2Value(double velocity);
+
+    double      ConvertValue2Current(INT16_T value);
+    INT16_T     ConvertCurrent2Value(double torque);
 };
 
 }

@@ -27,6 +27,7 @@ enum MEMORY_TYPE {
 class ControlTableItem
 {
 public:
+    std::string item_name;
     UINT16_T    address;
     ACCESS_TYPE access_type;
     MEMORY_TYPE memory_type;
@@ -36,7 +37,8 @@ public:
     bool        is_signed;
 
     ControlTableItem()
-        : address(0),
+        : item_name(""),
+          address(0),
           access_type(READ),
           memory_type(RAM),
           data_length(0),

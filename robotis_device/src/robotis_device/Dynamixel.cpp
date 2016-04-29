@@ -15,25 +15,26 @@ Dynamixel::Dynamixel(int id, std::string model_name, float protocol_version)
       port_name(""),
       ctrl_module_name("none"),
       protocol_version(protocol_version),
+      current_ratio(1.0),
+      velocity_ratio(1.0),
       value_of_0_radian_position(0),
       value_of_min_radian_position(0),
       value_of_max_radian_position(0),
-      min_radian(-3.14),
-      max_radian(3.14),
-      torque_enable_address(0),
-      position_d_gain_address(0),
-      position_i_gain_address(0),
-      position_p_gain_address(0),
-      goal_position_address(0),
-      goal_velocity_address(0),
-      goal_torque_address(0),
-      present_position_address(0),
-      present_velocity_address(0),
-      present_load_address(0),
-      is_moving_address(0)
+      min_radian(-3.14159265),
+      max_radian(3.14159265),
+      torque_enable_item(0),
+      present_position_item(0),
+      present_velocity_item(0),
+      present_current_item(0),
+      goal_position_item(0),
+      goal_velocity_item(0),
+      goal_current_item(0)
 {
     ctrl_table.clear();
     dxl_state = new DynamixelState();
+
+    bulk_read_items.clear();
+    indirect_address_table.clear();
 }
 
 double Dynamixel::ConvertValue2Radian(INT32_T value)
@@ -86,4 +87,24 @@ INT32_T Dynamixel::ConvertRadian2Value(double radian)
         return value_of_min_radian_position;
 
     return _value;
+}
+
+double Dynamixel::ConvertValue2Velocity(INT32_T value)
+{
+    return (double)value * velocity_ratio;
+}
+
+INT32_T Dynamixel::ConvertVelocity2Value(double velocity)
+{
+    return (INT32_T)(velocity / velocity_ratio);;
+}
+
+double Dynamixel::ConvertValue2Current(INT16_T value)
+{
+	return (double)value * current_ratio;
+}
+
+INT16_T Dynamixel::ConvertCurrent2Value(double torque)
+{
+	return (INT16_T)(torque / current_ratio);
 }

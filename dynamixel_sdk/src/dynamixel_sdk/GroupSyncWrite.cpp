@@ -2,8 +2,11 @@
  * GroupSyncWrite.cpp
  *
  *  Created on: 2016. 1. 28.
- *      Author: zerom
+ *      Author: zerom, leon
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define WINDLLEXPORT
+#endif
 
 #include <algorithm>
 #include "dynamixel_sdk/GroupSyncWrite.h"

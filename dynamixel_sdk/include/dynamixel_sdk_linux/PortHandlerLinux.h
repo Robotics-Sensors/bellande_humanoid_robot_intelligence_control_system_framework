@@ -2,7 +2,7 @@
  * PortHandlerLinux.h
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_LINUX_PORTHANDLERLINUX_H_

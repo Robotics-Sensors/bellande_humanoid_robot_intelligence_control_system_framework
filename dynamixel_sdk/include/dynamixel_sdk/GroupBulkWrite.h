@@ -2,7 +2,7 @@
  * GroupBulkWrite.h
  *
  *  Created on: 2016. 2. 2.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_GROUPBULKWRITE_H_
@@ -18,7 +18,7 @@
 namespace ROBOTIS
 {
 
-class GroupBulkWrite
+class WINDECLSPEC GroupBulkWrite
 {
 private:
     PortHandler    *port_;

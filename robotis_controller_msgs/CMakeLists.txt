@@ -15,6 +15,7 @@ add_message_files(
   FILES
   SyncWriteItem.msg
   JointCtrlModule.msg
+  StatusMsg.msg
 )
 
 ## Generate services in the 'srv' folder

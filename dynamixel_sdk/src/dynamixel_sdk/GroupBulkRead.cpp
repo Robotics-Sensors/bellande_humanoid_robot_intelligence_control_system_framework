@@ -2,8 +2,11 @@
  * GroupBulkRead.cpp
  *
  *  Created on: 2016. 1. 28.
- *      Author: zerom
+ *      Author: zerom, leon
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define WINDLLEXPORT
+#endif
 
 #include <stdio.h>
 #include <algorithm>
@@ -155,7 +158,7 @@ int GroupBulkRead::TxRxPacket()
     return RxPacket();
 }
 
-bool GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT8_T *data)
+bool GroupBulkRead::IsAvailable(UINT8_T id, UINT16_T address, UINT16_T data_length)
 {
     UINT16_T _start_addr, _data_length;
 
@@ -165,48 +168,32 @@ bool GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT8_T *data)
     _start_addr = address_list_[id];
     _data_length = length_list_[id];
 
-    if(address < _start_addr || _start_addr + _data_length - 1 < address)
+    if(address < _start_addr || _start_addr + _data_length - data_length < address)
         return false;
-
-    *data = data_list_[id][address - _start_addr];
 
     return true;
 }
 
-bool GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT16_T *data)
+UINT32_T GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT16_T data_length)
 {
-    UINT16_T _start_addr, _data_length;
+    if(IsAvailable(id, address, data_length) == false)
+        return 0;
 
-    if(last_result_ == false || data_list_.find(id) == data_list_.end())
-        return false;
+    UINT16_T _start_addr = address_list_[id];
 
-    _start_addr = address_list_[id];
-    _data_length = length_list_[id];
+    switch(data_length)
+    {
+    case 1:
+        return data_list_[id][address - _start_addr];
 
-    if(address < _start_addr || _start_addr + _data_length - 2 < address)
-        return false;
+    case 2:
+        return DXL_MAKEWORD(data_list_[id][address - _start_addr], data_list_[id][address - _start_addr + 1]);
 
-    *data = DXL_MAKEWORD(data_list_[id][address - _start_addr], data_list_[id][address - _start_addr + 1]);
+    case 4:
+        return DXL_MAKEDWORD(DXL_MAKEWORD(data_list_[id][address - _start_addr + 0], data_list_[id][address - _start_addr + 1]),
+                             DXL_MAKEWORD(data_list_[id][address - _start_addr + 2], data_list_[id][address - _start_addr + 3]));
 
-    return true;
+    default:
+        return 0;
+    }
 }
-
-bool GroupBulkRead::GetData(UINT8_T id, UINT16_T address, UINT32_T *data)
-{
-    UINT16_T _start_addr, _data_length;
-
-    if(last_result_ == false || data_list_.find(id) == data_list_.end())
-        return false;
-
-    _start_addr = address_list_[id];
-    _data_length = length_list_[id];
-
-    if(address < _start_addr || _start_addr + _data_length - 4 < address)
-        return false;
-
-    *data = DXL_MAKEDWORD(DXL_MAKEWORD(data_list_[id][address - _start_addr + 0], data_list_[id][address - _start_addr + 1]),
-                          DXL_MAKEWORD(data_list_[id][address - _start_addr + 2], data_list_[id][address - _start_addr + 3]));
-
-    return true;
-}
-

@@ -2,7 +2,7 @@
  * Protocol2PacketHandler.h
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_PROTOCOL2PACKETHANDLER_H_
@@ -14,7 +14,7 @@
 namespace ROBOTIS
 {
 
-class Protocol2PacketHandler : public PacketHandler
+class WINDECLSPEC Protocol2PacketHandler : public PacketHandler
 {
 private:
     static Protocol2PacketHandler *unique_instance_;

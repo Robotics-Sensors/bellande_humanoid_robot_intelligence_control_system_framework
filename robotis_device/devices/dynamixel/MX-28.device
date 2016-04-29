@@ -1,6 +1,6 @@
 [device info]
 model_name  = MX-28
-device_type = Dynamixel
+device_type = dynamixel
 
 [type info]
 value_of_0_radian_position      = 2048
@@ -8,17 +8,17 @@ value_of_min_radian_position    = 0
 value_of_max_radian_position    = 4095
 min_radian                      = -3.14159265
 max_radian                      =  3.14159265
-torque_enable_address           = 24
-position_d_gain_address         = 26
-position_i_gain_address         = 27
-position_p_gain_address         = 28
-goal_position_address           = 30
-goal_velocity_address           = 32
-goal_torque_address             = 34
-present_position_address        = 36
-present_velocity_address        = 38
-present_load_address            = 40
-is_moving_address               = 46
+
+torque_enable_item_name         = torque_enable
+present_position_item_name      = present_position
+present_velocity_item_name      = present_velocity
+present_current_item_name       = 
+goal_position_item_name         = goal_position
+goal_velocity_item_name         = goal_velocity
+goal_current_item_name          = 
+position_d_gain_item_name       = position_d_gain
+position_i_gain_item_name       = position_i_gain
+position_p_gain_item_name       = position_p_gain
 
 [control table]
 # addr | item name                | length | access | memory |   min value   |  max value  | signed
@@ -41,9 +41,9 @@ is_moving_address               = 46
    22  | resolution_dividor       | 1      | RW     | EEPROM | 1             | 255         | N
    24  | torque_enable            | 1      | RW     | RAM    | 0             | 1           | N
    25  | LED                      | 1      | RW     | RAM    | 0             | 1           | N
-   26  | position_D_gain          | 1      | RW     | RAM    | 0             | 254         | N
-   27  | position_I_gain          | 1      | RW     | RAM    | 0             | 254         | N
-   28  | position_P_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   26  | position_d_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   27  | position_i_gain          | 1      | RW     | RAM    | 0             | 254         | N
+   28  | position_p_gain          | 1      | RW     | RAM    | 0             | 254         | N
    30  | goal_position            | 2      | RW     | RAM    | -28672        | 28672       | Y
    32  | goal_velocity            | 2      | RW     | RAM    | 0             | 1023        | N
    34  | goal_torque              | 2      | RW     | RAM    | 0             | 1023        | N

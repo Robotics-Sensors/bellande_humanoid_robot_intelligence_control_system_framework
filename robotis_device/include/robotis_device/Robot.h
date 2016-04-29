@@ -21,6 +21,8 @@ class Robot
 {
 public:
     std::map<std::string, PortHandler *>    ports;      // string: port name
+    std::map<std::string, std::string>      port_default_joint; // port name, default joint name
+
     std::map<std::string, Dynamixel *>      dxls;       // string: joint name
     std::map<std::string, Sensor *>         sensors;    // string: sensor name
 

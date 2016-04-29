@@ -71,18 +71,19 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
             if(session == "port info")
             {
                 std::vector<std::string> tokens = split(input_str, '|');
-                if(tokens.size() != 2)
+                if(tokens.size() != 3)
                     continue;
 
                 std::cout << tokens[0] << " added. (baudrate: " << tokens[1] << ")" << std::endl;
 
                 ports[tokens[0]] = (PortHandler*)PortHandler::GetPortHandler(tokens[0].c_str());
                 ports[tokens[0]]->SetBaudRate(std::atoi(tokens[1].c_str()));
+                port_default_joint[tokens[0]] = tokens[2];
             }
             else if(session == "device info")
             {
                 std::vector<std::string> tokens = split(input_str, '|');
-                if(tokens.size() != 6)
+                if(tokens.size() != 7)
                     continue;
 
                 if(tokens[0] == "dynamixel")
@@ -94,6 +95,39 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
                     std::string _dev_name   = tokens[5];
 
                     dxls[_dev_name] = getDynamixel(_file_path, _id, _port, _protocol);
+
+                    Dynamixel *_dxl = dxls[_dev_name];
+                    std::vector<std::string> sub_tokens = split(tokens[6], ',');
+                    if(sub_tokens.size() > 0)
+                    {
+                        std::map<std::string, ControlTableItem *>::iterator _indirect_it = _dxl->ctrl_table.find(INDIRECT_ADDRESS_1);
+                        if(_indirect_it != _dxl->ctrl_table.end())    // INDIRECT_ADDRESS_1 exist
+                        {
+                            UINT16_T _indirect_data_addr = _dxl->ctrl_table[INDIRECT_DATA_1]->address;
+                            for(int _i = 0; _i < sub_tokens.size(); _i++)
+                            {
+                                _dxl->bulk_read_items.push_back(new ControlTableItem());
+                                ControlTableItem *_dest_item = _dxl->bulk_read_items[_i];
+                                ControlTableItem *_src_item = _dxl->ctrl_table[sub_tokens[_i]];
+
+                                _dest_item->item_name   = _src_item->item_name;
+                                _dest_item->address     = _indirect_data_addr;
+                                _dest_item->access_type = _src_item->access_type;
+                                _dest_item->memory_type = _src_item->memory_type;
+                                _dest_item->data_length = _src_item->data_length;
+                                _dest_item->data_min_value = _src_item->data_min_value;
+                                _dest_item->data_max_value = _src_item->data_max_value;
+                                _dest_item->is_signed   = _src_item->is_signed;
+
+                                _indirect_data_addr += _dest_item->data_length;
+                            }
+                        }
+                        else    // INDIRECT_ADDRESS_1 exist
+                        {
+                            for(int _i = 0; _i < sub_tokens.size(); _i++)
+                                _dxl->bulk_read_items.push_back(_dxl->ctrl_table[sub_tokens[_i]]);
+                        }
+                    }
                 }
             }
         }
@@ -112,47 +146,61 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
     std::ifstream file(path.c_str());
     if(file.is_open())
     {
-        std::string session = "";
-        std::string input_str;
+        std::string _session = "";
+        std::string _input_str;
+
+        std::string _torque_enable_item_name    = "";
+        std::string _present_position_item_name = "";
+        std::string _present_velocity_item_name = "";
+        std::string _present_current_item_name  = "";
+        std::string _goal_position_item_name    = "";
+        std::string _goal_velocity_item_name    = "";
+        std::string _goal_current_item_name     = "";
+
         while(!file.eof())
         {
-            std::getline(file, input_str);
+            std::getline(file, _input_str);
 
             // remove comment ( # )
-            std::size_t pos = input_str.find("#");
+            std::size_t pos = _input_str.find("#");
             if(pos != std::string::npos)
-                input_str = input_str.substr(0, pos);
+                _input_str = _input_str.substr(0, pos);
 
             // trim
-            input_str = trim(input_str);
-            if(input_str == "")
+            _input_str = trim(_input_str);
+            if(_input_str == "")
                 continue;
 
-            // find session
-            if(!input_str.compare(0, 1, "[") && !input_str.compare(input_str.size()-1, 1, "]"))
+            // find _session
+            if(!_input_str.compare(0, 1, "[") && !_input_str.compare(_input_str.size()-1, 1, "]"))
             {
-                input_str = input_str.substr(1, input_str.size()-2);
-                std::transform(input_str.begin(), input_str.end(), input_str.begin(), ::tolower);
-                session = trim(input_str);
+                _input_str = _input_str.substr(1, _input_str.size()-2);
+                std::transform(_input_str.begin(), _input_str.end(), _input_str.begin(), ::tolower);
+                _session = trim(_input_str);
                 continue;
             }
 
-            if(session == "device info")
+            if(_session == "device info")
             {
-                std::vector<std::string> tokens = split(input_str, '=');
+                std::vector<std::string> tokens = split(_input_str, '=');
                 if(tokens.size() != 2)
                     continue;
 
                 if(tokens[0] == "model_name")
                     dxl = new Dynamixel(id, tokens[1], protocol_version);
             }
-            else if(session == "type info")
+            else if(_session == "type info")
             {
-                std::vector<std::string> tokens = split(input_str, '=');
+                std::vector<std::string> tokens = split(_input_str, '=');
                 if(tokens.size() != 2)
                     continue;
 
-                if(tokens[0] == "value_of_0_radian_position")
+                if(tokens[0] == "current_ratio")
+                	dxl->current_ratio = std::atof(tokens[1].c_str());
+                else if(tokens[0] == "velocity_ratio")
+                    dxl->velocity_ratio = std::atof(tokens[1].c_str());
+
+                else if(tokens[0] == "value_of_0_radian_position")
                     dxl->value_of_0_radian_position = std::atoi(tokens[1].c_str());
                 else if(tokens[0] == "value_of_min_radian_position")
                     dxl->value_of_min_radian_position = std::atoi(tokens[1].c_str());
@@ -162,36 +210,30 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
                     dxl->min_radian = std::atof(tokens[1].c_str());
                 else if(tokens[0] == "max_radian")
                     dxl->max_radian = std::atof(tokens[1].c_str());
-                else if(tokens[0] == "torque_enable_address")
-                    dxl->torque_enable_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "position_d_gain_address")
-                    dxl->position_d_gain_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "position_i_gain_address")
-                    dxl->position_i_gain_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "position_p_gain_address")
-                    dxl->position_p_gain_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "goal_position_address")
-                    dxl->goal_position_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "goal_velocity_address")
-                    dxl->goal_velocity_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "goal_torque_address")
-                    dxl->goal_torque_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "present_position_address")
-                    dxl->present_position_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "present_velocity_address")
-                    dxl->present_velocity_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "present_load_address")
-                    dxl->present_load_address = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "is_moving_address")
-                    dxl->is_moving_address = std::atoi(tokens[1].c_str());
+
+                else if(tokens[0] == "torque_enable_item_name")
+                    _torque_enable_item_name = tokens[1];
+                else if(tokens[0] == "present_position_item_name")
+                    _present_position_item_name = tokens[1];
+                else if(tokens[0] == "present_velocity_item_name")
+                    _present_velocity_item_name = tokens[1];
+                else if(tokens[0] == "present_current_item_name")
+                    _present_current_item_name = tokens[1];
+                else if(tokens[0] == "goal_position_item_name")
+                    _goal_position_item_name = tokens[1];
+                else if(tokens[0] == "goal_velocity_item_name")
+                    _goal_velocity_item_name = tokens[1];
+                else if(tokens[0] == "goal_current_item_name")
+                    _goal_current_item_name = tokens[1];
             }
-            else if(session == "control table")
+            else if(_session == "control table")
             {
-                std::vector<std::string> tokens = split(input_str, '|');
+                std::vector<std::string> tokens = split(_input_str, '|');
                 if(tokens.size() != 8)
                     continue;
 
                 ControlTableItem *item = new ControlTableItem();
+                item->item_name = tokens[1];
                 item->address = std::atoi(tokens[0].c_str());
                 item->data_length = std::atoi(tokens[2].c_str());
                 if(tokens[3] == "R")
@@ -212,6 +254,21 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
             }
         }
         dxl->port_name = port;
+
+        if(dxl->ctrl_table[_torque_enable_item_name] != NULL)
+            dxl->torque_enable_item = dxl->ctrl_table[_torque_enable_item_name];
+        if(dxl->ctrl_table[_present_position_item_name] != NULL)
+            dxl->present_position_item = dxl->ctrl_table[_present_position_item_name];
+        if(dxl->ctrl_table[_present_velocity_item_name] != NULL)
+            dxl->present_velocity_item = dxl->ctrl_table[_present_velocity_item_name];
+        if(dxl->ctrl_table[_present_current_item_name] != NULL)
+            dxl->present_current_item = dxl->ctrl_table[_present_current_item_name];
+        if(dxl->ctrl_table[_goal_position_item_name] != NULL)
+            dxl->goal_position_item = dxl->ctrl_table[_goal_position_item_name];
+        if(dxl->ctrl_table[_goal_velocity_item_name] != NULL)
+            dxl->goal_velocity_item = dxl->ctrl_table[_goal_velocity_item_name];
+        if(dxl->ctrl_table[_goal_current_item_name] != NULL)
+            dxl->goal_current_item = dxl->ctrl_table[_goal_current_item_name];
 
         fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), dxl->id, dxl->model_name.c_str());
         //std::cout << "[ID:" << (int)(dxl->id) << "] " << dxl->model_name << " added. (" << port << ")" << std::endl;

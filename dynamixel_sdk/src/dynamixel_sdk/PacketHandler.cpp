@@ -2,8 +2,11 @@
  * PacketHandler.cpp
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom
+ *      Author: zerom, leon
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define WINDLLEXPORT
+#endif
 
 #include "dynamixel_sdk/PacketHandler.h"
 #include "dynamixel_sdk/Protocol1PacketHandler.h"

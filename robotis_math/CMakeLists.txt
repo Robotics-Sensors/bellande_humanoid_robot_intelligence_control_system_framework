@@ -1,9 +1,16 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(robotis_framework_common)
+project(robotis_math)
 
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  cmake_modules
 )
+
+find_package(Eigen REQUIRED)
+
 
 ###################################
 ## catkin specific configuration ##
@@ -16,8 +23,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES robotis_framework_common
-#  CATKIN_DEPENDS roscpp
+  LIBRARIES robotis_math
+  CATKIN_DEPENDS roscpp
 #  DEPENDS system_lib
 )
 
@@ -27,30 +34,32 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(robotis_framework_common
-#   src/${PROJECT_NAME}/robotis_framework_common.cpp
-# )
+add_library(robotis_math
+   src/RobotisMathBase.cpp
+   src/RobotisTrajectoryCalculator.cpp
+   src/RobotisLinearAlgebra.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(robotis_framework_common ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(robotis_math ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(robotis_framework_common_node src/robotis_framework_common_node.cpp)
+# add_executable(robotis_math_node src/robotis_math_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(robotis_framework_common_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+#add_dependencies(robotis_math_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(robotis_framework_common_node
-#   ${catkin_LIBRARIES}
-# )
-
+target_link_libraries(robotis_math
+   ${catkin_LIBRARIES}
+)

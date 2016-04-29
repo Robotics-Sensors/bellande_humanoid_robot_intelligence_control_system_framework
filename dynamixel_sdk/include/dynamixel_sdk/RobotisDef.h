@@ -2,7 +2,7 @@
  * RobotisDef.h
  *
  *  Created on: 2016. 1. 27.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_ROBOTISDEF_H_

@@ -2,7 +2,7 @@
  * GroupSyncWrite.h
  *
  *  Created on: 2016. 1. 28.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_GROUPSYNCWRITE_H_
@@ -18,7 +18,7 @@
 namespace ROBOTIS
 {
 
-class GroupSyncWrite
+class WINDECLSPEC GroupSyncWrite
 {
 private:
     PortHandler    *port_;

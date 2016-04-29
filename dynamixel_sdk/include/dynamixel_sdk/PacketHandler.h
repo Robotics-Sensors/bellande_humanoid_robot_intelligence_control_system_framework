@@ -2,7 +2,7 @@
  * PacketHandler.h
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_PACKETHANDLER_H_
@@ -54,7 +54,7 @@
 namespace ROBOTIS
 {
 
-class PacketHandler
+class WINDECLSPEC PacketHandler
 {
 protected:
     PacketHandler() { }

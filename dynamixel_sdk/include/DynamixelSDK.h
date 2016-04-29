@@ -2,7 +2,7 @@
  * DynamixelSDK.h
  *
  *  Created on: 2016. 3. 8.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_DYNAMIXELSDK_H_

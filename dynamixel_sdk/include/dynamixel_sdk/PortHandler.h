@@ -2,19 +2,28 @@
  * PortHandler.h
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_PORTHANDLER_H_
 #define DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_PORTHANDLER_H_
 
+#ifdef __linux__
+#define WINDECLSPEC
+#elif defined(_WIN32) || defined(_WIN64)
+#ifdef WINDLLEXPORT
+#define WINDECLSPEC __declspec(dllexport)
+#else
+#define WINDECLSPEC __declspec(dllimport)
+#endif
+#endif
 
 #include "RobotisDef.h"
 
 namespace ROBOTIS
 {
 
-class PortHandler
+class WINDECLSPEC PortHandler
 {
 public:
     static const int DEFAULT_BAUDRATE = 1000000;

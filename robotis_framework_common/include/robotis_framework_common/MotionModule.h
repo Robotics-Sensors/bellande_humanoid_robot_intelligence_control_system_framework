@@ -5,15 +5,15 @@
  *      Author: zerom
  */
 
-#ifndef ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_MSGS_INCLUDE_MOTIONMODULE_H_
-#define ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_MSGS_INCLUDE_MOTIONMODULE_H_
+#ifndef ROBOTIS_FRAMEWORK_COMMON_INCLUDE_ROBOTIS_FRAMEWORK_COMMON_MOTIONMODULE_H_
+#define ROBOTIS_FRAMEWORK_COMMON_INCLUDE_ROBOTIS_FRAMEWORK_COMMON_MOTIONMODULE_H_
 
 
 #include <map>
 #include <string>
 
+#include "robotis_device/Robot.h"
 #include "robotis_device/Dynamixel.h"
-#include "robotis_device/DynamixelState.h"
 
 namespace ROBOTIS
 {
@@ -22,7 +22,7 @@ enum CONTROL_MODE
 {
     POSITION_CONTROL,
     VELOCITY_CONTROL,
-    TORQUE_CONTROL
+    CURRENT_CONTROL
 };
 
 class MotionModule
@@ -36,18 +36,15 @@ public:
 
     virtual ~MotionModule() { }
 
-    virtual void    Initialize(const int control_cycle_msec) = 0;
-    virtual void    Process(std::map<std::string, Dynamixel *> dxls) = 0;
+    virtual void    Initialize(const int control_cycle_msec, Robot *robot) = 0;
+    virtual void    Process(std::map<std::string, Dynamixel *> dxls, std::map<std::string, double> sensors) = 0;
 
-    inline double powDI(double a, int b);
+    virtual void	Stop() = 0;
+    virtual bool	IsRunning() = 0;
 };
 
-inline double MotionModule::powDI(double a, int b)
-{
-	return (b == 0 ? 1 : (b > 0 ? a * powDI(a, b - 1) : 1 / powDI(a, -b)));
-}
 
 }
 
 
-#endif /* ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_MSGS_INCLUDE_MOTIONMODULE_H_ */
+#endif /* ROBOTIS_FRAMEWORK_COMMON_INCLUDE_ROBOTIS_FRAMEWORK_COMMON_MOTIONMODULE_H_ */

@@ -2,7 +2,7 @@
  * PortHandlerLinux.cpp
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom
+ *      Author: zerom, leon
  */
 
 #include <stdio.h>

@@ -18,6 +18,7 @@
 
 #include "robotis_device/Robot.h"
 #include "robotis_framework_common/MotionModule.h"
+#include "robotis_framework_common/SensorModule.h"
 
 #include "robotis_controller_msgs/SyncWriteItem.h"
 #include "robotis_controller_msgs/JointCtrlModule.h"
@@ -43,6 +44,7 @@ private:
 
     boost::thread               queue_thread_;
     boost::thread               gazebo_thread_;
+    boost::thread               set_module_thread_;
     boost::mutex                queue_mutex_;
 
     bool                        init_pose_loaded_;
@@ -51,13 +53,17 @@ private:
     pthread_t                   timer_thread_;
     CONTROLLER_MODE             controller_mode_;
 
-    std::list<MotionModule *>       modules_;
+    std::list<MotionModule *>       motion_modules_;
+    std::list<SensorModule *>       sensor_modules_;
     std::vector<GroupSyncWrite *>   direct_sync_write_;
+
+    std::map<std::string, double>   sensor_result_;
 
     RobotisController();
 
     void QueueThread();
     void GazeboThread();
+    void SetCtrlModuleThread(std::string ctrl_module);
 
     bool CheckTimerStop();
     void InitSyncWrite();
@@ -73,7 +79,9 @@ public:
 
     // TODO: TEMPORARY CODE !!
     std::map<std::string, GroupBulkRead *>  port_to_bulk_read;
-    std::map<std::string, GroupSyncWrite *> port_to_sync_write;
+    std::map<std::string, GroupSyncWrite *> port_to_sync_write_position;
+    std::map<std::string, GroupSyncWrite *> port_to_sync_write_velocity;
+    std::map<std::string, GroupSyncWrite *> port_to_sync_write_torque;
 
     /* publisher */
     ros::Publisher  goal_joint_state_pub;
@@ -87,8 +95,11 @@ public:
 
     bool    Initialize(const std::string robot_file_path, const std::string init_file_path);
     void    Process();
-    void    AddModule(MotionModule *module);
-    void    RemoveModule(MotionModule *module);
+
+    void    AddMotionModule(MotionModule *module);
+    void    RemoveMotionModule(MotionModule *module);
+    void    AddSensorModule(SensorModule *module);
+    void    RemoveSensorModule(SensorModule *module);
 
     void    StartTimer();
     void    StopTimer();
@@ -100,7 +111,8 @@ public:
     void    SyncWriteItemCallback(const robotis_controller_msgs::SyncWriteItem::ConstPtr &msg);
     void    SetControllerModeCallback(const std_msgs::String::ConstPtr &msg);
     void    SetJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
-    void    SetCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
+    void    SetJointCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
+    void    SetCtrlModuleCallback(const std_msgs::String::ConstPtr &msg);
     bool    GetCtrlModuleCallback(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
 
     void    GazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);

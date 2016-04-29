@@ -2,8 +2,11 @@
  * GroupSyncRead.cpp
  *
  *  Created on: 2016. 2. 2.
- *      Author: zerom
+ *      Author: zerom, leon
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define WINDLLEXPORT
+#endif
 
 #include <algorithm>
 #include "dynamixel_sdk/GroupSyncRead.h"
@@ -138,50 +141,35 @@ int GroupSyncRead::TxRxPacket()
     return RxPacket();
 }
 
-bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT8_T *data)
+bool GroupSyncRead::IsAvailable(UINT8_T id, UINT16_T address, UINT16_T data_length)
 {
-    if(last_result_ == false || ph_->GetProtocolVersion() == 1.0)
+    if(ph_->GetProtocolVersion() == 1.0 || last_result_ == false || data_list_.find(id) == data_list_.end())
         return false;
 
-    if(data_list_.find(id) == data_list_.end())
+    if(address < start_address_ || start_address_ + data_length_ - data_length < address)
         return false;
-
-    if(address < start_address_ || start_address_ + data_length_ - 1 < address)
-        return false;
-
-    *data = data_list_[id][address - start_address_];
-
-    return true;
-}
-bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT16_T *data)
-{
-    if(last_result_ == false || ph_->GetProtocolVersion() == 1.0)
-        return false;
-
-    if(data_list_.find(id) == data_list_.end())
-        return false;
-
-    if(address < start_address_ || start_address_ + data_length_ - 2 < address)
-        return false;
-
-    *data = DXL_MAKEWORD(data_list_[id][address - start_address_], data_list_[id][address - start_address_ + 1]);
-
-    return true;
-}
-bool GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT32_T *data)
-{
-    if(last_result_ == false || ph_->GetProtocolVersion() == 1.0)
-        return false;
-
-    if(data_list_.find(id) == data_list_.end())
-        return false;
-
-    if(address < start_address_ || start_address_ + data_length_ - 4 < address)
-        return false;
-
-    *data = DXL_MAKEDWORD(DXL_MAKEWORD(data_list_[id][address - start_address_ + 0], data_list_[id][address - start_address_ + 1]),
-                          DXL_MAKEWORD(data_list_[id][address - start_address_ + 2], data_list_[id][address - start_address_ + 3]));
 
     return true;
 }
 
+UINT32_T GroupSyncRead::GetData(UINT8_T id, UINT16_T address, UINT16_T data_length)
+{
+    if(IsAvailable(id, address, data_length) == false)
+        return 0;
+
+    switch(data_length)
+    {
+    case 1:
+        return data_list_[id][address - start_address_];
+
+    case 2:
+        return DXL_MAKEWORD(data_list_[id][address - start_address_], data_list_[id][address - start_address_ + 1]);
+
+    case 4:
+        return DXL_MAKEDWORD(DXL_MAKEWORD(data_list_[id][address - start_address_ + 0], data_list_[id][address - start_address_ + 1]),
+                             DXL_MAKEWORD(data_list_[id][address - start_address_ + 2], data_list_[id][address - start_address_ + 3]));
+
+    default:
+        return 0;
+    }
+}

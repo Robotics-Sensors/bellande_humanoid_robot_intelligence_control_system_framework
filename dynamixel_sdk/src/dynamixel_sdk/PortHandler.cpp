@@ -2,8 +2,11 @@
  * PortHandler.cpp
  *
  *  Created on: 2016. 2. 5.
- *      Author: zerom
+ *      Author: zerom, leon
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define WINDLLEXPORT
+#endif
 
 #include "dynamixel_sdk/PortHandler.h"
 
@@ -27,5 +30,3 @@ PortHandler *PortHandler::GetPortHandler(const char *port_name)
     return (PortHandler *)(new PortHandlerWindows(port_name));
 #endif
 }
-
-

@@ -2,8 +2,11 @@
  * Protocol1PacketHandler.cpp
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom
+ *      Author: zerom, leon
  */
+#if defined(_WIN32) || defined(_WIN64)
+#define WINDLLEXPORT
+#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -180,7 +183,12 @@ int Protocol1PacketHandler::RxPacket(PortHandler *port, UINT8_T *rxpacket)
                 }
 
                 // re-calculate the exact length of the rx packet
-                _wait_length = rxpacket[PKT_LENGTH] + PKT_LENGTH + 1;
+                if(_wait_length != rxpacket[PKT_LENGTH] + PKT_LENGTH + 1)
+                {
+                    _wait_length = rxpacket[PKT_LENGTH] + PKT_LENGTH + 1;
+                    continue;
+                }
+                
                 if(_rx_length < _wait_length)
                 {
                     // check timeout
@@ -660,4 +668,3 @@ int Protocol1PacketHandler::BulkWriteTxOnly(PortHandler *port, UINT8_T *param, U
 {
     return COMM_NOT_AVAILABLE;
 }
-

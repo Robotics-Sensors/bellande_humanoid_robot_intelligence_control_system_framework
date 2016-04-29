@@ -24,7 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES robotis_controller
+  LIBRARIES robotis_controller
   CATKIN_DEPENDS roscpp roslib sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
@@ -49,7 +49,5 @@ add_library(robotis_controller
 ## Specify libraries to link a library or executable target against
 target_link_libraries(robotis_controller
   yaml-cpp
-  robotis_device
-  dynamixel_sdk
   ${catkin_LIBRARIES}
 )
