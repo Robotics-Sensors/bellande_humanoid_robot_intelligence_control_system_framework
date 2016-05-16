@@ -21,14 +21,15 @@ class Robot
 {
 public:
     std::map<std::string, PortHandler *>    ports;      // string: port name
-    std::map<std::string, std::string>      port_default_joint; // port name, default joint name
+    std::map<std::string, std::string>      port_default_device; // port name, default device name
 
     std::map<std::string, Dynamixel *>      dxls;       // string: joint name
     std::map<std::string, Sensor *>         sensors;    // string: sensor name
 
     Robot(std::string robot_file_path, std::string dev_desc_dir_path);
 
-    Dynamixel *getDynamixel(std::string path, int id, std::string port, float protocol_version);
+    Sensor     *getSensor(std::string path, int id, std::string port, float protocol_version);
+    Dynamixel  *getDynamixel(std::string path, int id, std::string port, float protocol_version);
 };
 
 }

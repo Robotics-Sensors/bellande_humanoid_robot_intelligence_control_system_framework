@@ -39,6 +39,7 @@ include_directories(
 ## Declare a C++ library
 add_library(robotis_device
   src/robotis_device/Robot.cpp
+  src/robotis_device/Sensor.cpp
   src/robotis_device/Dynamixel.cpp
 )
 

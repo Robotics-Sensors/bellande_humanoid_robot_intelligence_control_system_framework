@@ -5,16 +5,12 @@
  *      Author: zerom
  */
 
-#include "../include/robotis_device/Dynamixel.h"
+#include "robotis_device/Dynamixel.h"
 
 using namespace ROBOTIS;
 
 Dynamixel::Dynamixel(int id, std::string model_name, float protocol_version)
-    : id(id),
-      model_name(model_name),
-      port_name(""),
-      ctrl_module_name("none"),
-      protocol_version(protocol_version),
+    : ctrl_module_name("none"),
       current_ratio(1.0),
       velocity_ratio(1.0),
       value_of_0_radian_position(0),
@@ -30,11 +26,15 @@ Dynamixel::Dynamixel(int id, std::string model_name, float protocol_version)
       goal_velocity_item(0),
       goal_current_item(0)
 {
+    this->id = id;
+    this->model_name = model_name;
+    this->port_name = "";
+    this->protocol_version = protocol_version;
+
     ctrl_table.clear();
     dxl_state = new DynamixelState();
 
     bulk_read_items.clear();
-    indirect_address_table.clear();
 }
 
 double Dynamixel::ConvertValue2Radian(INT32_T value)
