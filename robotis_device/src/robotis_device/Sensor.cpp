@@ -17,5 +17,7 @@ Sensor::Sensor(int id, std::string model_name, float protocol_version)
     this->protocol_version = protocol_version;
     ctrl_table.clear();
 
+    sensor_state = new SensorState();
+
     bulk_read_items.clear();
 }

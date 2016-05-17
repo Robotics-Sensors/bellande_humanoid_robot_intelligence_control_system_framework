@@ -12,8 +12,6 @@
 
 using namespace ROBOTIS;
 
-RobotisController *RobotisController::unique_instance_ = new RobotisController();
-
 RobotisController::RobotisController()
 : is_timer_running_(false),
   stop_timer_(false),
@@ -586,62 +584,97 @@ void RobotisController::Process()
 //    if(_msec > 8) std::cout << "Process duration  : " << _msec << std::endl;
 
     // -> save to Robot->dxls[]->dynamixel_state.present_position
-    for(std::map<std::string, Dynamixel *>::iterator dxl_it = robot->dxls.begin(); dxl_it != robot->dxls.end(); dxl_it++)
+    if(robot->dxls.size() > 0)
     {
-        UINT32_T    _data        = 0;
-
-        std::string _port_name  = dxl_it->second->port_name;
-        std::string _joint_name = dxl_it->first;
-        Dynamixel  *_dxl        = dxl_it->second;
-
-        _present_state.header.stamp = ros::Time::now();
-        _goal_state.header.stamp    = _present_state.header.stamp;
-
-        if(gazebo_mode == false)
+        for(std::map<std::string, Dynamixel *>::iterator dxl_it = robot->dxls.begin(); dxl_it != robot->dxls.end(); dxl_it++)
         {
-            for(int _i = 0; _i < _dxl->bulk_read_items.size(); _i++)
-            {
-                ControlTableItem *_item = _dxl->bulk_read_items[_i];
-                if(port_to_bulk_read[_port_name]->IsAvailable(_dxl->id, _item->address, _item->data_length) == true)
-                {
-                    _data = port_to_bulk_read[_port_name]->GetData(_dxl->id, _item->address, _item->data_length);
+            UINT32_T    _data        = 0;
 
-                    // TODO: change dxl_state
-                    if(_dxl->present_position_item != 0 && _item->item_name == _dxl->present_position_item->item_name)
-                        _dxl->dxl_state->present_position = _dxl->ConvertValue2Radian(_data) - _dxl->dxl_state->position_offset; // remove offset
-                    else if(_dxl->present_velocity_item != 0 && _item->item_name == _dxl->present_velocity_item->item_name)
-                        _dxl->dxl_state->present_velocity = _dxl->ConvertValue2Velocity(_data);
-                    else if(_dxl->present_current_item != 0 && _item->item_name == _dxl->present_current_item->item_name)
-                        _dxl->dxl_state->present_current = _dxl->ConvertValue2Current(_data);
-                    else if(_dxl->goal_position_item != 0 && _item->item_name == _dxl->goal_position_item->item_name)
-                        _dxl->dxl_state->goal_position = _dxl->ConvertValue2Radian(_data) - _dxl->dxl_state->position_offset; // remove offset
-                    else if(_dxl->goal_velocity_item != 0 && _item->item_name == _dxl->goal_velocity_item->item_name)
-                        _dxl->dxl_state->goal_velocity = _dxl->ConvertValue2Velocity(_data);
-                    else if(_dxl->goal_current_item != 0 && _item->item_name == _dxl->goal_current_item->item_name)
-                        _dxl->dxl_state->goal_current = _dxl->ConvertValue2Current(_data);
-                    else
-                        _dxl->dxl_state->bulk_read_table[_item->item_name] = _data;
+            std::string _port_name  = dxl_it->second->port_name;
+            std::string _joint_name = dxl_it->first;
+            Dynamixel  *_dxl        = dxl_it->second;
+
+            _present_state.header.stamp = ros::Time::now();
+            _goal_state.header.stamp    = _present_state.header.stamp;
+
+            if(gazebo_mode == false && _dxl->bulk_read_items.size() > 0)
+            {
+                for(int _i = 0; _i < _dxl->bulk_read_items.size(); _i++)
+                {
+                    ControlTableItem *_item = _dxl->bulk_read_items[_i];
+                    if(port_to_bulk_read[_port_name]->IsAvailable(_dxl->id, _item->address, _item->data_length) == true)
+                    {
+                        _data = port_to_bulk_read[_port_name]->GetData(_dxl->id, _item->address, _item->data_length);
+
+                        // TODO: change dxl_state
+                        if(_dxl->present_position_item != 0 && _item->item_name == _dxl->present_position_item->item_name)
+                            _dxl->dxl_state->present_position = _dxl->ConvertValue2Radian(_data) - _dxl->dxl_state->position_offset; // remove offset
+                        else if(_dxl->present_velocity_item != 0 && _item->item_name == _dxl->present_velocity_item->item_name)
+                            _dxl->dxl_state->present_velocity = _dxl->ConvertValue2Velocity(_data);
+                        else if(_dxl->present_current_item != 0 && _item->item_name == _dxl->present_current_item->item_name)
+                            _dxl->dxl_state->present_current = _dxl->ConvertValue2Current(_data);
+                        else if(_dxl->goal_position_item != 0 && _item->item_name == _dxl->goal_position_item->item_name)
+                            _dxl->dxl_state->goal_position = _dxl->ConvertValue2Radian(_data) - _dxl->dxl_state->position_offset; // remove offset
+                        else if(_dxl->goal_velocity_item != 0 && _item->item_name == _dxl->goal_velocity_item->item_name)
+                            _dxl->dxl_state->goal_velocity = _dxl->ConvertValue2Velocity(_data);
+                        else if(_dxl->goal_current_item != 0 && _item->item_name == _dxl->goal_current_item->item_name)
+                            _dxl->dxl_state->goal_current = _dxl->ConvertValue2Current(_data);
+                        else
+                            _dxl->dxl_state->bulk_read_table[_item->item_name] = _data;
+                    }
                 }
+
+                // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
+                _dxl->dxl_state->update_time_stamp = TimeStamp(_present_state.header.stamp.sec, _present_state.header.stamp.nsec);
             }
 
-            // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
-            _dxl->dxl_state->update_time_stamp = TimeStamp(_present_state.header.stamp.sec, _present_state.header.stamp.nsec);
+            _present_state.name.push_back(_joint_name);
+            // TODO: should be converted to rad, rad/s, Nm
+            _present_state.position.push_back(_dxl->dxl_state->present_position);
+            _present_state.velocity.push_back(_dxl->dxl_state->present_velocity);
+            _present_state.effort.push_back(_dxl->dxl_state->present_current);
+
+            _goal_state.name.push_back(_joint_name);
+            _goal_state.position.push_back(_dxl->dxl_state->goal_position);
+            _goal_state.velocity.push_back(_dxl->dxl_state->goal_velocity);
+            _goal_state.effort.push_back(_dxl->dxl_state->goal_current);
         }
-
-        _present_state.name.push_back(_joint_name);
-        // TODO: should be converted to rad, rad/s, Nm
-        _present_state.position.push_back(_dxl->dxl_state->present_position);
-        _present_state.velocity.push_back(_dxl->dxl_state->present_velocity);
-        _present_state.effort.push_back(_dxl->dxl_state->present_current);
-
-        _goal_state.name.push_back(_joint_name);
-        _goal_state.position.push_back(_dxl->dxl_state->goal_position);
-        _goal_state.velocity.push_back(_dxl->dxl_state->goal_velocity);
-        _goal_state.effort.push_back(_dxl->dxl_state->goal_current);
     }
+
     // -> publish present joint_states & goal joint states topic
     present_joint_state_pub.publish(_present_state);
     goal_joint_state_pub.publish(_goal_state);
+
+    if(robot->sensors.size() > 0)
+    {
+        for(std::map<std::string, Sensor *>::iterator sensor_it = robot->sensors.begin(); sensor_it != robot->sensors.end(); sensor_it++)
+        {
+            UINT32_T    _data           = 0;
+
+            std::string _port_name      = sensor_it->second->port_name;
+            std::string _sensor_name    = sensor_it->first;
+            Sensor     *_sensor         = sensor_it->second;
+
+            if(gazebo_mode == false && _sensor->bulk_read_items.size() > 0)
+            {
+                for(int _i = 0; _i < _sensor->bulk_read_items.size(); _i++)
+                {
+                    ControlTableItem *_item = _sensor->bulk_read_items[_i];
+                    if(port_to_bulk_read[_port_name]->IsAvailable(_sensor->id, _item->address, _item->data_length) == true)
+                    {
+                        _data = port_to_bulk_read[_port_name]->GetData(_sensor->id, _item->address, _item->data_length);
+
+                        // TODO: change sensor_state
+                        _sensor->sensor_state->bulk_read_table[_item->item_name] = _data;
+                    }
+                }
+
+                // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
+                ros::Time _now = ros::Time::now();
+                _sensor->sensor_state->update_time_stamp = TimeStamp(_now.sec, _now.nsec);
+            }
+        }
+    }
 
     // Call SensorModule Process()
     // -> for loop : call SensorModule list -> Process()
@@ -649,7 +682,7 @@ void RobotisController::Process()
     {
         for(std::list<SensorModule*>::iterator _module_it = sensor_modules_.begin(); _module_it != sensor_modules_.end(); _module_it++)
         {
-            (*_module_it)->Process(robot->dxls);
+            (*_module_it)->Process(robot->dxls, robot->sensors);
 
             for(std::map<std::string, double>::iterator _it = (*_module_it)->result.begin(); _it != (*_module_it)->result.end(); _it++)
                 sensor_result_[_it->first] = _it->second;

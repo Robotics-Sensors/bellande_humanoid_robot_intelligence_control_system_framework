@@ -12,6 +12,7 @@
 #include <string>
 #include <stdint.h>
 #include "Device.h"
+#include "SensorState.h"
 #include "ControlTableItem.h"
 
 namespace ROBOTIS
@@ -19,8 +20,9 @@ namespace ROBOTIS
 
 class Sensor : public Device
 {
-    std::map<std::string, double> sensed_value;
 public:
+    SensorState *sensor_state;
+
     Sensor(int id, std::string model_name, float protocol_version);
 };
 
