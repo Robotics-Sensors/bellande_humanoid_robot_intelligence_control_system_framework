@@ -14,6 +14,7 @@
 
 #include "robotis_device/Robot.h"
 #include "robotis_device/Dynamixel.h"
+#include "robotis_framework_common/Singleton.h"
 
 namespace ROBOTIS
 {
@@ -28,7 +29,7 @@ public:
     virtual ~SensorModule() { }
 
     virtual void    Initialize(const int control_cycle_msec, Robot *robot) = 0;
-    virtual void    Process(std::map<std::string, Dynamixel *> dxls) = 0;
+    virtual void    Process(std::map<std::string, Dynamixel *> dxls, std::map<std::string, Sensor *> sensors) = 0;
 };
 
 }

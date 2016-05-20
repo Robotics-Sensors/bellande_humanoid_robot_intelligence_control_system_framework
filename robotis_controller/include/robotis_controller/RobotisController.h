@@ -37,11 +37,9 @@ enum CONTROLLER_MODE
     DIRECT_CONTROL_MODE
 };
 
-class RobotisController
+class RobotisController : public Singleton<RobotisController>
 {
 private:
-    static RobotisController   *unique_instance_;
-
     boost::thread               queue_thread_;
     boost::thread               gazebo_thread_;
     boost::thread               set_module_thread_;
@@ -58,8 +56,6 @@ private:
     std::vector<GroupSyncWrite *>   direct_sync_write_;
 
     std::map<std::string, double>   sensor_result_;
-
-    RobotisController();
 
     void QueueThread();
     void GazeboThread();
@@ -91,9 +87,11 @@ public:
     std::map<std::string, ros::Publisher> gazebo_joint_pub;
 
     static void *ThreadProc(void *param);
-    static RobotisController *GetInstance() { return unique_instance_; }
+
+    RobotisController();
 
     bool    Initialize(const std::string robot_file_path, const std::string init_file_path);
+    void    InitDevice(const std::string init_file_path);
     void    Process();
 
     void    AddMotionModule(MotionModule *module);
