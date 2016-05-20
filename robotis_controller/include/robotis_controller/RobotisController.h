@@ -91,7 +91,7 @@ public:
     RobotisController();
 
     bool    Initialize(const std::string robot_file_path, const std::string init_file_path);
-    void    DeviceInit(const std::string init_file_path);
+    void    InitDevice(const std::string init_file_path);
     void    Process();
 
     void    AddMotionModule(MotionModule *module);

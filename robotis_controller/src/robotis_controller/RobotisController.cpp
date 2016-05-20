@@ -179,7 +179,7 @@ bool RobotisController::Initialize(const std::string robot_file_path, const std:
         }
     }
 
-    DeviceInit(init_file_path);
+    InitDevice(init_file_path);
 
     // [ BulkRead ] StartAddress : Present Position , Length : 10 ( Position/Velocity/Current )
     for(std::map<std::string, Dynamixel*>::iterator _it = robot->dxls.begin(); _it != robot->dxls.end(); _it++)
@@ -259,7 +259,7 @@ bool RobotisController::Initialize(const std::string robot_file_path, const std:
     return true;
 }
 
-void RobotisController::DeviceInit(const std::string init_file_path)
+void RobotisController::InitDevice(const std::string init_file_path)
 {
     // device initialize
     if(DEBUG_PRINT) ROS_WARN("INIT FILE LOAD");
