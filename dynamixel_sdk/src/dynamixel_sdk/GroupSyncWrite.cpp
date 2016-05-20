@@ -92,11 +92,11 @@ bool GroupSyncWrite::ChangeParam(UINT8_T id, UINT8_T *data)
 
 void GroupSyncWrite::ClearParam()
 {
-    if(id_list_.size() != 0)
-    {
-        for(unsigned int _i = 0; _i < id_list_.size(); _i++)
-            delete[] data_list_[id_list_[_i]];
-    }
+    if(id_list_.size() == 0)
+        return;
+
+    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
+        delete[] data_list_[id_list_[_i]];
 
     id_list_.clear();
     data_list_.clear();
