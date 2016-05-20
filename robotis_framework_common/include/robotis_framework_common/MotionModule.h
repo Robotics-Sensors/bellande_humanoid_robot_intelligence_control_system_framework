@@ -14,6 +14,7 @@
 
 #include "robotis_device/Robot.h"
 #include "robotis_device/Dynamixel.h"
+#include "robotis_framework_common/Singleton.h"
 
 namespace ROBOTIS
 {

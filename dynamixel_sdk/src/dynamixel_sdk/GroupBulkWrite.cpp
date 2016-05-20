@@ -111,14 +111,11 @@ bool GroupBulkWrite::ChangeParam(UINT8_T id, UINT16_T start_address, UINT16_T da
 }
 void GroupBulkWrite::ClearParam()
 {
-    if(ph_->GetProtocolVersion() == 1.0)
+    if(ph_->GetProtocolVersion() == 1.0 || id_list_.size() == 0)
         return;
 
-    if(id_list_.size() != 0)
-    {
-        for(unsigned int _i = 0; _i < id_list_.size(); _i++)
-            delete[] data_list_[id_list_[_i]];
-    }
+    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
+        delete[] data_list_[id_list_[_i]];
 
     id_list_.clear();
     address_list_.clear();

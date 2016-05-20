@@ -5,24 +5,19 @@
  *      Author: zerom
  */
 
-#ifndef ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_INCLUDE_DEVICE_DYNAMIXELSTATE_H_
-#define ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_INCLUDE_DEVICE_DYNAMIXELSTATE_H_
+#ifndef ROBOTIS_DEVICE_INCLUDE_ROBOTIS_DEVICE_DYNAMIXELSTATE_H_
+#define ROBOTIS_DEVICE_INCLUDE_ROBOTIS_DEVICE_DYNAMIXELSTATE_H_
 
 #include <stdint.h>
-#include <robotis_framework_common/RobotisDef.h>
+
+#include "robotis_device/TimeStamp.h"
+#include "robotis_framework_common/RobotisDef.h"
 
 #define INDIRECT_DATA_1     "indirect_data_1"
 #define INDIRECT_ADDRESS_1  "indirect_address_1"
 
 namespace ROBOTIS
 {
-
-class TimeStamp {
-public:
-    long sec;
-    long nsec;
-    TimeStamp(long sec, long nsec) : sec(sec), nsec(nsec) { }
-};
 
 class DynamixelState
 {
@@ -57,4 +52,4 @@ public:
 }
 
 
-#endif /* ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_INCLUDE_DEVICE_DYNAMIXELSTATE_H_ */
+#endif /* ROBOTIS_DEVICE_INCLUDE_ROBOTIS_DEVICE_DYNAMIXELSTATE_H_ */
