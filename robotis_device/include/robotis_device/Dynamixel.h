@@ -41,6 +41,7 @@ public:
     ControlTableItem   *goal_position_item;
     ControlTableItem   *goal_velocity_item;
     ControlTableItem   *goal_current_item;
+    ControlTableItem   *position_p_gain_item;
 
     Dynamixel(int id, std::string model_name, float protocol_version);
 

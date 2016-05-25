@@ -30,6 +30,7 @@ public:
     double      goal_position;
     double      goal_velocity;
     double      goal_current;
+    double      position_p_gain;
 
     std::map<std::string, UINT32_T> bulk_read_table;
 
@@ -43,6 +44,7 @@ public:
           goal_position(0.0),
           goal_velocity(0.0),
           goal_current(0.0),
+          position_p_gain(0.0),
           position_offset(0.0)
     {
         bulk_read_table.clear();

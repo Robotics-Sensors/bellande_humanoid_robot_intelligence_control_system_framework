@@ -106,6 +106,9 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
                             UINT16_T _indirect_data_addr = _dxl->ctrl_table[INDIRECT_DATA_1]->address;
                             for(int _i = 0; _i < sub_tokens.size(); _i++)
                             {
+                                if(_dxl->bulk_read_items[_i] == NULL)
+                                    continue;
+
                                 _dxl->bulk_read_items.push_back(new ControlTableItem());
                                 ControlTableItem *_dest_item = _dxl->bulk_read_items[_i];
                                 ControlTableItem *_src_item = _dxl->ctrl_table[sub_tokens[_i]];
@@ -122,10 +125,13 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
                                 _indirect_data_addr += _dest_item->data_length;
                             }
                         }
-                        else    // INDIRECT_ADDRESS_1 exist
+                        else    // INDIRECT_ADDRESS_1 not exist
                         {
                             for(int _i = 0; _i < sub_tokens.size(); _i++)
-                                _dxl->bulk_read_items.push_back(_dxl->ctrl_table[sub_tokens[_i]]);
+                            {
+                                if(_dxl->ctrl_table[sub_tokens[_i]] != NULL)
+                                    _dxl->bulk_read_items.push_back(_dxl->ctrl_table[sub_tokens[_i]]);
+                            }
                         }
                     }
                 }
