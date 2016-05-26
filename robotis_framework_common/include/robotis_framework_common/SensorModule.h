@@ -21,12 +21,15 @@ namespace ROBOTIS
 
 class SensorModule
 {
-public:
+protected:
     std::string module_name;
 
+public:
     std::map<std::string, double> result;
 
     virtual ~SensorModule() { }
+
+    std::string     GetModuleName() { return module_name; }
 
     virtual void    Initialize(const int control_cycle_msec, Robot *robot) = 0;
     virtual void    Process(std::map<std::string, Dynamixel *> dxls, std::map<std::string, Sensor *> sensors) = 0;

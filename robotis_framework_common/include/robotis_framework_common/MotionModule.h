@@ -28,14 +28,34 @@ enum CONTROL_MODE
 
 class MotionModule
 {
-public:
+protected:
     bool            enable;
     std::string     module_name;
     CONTROL_MODE    control_mode;
 
+public:
     std::map<std::string, DynamixelState *> result;
 
     virtual ~MotionModule() { }
+
+    std::string     GetModuleName() { return module_name; }
+    CONTROL_MODE    GetControlMode() { return control_mode; }
+
+    void SetModuleEnable(bool enable)
+    {
+        if(this->enable == enable)
+            return;
+        
+        this->enable = enable;
+        if(enable)
+            OnModuleEnable();
+        else
+            OnModuleDisable();
+    }
+    bool GetModuleEnable() { return enable; }
+
+    virtual void    OnModuleEnable() { }
+    virtual void    OnModuleDisable() { }
 
     virtual void    Initialize(const int control_cycle_msec, Robot *robot) = 0;
     virtual void    Process(std::map<std::string, Dynamixel *> dxls, std::map<std::string, double> sensors) = 0;

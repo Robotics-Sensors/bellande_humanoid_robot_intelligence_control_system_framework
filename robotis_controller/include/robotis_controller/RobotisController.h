@@ -24,7 +24,6 @@
 #include "robotis_controller_msgs/JointCtrlModule.h"
 #include "robotis_controller_msgs/GetJointModule.h"
 
-// TODO: TEMPORARY CODE !!
 #include "dynamixel_sdk/GroupBulkRead.h"
 #include "dynamixel_sdk/GroupSyncWrite.h"
 
@@ -73,11 +72,14 @@ public:
     bool                        gazebo_mode;
     std::string                 gazebo_robot_name;
 
-    // TODO: TEMPORARY CODE !!
+    /* bulk read */
     std::map<std::string, GroupBulkRead *>  port_to_bulk_read;
+
+    /* sync write */
     std::map<std::string, GroupSyncWrite *> port_to_sync_write_position;
     std::map<std::string, GroupSyncWrite *> port_to_sync_write_velocity;
     std::map<std::string, GroupSyncWrite *> port_to_sync_write_torque;
+    std::map<std::string, GroupSyncWrite *> port_to_sync_write_position_p_gain;
 
     /* publisher */
     ros::Publisher  goal_joint_state_pub;
