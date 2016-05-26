@@ -1316,10 +1316,13 @@ void RobotisController::SetCtrlModuleThread(std::string ctrl_module)
             _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_pos_data));
             _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_pos_data));
 
-            port_to_sync_write_position[_dxl->port_name]->AddParam(_dxl->id, _sync_write_data);
+            if(port_to_sync_write_position[_dxl->port_name] != NULL)
+                port_to_sync_write_position[_dxl->port_name]->AddParam(_dxl->id, _sync_write_data);
 
-            port_to_sync_write_torque[_dxl->port_name]->RemoveParam(_dxl->id);
-            port_to_sync_write_velocity[_dxl->port_name]->RemoveParam(_dxl->id);
+            if(port_to_sync_write_torque[_dxl->port_name] != NULL)
+                port_to_sync_write_torque[_dxl->port_name]->RemoveParam(_dxl->id);
+            if(port_to_sync_write_velocity[_dxl->port_name] != NULL)
+                port_to_sync_write_velocity[_dxl->port_name]->RemoveParam(_dxl->id);
         }
     }
     else
