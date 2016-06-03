@@ -46,8 +46,8 @@ namespace robotis_framework
 #define PRINT_VAR(X) std::cout << #X << " : " << X << std::endl
 #define PRINT_MAT(X) std::cout << #X << ":\n" << X << std::endl << std::endl
 
-#define deg2rad 	(M_PI / 180.0)
-#define rad2deg 	(180.0 / M_PI)
+#define DEGREE2RADIAN (M_PI / 180.0)
+#define RADIAN2DEGREE (180.0 / M_PI)
 
 inline double powDI(double a, int b)
 {

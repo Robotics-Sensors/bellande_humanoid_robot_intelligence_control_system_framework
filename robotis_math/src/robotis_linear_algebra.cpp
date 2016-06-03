@@ -75,7 +75,7 @@ Eigen::MatrixXd transformationXYZRPY ( double position_x, double position_y, dou
     return _transformation;
 }
 
-Eigen::MatrixXd InverseTransformation(Eigen::MatrixXd transform)
+Eigen::MatrixXd inverseTransformation(Eigen::MatrixXd transform)
 {
 	Eigen::Vector3d vecBOA; //If T is Transform Matrix A from B, the BOA is translation component coordi. B to coordi. A
 	Eigen::Vector3d vec_x, vec_y, vec_z;
@@ -261,7 +261,7 @@ Eigen::MatrixXd hatto( Eigen::MatrixXd matrix3d )
     return _hatto;
 }
 
-Eigen::MatrixXd Rodrigues( Eigen::MatrixXd hat_matrix , double angle )
+Eigen::MatrixXd rodrigues( Eigen::MatrixXd hat_matrix , double angle )
 {
     Eigen::MatrixXd _E	 = 	Eigen::MatrixXd::Identity( 3 , 3 );
     Eigen::MatrixXd _Rodrigues = _E + hat_matrix * sin( angle ) + hat_matrix * hat_matrix * ( 1 - cos( angle ) );
