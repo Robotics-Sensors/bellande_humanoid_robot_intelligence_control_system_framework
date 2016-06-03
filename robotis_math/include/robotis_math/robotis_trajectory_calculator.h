@@ -9,12 +9,12 @@
 #define ROBOTIS_TRAJECTORY_CALCULATOR_H_
 
 
-#include "RobotisMathBase.h"
-#include "RobotisLinearAlgebra.h"
+#include "robotis_linear_algebra.h"
+#include "robotis_math_base.h"
 
 // minimum jerk trajectory
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
 Eigen::MatrixXd minimum_jerk_tra( double pos_start , double vel_start , double accel_start,

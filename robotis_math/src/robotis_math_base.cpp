@@ -5,12 +5,12 @@
  *      Author: jay
  */
 
-#include "robotis_math/RobotisMathBase.h"
+#include "../include/robotis_math/robotis_math_base.h"
 
 
 
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
 double sign( double x )

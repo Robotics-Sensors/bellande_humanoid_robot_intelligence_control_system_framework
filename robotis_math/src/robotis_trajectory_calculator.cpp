@@ -7,7 +7,7 @@
 
 
 
-#include "robotis_math/RobotisTrajectoryCalculator.h"
+#include "../include/robotis_math/robotis_trajectory_calculator.h"
 
 
 /*
@@ -19,7 +19,7 @@
 
 
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
 Eigen::MatrixXd minimum_jerk_tra( double pos_start , double vel_start , double accel_start,

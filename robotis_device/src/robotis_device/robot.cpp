@@ -1,5 +1,35 @@
+/*******************************************************************************
+ * Copyright (c) 2016, ROBOTIS CO., LTD.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of ROBOTIS nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 /*
- * Robot.cpp
+ * robot.cpp
  *
  *  Created on: 2015. 12. 11.
  *      Author: zerom
@@ -8,404 +38,420 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include "../include/robotis_device/Robot.h"
 
-using namespace ROBOTIS;
+#include "robotis_device/robot.h"
 
-static inline std::string &ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-    return s;
+using namespace robotis_framework;
+
+static inline std::string &ltrim(std::string &s)
+{
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+  return s;
 }
-static inline std::string &rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-    return s;
+static inline std::string &rtrim(std::string &s)
+{
+  s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+  return s;
 }
-static inline std::string &trim(std::string &s) {
-    return ltrim(rtrim(s));
+static inline std::string &trim(std::string &s)
+{
+  return ltrim(rtrim(s));
 }
 
-static inline std::vector<std::string> split(const std::string &text, char sep) {
-    std::vector<std::string> tokens;
-    std::size_t start = 0, end = 0;
-    while((end = text.find(sep, start)) != (std::string::npos)) {
-        tokens.push_back(text.substr(start, end - start));
-        trim(tokens.back());
-        start = end + 1;
-    }
-    tokens.push_back(text.substr(start));
+static inline std::vector<std::string> split(const std::string &text, char sep)
+{
+  std::vector<std::string> tokens;
+  std::size_t start = 0, end = 0;
+
+  while ((end = text.find(sep, start)) != (std::string::npos))
+  {
+    tokens.push_back(text.substr(start, end - start));
     trim(tokens.back());
-    return tokens;
+    start = end + 1;
+  }
+  tokens.push_back(text.substr(start));
+  trim(tokens.back());
+
+  return tokens;
 }
 
 Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
 {
-    if(dev_desc_dir_path.compare(dev_desc_dir_path.size()-1, 1, "/") != 0)
-        dev_desc_dir_path += "/";
+  if (dev_desc_dir_path.compare(dev_desc_dir_path.size() - 1, 1, "/") != 0)
+    dev_desc_dir_path += "/";
 
-    std::ifstream file(robot_file_path.c_str());
-    if(file.is_open())
+  std::ifstream file(robot_file_path.c_str());
+  if (file.is_open())
+  {
+    std::string session = "";
+    std::string input_str;
+    while (!file.eof())
     {
-        std::string session = "";
-        std::string input_str;
-        while(!file.eof())
+      std::getline(file, input_str);
+
+      // remove comment ( # )
+      std::size_t pos = input_str.find("#");
+      if (pos != std::string::npos)
+        input_str = input_str.substr(0, pos);
+
+      // trim
+      input_str = trim(input_str);
+
+      // find session
+      if (!input_str.compare(0, 1, "[") && !input_str.compare(input_str.size() - 1, 1, "]"))
+      {
+        input_str = input_str.substr(1, input_str.size() - 2);
+        std::transform(input_str.begin(), input_str.end(), input_str.begin(), ::tolower);
+        session = trim(input_str);
+        continue;
+      }
+
+      if (session == SESSION_PORT_INFO)
+      {
+        std::vector<std::string> tokens = split(input_str, '|');
+        if (tokens.size() != 3)
+          continue;
+
+        std::cout << tokens[0] << " added. (baudrate: " << tokens[1] << ")" << std::endl;
+
+        ports_[tokens[0]] = dynamixel::PortHandler::getPortHandler(tokens[0].c_str());
+        ports_[tokens[0]]->setBaudRate(std::atoi(tokens[1].c_str()));
+        port_default_device_[tokens[0]] = tokens[2];
+      }
+      else if (session == SESSION_DEVICE_INFO)
+      {
+        std::vector<std::string> tokens = split(input_str, '|');
+        if (tokens.size() != 7)
+          continue;
+
+        if (tokens[0] == DYNAMIXEL)
         {
-            std::getline(file, input_str);
+          std::string file_path = dev_desc_dir_path + tokens[0] + "/" + tokens[3] + ".device";
+          int         id        = std::atoi(tokens[2].c_str());
+          std::string port      = tokens[1];
+          float       protocol  = std::atof(tokens[4].c_str());
+          std::string dev_name  = tokens[5];
 
-            // remove comment ( # )
-            std::size_t pos = input_str.find("#");
-            if(pos != std::string::npos)
-                input_str = input_str.substr(0, pos);
+          dxls_[dev_name] = getDynamixel(file_path, id, port, protocol);
 
-            // trim
-            input_str = trim(input_str);
-
-            // find session
-            if(!input_str.compare(0, 1, "[") && !input_str.compare(input_str.size()-1, 1, "]"))
+          Dynamixel *dxl = dxls_[dev_name];
+          std::vector<std::string> sub_tokens = split(tokens[6], ',');
+          if (sub_tokens.size() > 0)
+          {
+            std::map<std::string, ControlTableItem *>::iterator indirect_it = dxl->ctrl_table_.find(INDIRECT_ADDRESS_1);
+            if (indirect_it != dxl->ctrl_table_.end())    // INDIRECT_ADDRESS_1 exist
             {
-                input_str = input_str.substr(1, input_str.size()-2);
-                std::transform(input_str.begin(), input_str.end(), input_str.begin(), ::tolower);
-                session = trim(input_str);
-                continue;
-            }
+              uint16_t indirect_data_addr = dxl->ctrl_table_[INDIRECT_DATA_1]->address_;
+              for (int _i = 0; _i < sub_tokens.size(); _i++)
+              {
+                dxl->bulk_read_items_.push_back(new ControlTableItem());
+                ControlTableItem *dest_item = dxl->bulk_read_items_[_i];
+                ControlTableItem *src_item  = dxl->ctrl_table_[sub_tokens[_i]];
 
-            if(session == "port info")
+                dest_item->item_name_       = src_item->item_name_;
+                dest_item->address_         = indirect_data_addr;
+                dest_item->access_type_     = src_item->access_type_;
+                dest_item->memory_type_     = src_item->memory_type_;
+                dest_item->data_length_     = src_item->data_length_;
+                dest_item->data_min_value_  = src_item->data_min_value_;
+                dest_item->data_max_value_  = src_item->data_max_value_;
+                dest_item->is_signed_       = src_item->is_signed_;
+
+                indirect_data_addr += dest_item->data_length_;
+              }
+            }
+            else    // INDIRECT_ADDRESS_1 not exist
             {
-                std::vector<std::string> tokens = split(input_str, '|');
-                if(tokens.size() != 3)
-                    continue;
-
-                std::cout << tokens[0] << " added. (baudrate: " << tokens[1] << ")" << std::endl;
-
-                ports[tokens[0]] = (PortHandler*)PortHandler::GetPortHandler(tokens[0].c_str());
-                ports[tokens[0]]->SetBaudRate(std::atoi(tokens[1].c_str()));
-                port_default_device[tokens[0]] = tokens[2];
+              for (int i = 0; i < sub_tokens.size(); i++)
+              {
+                if (dxl->ctrl_table_[sub_tokens[i]] != NULL)
+                  dxl->bulk_read_items_.push_back(dxl->ctrl_table_[sub_tokens[i]]);
+              }
             }
-            else if(session == "device info")
-            {
-                std::vector<std::string> tokens = split(input_str, '|');
-                if(tokens.size() != 7)
-                    continue;
-
-                if(tokens[0] == "dynamixel")
-                {
-                    std::string _file_path  = dev_desc_dir_path + tokens[0] + "/" + tokens[3] + ".device";
-                    int         _id         = std::atoi(tokens[2].c_str());
-                    std::string _port       = tokens[1];
-                    float       _protocol   = std::atof(tokens[4].c_str());
-                    std::string _dev_name   = tokens[5];
-
-                    dxls[_dev_name] = getDynamixel(_file_path, _id, _port, _protocol);
-
-                    Dynamixel *_dxl = dxls[_dev_name];
-                    std::vector<std::string> sub_tokens = split(tokens[6], ',');
-                    if(sub_tokens.size() > 0)
-                    {
-                        std::map<std::string, ControlTableItem *>::iterator _indirect_it = _dxl->ctrl_table.find(INDIRECT_ADDRESS_1);
-                        if(_indirect_it != _dxl->ctrl_table.end())    // INDIRECT_ADDRESS_1 exist
-                        {
-                            UINT16_T _indirect_data_addr = _dxl->ctrl_table[INDIRECT_DATA_1]->address;
-                            for(int _i = 0; _i < sub_tokens.size(); _i++)
-                            {
-                                _dxl->bulk_read_items.push_back(new ControlTableItem());
-                                ControlTableItem *_dest_item = _dxl->bulk_read_items[_i];
-                                ControlTableItem *_src_item = _dxl->ctrl_table[sub_tokens[_i]];
-
-                                _dest_item->item_name   = _src_item->item_name;
-                                _dest_item->address     = _indirect_data_addr;
-                                _dest_item->access_type = _src_item->access_type;
-                                _dest_item->memory_type = _src_item->memory_type;
-                                _dest_item->data_length = _src_item->data_length;
-                                _dest_item->data_min_value = _src_item->data_min_value;
-                                _dest_item->data_max_value = _src_item->data_max_value;
-                                _dest_item->is_signed   = _src_item->is_signed;
-
-                                _indirect_data_addr += _dest_item->data_length;
-                            }
-                        }
-                        else    // INDIRECT_ADDRESS_1 not exist
-                        {
-                            for(int _i = 0; _i < sub_tokens.size(); _i++)
-                            {
-                                if(_dxl->ctrl_table[sub_tokens[_i]] != NULL)
-                                    _dxl->bulk_read_items.push_back(_dxl->ctrl_table[sub_tokens[_i]]);
-                            }
-                        }
-                    }
-                }
-                else if(tokens[0] == "sensor")
-                {
-                    std::string _file_path  = dev_desc_dir_path + tokens[0] + "/" + tokens[3] + ".device";
-                    int         _id         = std::atoi(tokens[2].c_str());
-                    std::string _port       = tokens[1];
-                    float       _protocol   = std::atof(tokens[4].c_str());
-                    std::string _dev_name   = tokens[5];
-
-                    sensors[_dev_name] = getSensor(_file_path, _id, _port, _protocol);
-
-                    Sensor *_sensor = sensors[_dev_name];
-                    std::vector<std::string> sub_tokens = split(tokens[6], ',');
-                    if(sub_tokens.size() > 0)
-                    {
-                        std::map<std::string, ControlTableItem *>::iterator _indirect_it = _sensor->ctrl_table.find(INDIRECT_ADDRESS_1);
-                        if(_indirect_it != _sensor->ctrl_table.end())    // INDIRECT_ADDRESS_1 exist
-                        {
-                            UINT16_T _indirect_data_addr = _sensor->ctrl_table[INDIRECT_DATA_1]->address;
-                            for(int _i = 0; _i < sub_tokens.size(); _i++)
-                            {
-                                _sensor->bulk_read_items.push_back(new ControlTableItem());
-                                ControlTableItem *_dest_item = _sensor->bulk_read_items[_i];
-                                ControlTableItem *_src_item = _sensor->ctrl_table[sub_tokens[_i]];
-
-                                _dest_item->item_name   = _src_item->item_name;
-                                _dest_item->address     = _indirect_data_addr;
-                                _dest_item->access_type = _src_item->access_type;
-                                _dest_item->memory_type = _src_item->memory_type;
-                                _dest_item->data_length = _src_item->data_length;
-                                _dest_item->data_min_value = _src_item->data_min_value;
-                                _dest_item->data_max_value = _src_item->data_max_value;
-                                _dest_item->is_signed   = _src_item->is_signed;
-
-                                _indirect_data_addr += _dest_item->data_length;
-                            }
-                        }
-                        else    // INDIRECT_ADDRESS_1 exist
-                        {
-                            for(int _i = 0; _i < sub_tokens.size(); _i++)
-                                _sensor->bulk_read_items.push_back(_sensor->ctrl_table[sub_tokens[_i]]);
-                        }
-                    }
-                }
-            }
+          }
         }
-        file.close();
+        else if (tokens[0] == SENSOR)
+        {
+          std::string file_path = dev_desc_dir_path + tokens[0] + "/" + tokens[3] + ".device";
+          int         id        = std::atoi(tokens[2].c_str());
+          std::string port      = tokens[1];
+          float       protocol  = std::atof(tokens[4].c_str());
+          std::string dev_name  = tokens[5];
+
+          sensors_[dev_name] = getSensor(file_path, id, port, protocol);
+
+          Sensor *sensor = sensors_[dev_name];
+          std::vector<std::string> sub_tokens = split(tokens[6], ',');
+          if (sub_tokens.size() > 0)
+          {
+            std::map<std::string, ControlTableItem *>::iterator indirect_it = sensor->ctrl_table_.find(INDIRECT_ADDRESS_1);
+            if (indirect_it != sensor->ctrl_table_.end())    // INDIRECT_ADDRESS_1 exist
+            {
+              uint16_t indirect_data_addr = sensor->ctrl_table_[INDIRECT_DATA_1]->address_;
+              for (int i = 0; i < sub_tokens.size(); i++)
+              {
+                sensor->bulk_read_items_.push_back(new ControlTableItem());
+                ControlTableItem *dest_item = sensor->bulk_read_items_[i];
+                ControlTableItem *src_item  = sensor->ctrl_table_[sub_tokens[i]];
+
+                dest_item->item_name_       = src_item->item_name_;
+                dest_item->address_         = indirect_data_addr;
+                dest_item->access_type_     = src_item->access_type_;
+                dest_item->memory_type_     = src_item->memory_type_;
+                dest_item->data_length_     = src_item->data_length_;
+                dest_item->data_min_value_  = src_item->data_min_value_;
+                dest_item->data_max_value_  = src_item->data_max_value_;
+                dest_item->is_signed_       = src_item->is_signed_;
+
+                indirect_data_addr += dest_item->data_length_;
+              }
+            }
+            else    // INDIRECT_ADDRESS_1 exist
+            {
+              for (int i = 0; i < sub_tokens.size(); i++)
+                sensor->bulk_read_items_.push_back(sensor->ctrl_table_[sub_tokens[i]]);
+            }
+          }
+        }
+      }
     }
-    else
-    {
-        std::cout << "Unable to open file : " + robot_file_path << std::endl;
-    }
+    file.close();
+  }
+  else
+  {
+    std::cout << "Unable to open file : " + robot_file_path << std::endl;
+  }
 }
 
 Sensor *Robot::getSensor(std::string path, int id, std::string port, float protocol_version)
 {
-    Sensor *_sensor;
+  Sensor *sensor;
 
-    // load file model_name.device
-    std::ifstream file(path.c_str());
-    if(file.is_open())
+  // load file model_name.device
+  std::ifstream file(path.c_str());
+  if (file.is_open())
+  {
+    std::string session = "";
+    std::string input_str;
+
+    while (!file.eof())
     {
-        std::string _session = "";
-        std::string _input_str;
+      std::getline(file, input_str);
 
-        while(!file.eof())
-        {
-            std::getline(file, _input_str);
+      // remove comment ( # )
+      std::size_t pos = input_str.find("#");
+      if (pos != std::string::npos)
+        input_str = input_str.substr(0, pos);
 
-            // remove comment ( # )
-            std::size_t pos = _input_str.find("#");
-            if(pos != std::string::npos)
-                _input_str = _input_str.substr(0, pos);
+      // trim
+      input_str = trim(input_str);
+      if (input_str == "")
+        continue;
 
-            // trim
-            _input_str = trim(_input_str);
-            if(_input_str == "")
-                continue;
+      // find _session
+      if (!input_str.compare(0, 1, "[") && !input_str.compare(input_str.size() - 1, 1, "]"))
+      {
+        input_str = input_str.substr(1, input_str.size() - 2);
+        std::transform(input_str.begin(), input_str.end(), input_str.begin(), ::tolower);
+        session = trim(input_str);
+        continue;
+      }
 
-            // find _session
-            if(!_input_str.compare(0, 1, "[") && !_input_str.compare(_input_str.size()-1, 1, "]"))
-            {
-                _input_str = _input_str.substr(1, _input_str.size()-2);
-                std::transform(_input_str.begin(), _input_str.end(), _input_str.begin(), ::tolower);
-                _session = trim(_input_str);
-                continue;
-            }
+      if (session == SESSION_DEVICE_INFO)
+      {
+        std::vector<std::string> tokens = split(input_str, '=');
+        if (tokens.size() != 2)
+          continue;
 
-            if(_session == "device info")
-            {
-                std::vector<std::string> tokens = split(_input_str, '=');
-                if(tokens.size() != 2)
-                    continue;
+        if (tokens[0] == "model_name")
+          sensor = new Sensor(id, tokens[1], protocol_version);
+      }
+      else if (session == SESSION_CONTROL_TABLE)
+      {
+        std::vector<std::string> tokens = split(input_str, '|');
+        if (tokens.size() != 8)
+          continue;
 
-                if(tokens[0] == "model_name")
-                    _sensor = new Sensor(id, tokens[1], protocol_version);
-            }
-            else if(_session == "control table")
-            {
-                std::vector<std::string> tokens = split(_input_str, '|');
-                if(tokens.size() != 8)
-                    continue;
+        ControlTableItem *item = new ControlTableItem();
+        item->item_name_    = tokens[1];
+        item->address_      = std::atoi(tokens[0].c_str());
+        item->data_length_  = std::atoi(tokens[2].c_str());
 
-                ControlTableItem *item = new ControlTableItem();
-                item->item_name = tokens[1];
-                item->address = std::atoi(tokens[0].c_str());
-                item->data_length = std::atoi(tokens[2].c_str());
-                if(tokens[3] == "R")
-                    item->access_type = READ;
-                else if(tokens[3] == "RW")
-                    item->access_type = READ_WRITE;
-                if(tokens[4] == "EEPROM")
-                    item->memory_type = EEPROM;
-                else if(tokens[4] == "RAM")
-                    item->memory_type = RAM;
-                item->data_min_value = std::atol(tokens[5].c_str());
-                item->data_max_value = std::atol(tokens[6].c_str());
-                if(tokens[7] == "Y")
-                    item->is_signed = true;
-                else if(tokens[7] == "N")
-                    item->is_signed = false;
-                _sensor->ctrl_table[tokens[1]] = item;
-            }
-        }
-        _sensor->port_name = port;
+        if (tokens[3] == "R")
+          item->access_type_ = Read;
+        else if (tokens[3] == "RW")
+          item->access_type_ = ReadWrite;
 
-        fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), _sensor->id, _sensor->model_name.c_str());
-        //std::cout << "[ID:" << (int)(_sensor->id) << "] " << _sensor->model_name << " added. (" << port << ")" << std::endl;
-        file.close();
+        if (tokens[4] == "EEPROM")
+          item->memory_type_ = EEPROM;
+        else if (tokens[4] == "RAM")
+          item->memory_type_ = RAM;
+
+        item->data_min_value_ = std::atol(tokens[5].c_str());
+        item->data_max_value_ = std::atol(tokens[6].c_str());
+
+        if (tokens[7] == "Y")
+          item->is_signed_ = true;
+        else if (tokens[7] == "N")
+          item->is_signed_ = false;
+        sensor->ctrl_table_[tokens[1]] = item;
+      }
     }
-    else
-        std::cout << "Unable to open file : " + path << std::endl;
+    sensor->port_name_ = port;
 
-    return _sensor;
+    fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), sensor->id_, sensor->model_name_.c_str());
+    //std::cout << "[ID:" << (int)(_sensor->id) << "] " << _sensor->model_name << " added. (" << port << ")" << std::endl;
+    file.close();
+  }
+  else
+    std::cout << "Unable to open file : " + path << std::endl;
+
+  return sensor;
 }
 
 Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float protocol_version)
 {
-    Dynamixel *_dxl;
+  Dynamixel *dxl;
 
-    // load file model_name.device
-    std::ifstream file(path.c_str());
-    if(file.is_open())
+  // load file model_name.device
+  std::ifstream file(path.c_str());
+  if (file.is_open())
+  {
+    std::string session = "";
+    std::string input_str;
+
+    std::string torque_enable_item_name = "";
+    std::string present_position_item_name = "";
+    std::string present_velocity_item_name = "";
+    std::string present_current_item_name = "";
+    std::string goal_position_item_name = "";
+    std::string goal_velocity_item_name = "";
+    std::string goal_current_item_name = "";
+
+    while (!file.eof())
     {
-        std::string _session = "";
-        std::string _input_str;
+      std::getline(file, input_str);
 
-        std::string _torque_enable_item_name    = "";
-        std::string _present_position_item_name = "";
-        std::string _present_velocity_item_name = "";
-        std::string _present_current_item_name  = "";
-        std::string _goal_position_item_name    = "";
-        std::string _goal_velocity_item_name    = "";
-        std::string _goal_current_item_name     = "";
+      // remove comment ( # )
+      std::size_t pos = input_str.find("#");
+      if (pos != std::string::npos)
+        input_str = input_str.substr(0, pos);
 
-        while(!file.eof())
-        {
-            std::getline(file, _input_str);
+      // trim
+      input_str = trim(input_str);
+      if (input_str == "")
+        continue;
 
-            // remove comment ( # )
-            std::size_t pos = _input_str.find("#");
-            if(pos != std::string::npos)
-                _input_str = _input_str.substr(0, pos);
+      // find session
+      if (!input_str.compare(0, 1, "[") && !input_str.compare(input_str.size() - 1, 1, "]"))
+      {
+        input_str = input_str.substr(1, input_str.size() - 2);
+        std::transform(input_str.begin(), input_str.end(), input_str.begin(), ::tolower);
+        session = trim(input_str);
+        continue;
+      }
 
-            // trim
-            _input_str = trim(_input_str);
-            if(_input_str == "")
-                continue;
+      if (session == SESSION_DEVICE_INFO)
+      {
+        std::vector<std::string> tokens = split(input_str, '=');
+        if (tokens.size() != 2)
+          continue;
 
-            // find _session
-            if(!_input_str.compare(0, 1, "[") && !_input_str.compare(_input_str.size()-1, 1, "]"))
-            {
-                _input_str = _input_str.substr(1, _input_str.size()-2);
-                std::transform(_input_str.begin(), _input_str.end(), _input_str.begin(), ::tolower);
-                _session = trim(_input_str);
-                continue;
-            }
+        if (tokens[0] == "model_name")
+          dxl = new Dynamixel(id, tokens[1], protocol_version);
+      }
+      else if (session == SESSION_TYPE_INFO)
+      {
+        std::vector<std::string> tokens = split(input_str, '=');
+        if (tokens.size() != 2)
+          continue;
 
-            if(_session == "device info")
-            {
-                std::vector<std::string> tokens = split(_input_str, '=');
-                if(tokens.size() != 2)
-                    continue;
+        if (tokens[0] == "current_ratio")
+          dxl->current_ratio_ = std::atof(tokens[1].c_str());
+        else if (tokens[0] == "velocity_ratio")
+          dxl->velocity_ratio_ = std::atof(tokens[1].c_str());
 
-                if(tokens[0] == "model_name")
-                    _dxl = new Dynamixel(id, tokens[1], protocol_version);
-            }
-            else if(_session == "type info")
-            {
-                std::vector<std::string> tokens = split(_input_str, '=');
-                if(tokens.size() != 2)
-                    continue;
+        else if (tokens[0] == "value_of_0_radian_position")
+          dxl->value_of_0_radian_position_ = std::atoi(tokens[1].c_str());
+        else if (tokens[0] == "value_of_min_radian_position")
+          dxl->value_of_min_radian_position_ = std::atoi(tokens[1].c_str());
+        else if (tokens[0] == "value_of_max_radian_position")
+          dxl->value_of_max_radian_position_ = std::atoi(tokens[1].c_str());
+        else if (tokens[0] == "min_radian")
+          dxl->min_radian_ = std::atof(tokens[1].c_str());
+        else if (tokens[0] == "max_radian")
+          dxl->max_radian_ = std::atof(tokens[1].c_str());
 
-                if(tokens[0] == "current_ratio")
-                	_dxl->current_ratio = std::atof(tokens[1].c_str());
-                else if(tokens[0] == "velocity_ratio")
-                    _dxl->velocity_ratio = std::atof(tokens[1].c_str());
+        else if (tokens[0] == "torque_enable_item_name")
+          torque_enable_item_name = tokens[1];
+        else if (tokens[0] == "present_position_item_name")
+          present_position_item_name = tokens[1];
+        else if (tokens[0] == "present_velocity_item_name")
+          present_velocity_item_name = tokens[1];
+        else if (tokens[0] == "present_current_item_name")
+          present_current_item_name = tokens[1];
+        else if (tokens[0] == "goal_position_item_name")
+          goal_position_item_name = tokens[1];
+        else if (tokens[0] == "goal_velocity_item_name")
+          goal_velocity_item_name = tokens[1];
+        else if (tokens[0] == "goal_current_item_name")
+          goal_current_item_name = tokens[1];
+      }
+      else if (session == SESSION_CONTROL_TABLE)
+      {
+        std::vector<std::string> tokens = split(input_str, '|');
+        if (tokens.size() != 8)
+          continue;
 
-                else if(tokens[0] == "value_of_0_radian_position")
-                    _dxl->value_of_0_radian_position = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "value_of_min_radian_position")
-                    _dxl->value_of_min_radian_position = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "value_of_max_radian_position")
-                    _dxl->value_of_max_radian_position = std::atoi(tokens[1].c_str());
-                else if(tokens[0] == "min_radian")
-                    _dxl->min_radian = std::atof(tokens[1].c_str());
-                else if(tokens[0] == "max_radian")
-                    _dxl->max_radian = std::atof(tokens[1].c_str());
+        ControlTableItem *item = new ControlTableItem();
+        item->item_name_    = tokens[1];
+        item->address_      = std::atoi(tokens[0].c_str());
+        item->data_length_  = std::atoi(tokens[2].c_str());
 
-                else if(tokens[0] == "torque_enable_item_name")
-                    _torque_enable_item_name = tokens[1];
-                else if(tokens[0] == "present_position_item_name")
-                    _present_position_item_name = tokens[1];
-                else if(tokens[0] == "present_velocity_item_name")
-                    _present_velocity_item_name = tokens[1];
-                else if(tokens[0] == "present_current_item_name")
-                    _present_current_item_name = tokens[1];
-                else if(tokens[0] == "goal_position_item_name")
-                    _goal_position_item_name = tokens[1];
-                else if(tokens[0] == "goal_velocity_item_name")
-                    _goal_velocity_item_name = tokens[1];
-                else if(tokens[0] == "goal_current_item_name")
-                    _goal_current_item_name = tokens[1];
-            }
-            else if(_session == "control table")
-            {
-                std::vector<std::string> tokens = split(_input_str, '|');
-                if(tokens.size() != 8)
-                    continue;
+        if (tokens[3] == "R")
+          item->access_type_ = Read;
+        else if (tokens[3] == "RW")
+          item->access_type_ = ReadWrite;
 
-                ControlTableItem *item = new ControlTableItem();
-                item->item_name = tokens[1];
-                item->address = std::atoi(tokens[0].c_str());
-                item->data_length = std::atoi(tokens[2].c_str());
-                if(tokens[3] == "R")
-                    item->access_type = READ;
-                else if(tokens[3] == "RW")
-                    item->access_type = READ_WRITE;
-                if(tokens[4] == "EEPROM")
-                    item->memory_type = EEPROM;
-                else if(tokens[4] == "RAM")
-                    item->memory_type = RAM;
-                item->data_min_value = std::atol(tokens[5].c_str());
-                item->data_max_value = std::atol(tokens[6].c_str());
-                if(tokens[7] == "Y")
-                    item->is_signed = true;
-                else if(tokens[7] == "N")
-                    item->is_signed = false;
-                _dxl->ctrl_table[tokens[1]] = item;
-            }
-        }
-        _dxl->port_name = port;
+        if (tokens[4] == "EEPROM")
+          item->memory_type_ = EEPROM;
+        else if (tokens[4] == "RAM")
+          item->memory_type_ = RAM;
 
-        if(_dxl->ctrl_table[_torque_enable_item_name] != NULL)
-            _dxl->torque_enable_item = _dxl->ctrl_table[_torque_enable_item_name];
-        if(_dxl->ctrl_table[_present_position_item_name] != NULL)
-            _dxl->present_position_item = _dxl->ctrl_table[_present_position_item_name];
-        if(_dxl->ctrl_table[_present_velocity_item_name] != NULL)
-            _dxl->present_velocity_item = _dxl->ctrl_table[_present_velocity_item_name];
-        if(_dxl->ctrl_table[_present_current_item_name] != NULL)
-            _dxl->present_current_item = _dxl->ctrl_table[_present_current_item_name];
-        if(_dxl->ctrl_table[_goal_position_item_name] != NULL)
-            _dxl->goal_position_item = _dxl->ctrl_table[_goal_position_item_name];
-        if(_dxl->ctrl_table[_goal_velocity_item_name] != NULL)
-            _dxl->goal_velocity_item = _dxl->ctrl_table[_goal_velocity_item_name];
-        if(_dxl->ctrl_table[_goal_current_item_name] != NULL)
-            _dxl->goal_current_item = _dxl->ctrl_table[_goal_current_item_name];
+        item->data_min_value_ = std::atol(tokens[5].c_str());
+        item->data_max_value_ = std::atol(tokens[6].c_str());
 
-        fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), _dxl->id, _dxl->model_name.c_str());
-        //std::cout << "[ID:" << (int)(_dxl->id) << "] " << _dxl->model_name << " added. (" << port << ")" << std::endl;
-        file.close();
+        if (tokens[7] == "Y")
+          item->is_signed_ = true;
+        else if (tokens[7] == "N")
+          item->is_signed_ = false;
+        dxl->ctrl_table_[tokens[1]] = item;
+      }
     }
-    else
-        std::cout << "Unable to open file : " + path << std::endl;
+    dxl->port_name_ = port;
 
-    return _dxl;
+    if (dxl->ctrl_table_[torque_enable_item_name] != NULL)
+      dxl->torque_enable_item_ = dxl->ctrl_table_[torque_enable_item_name];
+    if (dxl->ctrl_table_[present_position_item_name] != NULL)
+      dxl->present_position_item_ = dxl->ctrl_table_[present_position_item_name];
+    if (dxl->ctrl_table_[present_velocity_item_name] != NULL)
+      dxl->present_velocity_item_ = dxl->ctrl_table_[present_velocity_item_name];
+    if (dxl->ctrl_table_[present_current_item_name] != NULL)
+      dxl->present_current_item_ = dxl->ctrl_table_[present_current_item_name];
+    if (dxl->ctrl_table_[goal_position_item_name] != NULL)
+      dxl->goal_position_item_ = dxl->ctrl_table_[goal_position_item_name];
+    if (dxl->ctrl_table_[goal_velocity_item_name] != NULL)
+      dxl->goal_velocity_item_ = dxl->ctrl_table_[goal_velocity_item_name];
+    if (dxl->ctrl_table_[goal_current_item_name] != NULL)
+      dxl->goal_current_item_ = dxl->ctrl_table_[goal_current_item_name];
+
+    fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), dxl->id_, dxl->model_name_.c_str());
+    //std::cout << "[ID:" << (int)(_dxl->id) << "] " << _dxl->model_name << " added. (" << port << ")" << std::endl;
+    file.close();
+  }
+  else
+    std::cout << "Unable to open file : " + path << std::endl;
+
+  return dxl;
 }
 

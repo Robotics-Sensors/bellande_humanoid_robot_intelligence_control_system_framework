@@ -6,9 +6,9 @@
  */
 
 
-#include "robotis_math/RobotisLinearAlgebra.h"
+#include "../include/robotis_math/robotis_linear_algebra.h"
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
 Eigen::MatrixXd transitionXYZ ( double position_x, double position_y, double position_z )

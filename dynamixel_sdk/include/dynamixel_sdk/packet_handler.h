@@ -1,8 +1,39 @@
+/*******************************************************************************
+* Copyright (c) 2016, ROBOTIS CO., LTD.
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* * Redistributions of source code must retain the above copyright notice, this
+*   list of conditions and the following disclaimer.
+*
+* * Redistributions in binary form must reproduce the above copyright notice,
+*   this list of conditions and the following disclaimer in the documentation
+*   and/or other materials provided with the distribution.
+*
+* * Neither the name of ROBOTIS nor the names of its
+*   contributors may be used to endorse or promote products derived from
+*   this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************/
+
+/* Author: zerom, Leon Ryu Woon Jung */
+
 /*
- * PacketHandler.h
+ * packet_handler.h
  *
  *  Created on: 2016. 1. 26.
- *      Author: zerom, leon
  */
 
 #ifndef DYNAMIXEL_SDK_INCLUDE_DYNAMIXEL_SDK_PACKETHANDLER_H_
@@ -11,8 +42,7 @@
 
 #include <stdio.h>
 #include <vector>
-#include "RobotisDef.h"
-#include "PortHandler.h"
+#include "port_handler.h"
 
 #define BROADCAST_ID        0xFE    // 254
 #define MAX_ID              0xFC    // 252
@@ -51,81 +81,81 @@
 #define COMM_RX_CORRUPT     -3002   // Incorrect status packet
 #define COMM_NOT_AVAILABLE  -9000   //
 
-namespace ROBOTIS
+namespace dynamixel
 {
 
 class WINDECLSPEC PacketHandler
 {
-protected:
-    PacketHandler() { }
+ protected:
+  PacketHandler() { }
 
-public:
-    static PacketHandler *GetPacketHandler(float protocol_version = 2.0);
+ public:
+  static PacketHandler *getPacketHandler(float protocol_version = 2.0);
 
-    virtual ~PacketHandler() { }
+  virtual ~PacketHandler() { }
 
-    virtual float   GetProtocolVersion() = 0;
+  virtual float   getProtocolVersion() = 0;
 
-    virtual void    PrintTxRxResult(int result) = 0;
-    virtual void    PrintRxPacketError(UINT8_T error) = 0;
+  virtual void    printTxRxResult(int result) = 0;
+  virtual void    printRxPacketError(uint8_t error) = 0;
 
-    virtual int TxPacket        (PortHandler *port, UINT8_T *txpacket) = 0;
-    virtual int RxPacket        (PortHandler *port, UINT8_T *rxpacket) = 0;
-    virtual int TxRxPacket      (PortHandler *port, UINT8_T *txpacket, UINT8_T *rxpacket, UINT8_T *error = 0) = 0;
+  virtual int txPacket        (PortHandler *port, uint8_t *txpacket) = 0;
+  virtual int rxPacket        (PortHandler *port, uint8_t *rxpacket) = 0;
+  virtual int txRxPacket      (PortHandler *port, uint8_t *txpacket, uint8_t *rxpacket, uint8_t *error = 0) = 0;
 
-    virtual int Ping            (PortHandler *port, UINT8_T id, UINT8_T *error = 0) = 0;
-    virtual int Ping            (PortHandler *port, UINT8_T id, UINT16_T *model_number, UINT8_T *error = 0) = 0;
+  virtual int ping            (PortHandler *port, uint8_t id, uint8_t *error = 0) = 0;
+  virtual int ping            (PortHandler *port, uint8_t id, uint16_t *model_number, uint8_t *error = 0) = 0;
 
-    // BroadcastPing
-    virtual int BroadcastPing   (PortHandler *port, std::vector<UINT8_T> &id_list) = 0;
+  // broadcastPing
+  virtual int broadcastPing   (PortHandler *port, std::vector<uint8_t> &id_list) = 0;
 
-    virtual int Action          (PortHandler *port, UINT8_T id) = 0;
-    virtual int Reboot          (PortHandler *port, UINT8_T id, UINT8_T *error = 0) = 0;
-    virtual int FactoryReset    (PortHandler *port, UINT8_T id, UINT8_T option = 0, UINT8_T *error = 0) = 0;
+  virtual int action          (PortHandler *port, uint8_t id) = 0;
+  virtual int reboot          (PortHandler *port, uint8_t id, uint8_t *error = 0) = 0;
+  virtual int factoryReset    (PortHandler *port, uint8_t id, uint8_t option = 0, uint8_t *error = 0) = 0;
 
 
-    virtual int ReadTx          (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T length) = 0;
-    virtual int ReadRx          (PortHandler *port, UINT16_T length, UINT8_T *data, UINT8_T *error = 0) = 0;
-    virtual int ReadTxRx        (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T length, UINT8_T *data, UINT8_T *error = 0) = 0;
+  virtual int readTx          (PortHandler *port, uint8_t id, uint16_t address, uint16_t length) = 0;
+  virtual int readRx          (PortHandler *port, uint16_t length, uint8_t *data, uint8_t *error = 0) = 0;
+  virtual int readTxRx        (PortHandler *port, uint8_t id, uint16_t address, uint16_t length, uint8_t *data, uint8_t *error = 0) = 0;
 
-    virtual int Read1ByteTx     (PortHandler *port, UINT8_T id, UINT16_T address) = 0;
-    virtual int Read1ByteRx     (PortHandler *port, UINT8_T *data, UINT8_T *error = 0) = 0;
-    virtual int Read1ByteTxRx   (PortHandler *port, UINT8_T id, UINT16_T address, UINT8_T *data, UINT8_T *error = 0) = 0;
+  virtual int read1ByteTx     (PortHandler *port, uint8_t id, uint16_t address) = 0;
+  virtual int read1ByteRx     (PortHandler *port, uint8_t *data, uint8_t *error = 0) = 0;
+  virtual int read1ByteTxRx   (PortHandler *port, uint8_t id, uint16_t address, uint8_t *data, uint8_t *error = 0) = 0;
 
-    virtual int Read2ByteTx     (PortHandler *port, UINT8_T id, UINT16_T address) = 0;
-    virtual int Read2ByteRx     (PortHandler *port, UINT16_T *data, UINT8_T *error = 0) = 0;
-    virtual int Read2ByteTxRx   (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T *data, UINT8_T *error = 0) = 0;
+  virtual int read2ByteTx     (PortHandler *port, uint8_t id, uint16_t address) = 0;
+  virtual int read2ByteRx     (PortHandler *port, uint16_t *data, uint8_t *error = 0) = 0;
+  virtual int read2ByteTxRx   (PortHandler *port, uint8_t id, uint16_t address, uint16_t *data, uint8_t *error = 0) = 0;
 
-    virtual int Read4ByteTx     (PortHandler *port, UINT8_T id, UINT16_T address) = 0;
-    virtual int Read4ByteRx     (PortHandler *port, UINT32_T *data, UINT8_T *error = 0) = 0;
-    virtual int Read4ByteTxRx   (PortHandler *port, UINT8_T id, UINT16_T address, UINT32_T *data, UINT8_T *error = 0) = 0;
+  virtual int read4ByteTx     (PortHandler *port, uint8_t id, uint16_t address) = 0;
+  virtual int read4ByteRx     (PortHandler *port, uint32_t *data, uint8_t *error = 0) = 0;
+  virtual int read4ByteTxRx   (PortHandler *port, uint8_t id, uint16_t address, uint32_t *data, uint8_t *error = 0) = 0;
 
-    virtual int WriteTxOnly     (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T length, UINT8_T *data) = 0;
-    virtual int WriteTxRx       (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T length, UINT8_T *data, UINT8_T *error = 0) = 0;
+  virtual int writeTxOnly     (PortHandler *port, uint8_t id, uint16_t address, uint16_t length, uint8_t *data) = 0;
+  virtual int writeTxRx       (PortHandler *port, uint8_t id, uint16_t address, uint16_t length, uint8_t *data, uint8_t *error = 0) = 0;
 
-    virtual int Write1ByteTxOnly(PortHandler *port, UINT8_T id, UINT16_T address, UINT8_T data) = 0;
-    virtual int Write1ByteTxRx  (PortHandler *port, UINT8_T id, UINT16_T address, UINT8_T data, UINT8_T *error = 0) = 0;
+  virtual int write1ByteTxOnly(PortHandler *port, uint8_t id, uint16_t address, uint8_t data) = 0;
+  virtual int write1ByteTxRx  (PortHandler *port, uint8_t id, uint16_t address, uint8_t data, uint8_t *error = 0) = 0;
 
-    virtual int Write2ByteTxOnly(PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T data) = 0;
-    virtual int Write2ByteTxRx  (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T data, UINT8_T *error = 0) = 0;
+  virtual int write2ByteTxOnly(PortHandler *port, uint8_t id, uint16_t address, uint16_t data) = 0;
+  virtual int write2ByteTxRx  (PortHandler *port, uint8_t id, uint16_t address, uint16_t data, uint8_t *error = 0) = 0;
 
-    virtual int Write4ByteTxOnly(PortHandler *port, UINT8_T id, UINT16_T address, UINT32_T data) = 0;
-    virtual int Write4ByteTxRx  (PortHandler *port, UINT8_T id, UINT16_T address, UINT32_T data, UINT8_T *error = 0) = 0;
+  virtual int write4ByteTxOnly(PortHandler *port, uint8_t id, uint16_t address, uint32_t data) = 0;
+  virtual int write4ByteTxRx  (PortHandler *port, uint8_t id, uint16_t address, uint32_t data, uint8_t *error = 0) = 0;
 
-    virtual int RegWriteTxOnly  (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T length, UINT8_T *data) = 0;
-    virtual int RegWriteTxRx    (PortHandler *port, UINT8_T id, UINT16_T address, UINT16_T length, UINT8_T *data, UINT8_T *error = 0) = 0;
+  virtual int regWriteTxOnly  (PortHandler *port, uint8_t id, uint16_t address, uint16_t length, uint8_t *data) = 0;
+  virtual int regWriteTxRx    (PortHandler *port, uint8_t id, uint16_t address, uint16_t length, uint8_t *data, uint8_t *error = 0) = 0;
 
-    virtual int SyncReadTx      (PortHandler *port, UINT16_T start_address, UINT16_T data_length, UINT8_T *param, UINT16_T param_length) = 0;
-    // SyncReadRx   -> GroupSyncRead class
-    // SyncReadTxRx -> GroupSyncRead class
+  virtual int syncReadTx      (PortHandler *port, uint16_t start_address, uint16_t data_length, uint8_t *param, uint16_t param_length) = 0;
+  // SyncReadRx   -> GroupSyncRead class
+  // SyncReadTxRx -> GroupSyncRead class
 
-    virtual int SyncWriteTxOnly (PortHandler *port, UINT16_T start_address, UINT16_T data_length, UINT8_T *param, UINT16_T param_length) = 0;
+  virtual int syncWriteTxOnly (PortHandler *port, uint16_t start_address, uint16_t data_length, uint8_t *param, uint16_t param_length) = 0;
 
-    virtual int BulkReadTx      (PortHandler *port, UINT8_T *param, UINT16_T param_length) = 0;
-    // BulkReadRx   -> GroupBulkRead class
-    // BulkReadTxRx -> GroupBulkRead class
+  virtual int bulkReadTx      (PortHandler *port, uint8_t *param, uint16_t param_length) = 0;
+  // BulkReadRx   -> GroupBulkRead class
+  // BulkReadTxRx -> GroupBulkRead class
 
-    virtual int BulkWriteTxOnly (PortHandler *port, UINT8_T *param, UINT16_T param_length) = 0;
+  virtual int bulkWriteTxOnly (PortHandler *port, uint8_t *param, uint16_t param_length) = 0;
 };
 
 }

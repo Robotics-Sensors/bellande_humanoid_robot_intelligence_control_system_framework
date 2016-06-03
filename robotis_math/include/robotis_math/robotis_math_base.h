@@ -10,7 +10,7 @@
 
 #include <cmath>
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
 #define PRINT_VAR(X) std::cout << #X << " : " << X << std::endl

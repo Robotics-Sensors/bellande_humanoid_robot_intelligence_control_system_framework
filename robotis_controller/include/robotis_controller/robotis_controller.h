@@ -1,12 +1,42 @@
+/*******************************************************************************
+ * Copyright (c) 2016, ROBOTIS CO., LTD.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of ROBOTIS nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 /*
- * RobotisController.h
+ * robotis_controller.h
  *
  *  Created on: 2016. 1. 15.
  *      Author: zerom
  */
 
-#ifndef ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_INCLUDE_ROBOTIS_CONTROLLER_ROBOTISCONTROLLER_H_
-#define ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_INCLUDE_ROBOTIS_CONTROLLER_ROBOTISCONTROLLER_H_
+#ifndef ROBOTIS_CONTROLLER_ROBOTIS_CONTROLLER_H_
+#define ROBOTIS_CONTROLLER_ROBOTIS_CONTROLLER_H_
 
 
 #include <ros/ros.h>
@@ -16,132 +46,131 @@
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/JointState.h>
 
-#include "robotis_device/Robot.h"
-#include "robotis_framework_common/MotionModule.h"
-#include "robotis_framework_common/SensorModule.h"
-
 #include "robotis_controller_msgs/SyncWriteItem.h"
 #include "robotis_controller_msgs/JointCtrlModule.h"
 #include "robotis_controller_msgs/GetJointModule.h"
 
-#include "dynamixel_sdk/GroupBulkRead.h"
-#include "dynamixel_sdk/GroupSyncWrite.h"
+#include "robotis_device/robot.h"
+#include "robotis_framework_common/motion_module.h"
+#include "robotis_framework_common/sensor_module.h"
+#include "dynamixel_sdk/group_bulk_read.h"
+#include "dynamixel_sdk/group_sync_write.h"
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
-enum CONTROLLER_MODE
+enum ControllerMode
 {
-    MOTION_MODULE_MODE,
-    DIRECT_CONTROL_MODE
+  MotionModuleMode,
+  DirectControlMode
 };
 
 class RobotisController : public Singleton<RobotisController>
 {
 private:
-    boost::thread               queue_thread_;
-    boost::thread               gazebo_thread_;
-    boost::thread               set_module_thread_;
-    boost::mutex                queue_mutex_;
+  boost::thread   queue_thread_;
+  boost::thread   gazebo_thread_;
+  boost::thread   set_module_thread_;
+  boost::mutex    queue_mutex_;
 
-    bool                        init_pose_loaded_;
-    bool                        is_timer_running_;
-    bool                        stop_timer_;
-    pthread_t                   timer_thread_;
-    CONTROLLER_MODE             controller_mode_;
+  bool            init_pose_loaded_;
+  bool            is_timer_running_;
+  bool            stop_timer_;
+  pthread_t       timer_thread_;
+  ControllerMode  controller_mode_;
 
-    std::list<MotionModule *>       motion_modules_;
-    std::list<SensorModule *>       sensor_modules_;
-    std::vector<GroupSyncWrite *>   direct_sync_write_;
+  std::list<MotionModule *> motion_modules_;
+  std::list<SensorModule *> sensor_modules_;
+  std::vector<dynamixel::GroupSyncWrite *>  direct_sync_write_;
 
-    std::map<std::string, double>   sensor_result_;
+  std::map<std::string, double> sensor_result_;
 
-    void QueueThread();
-    void GazeboThread();
-    void SetCtrlModuleThread(std::string ctrl_module);
+  void gazeboTimerThread();
+  void msgQueueThread();
+  void setCtrlModuleThread(std::string ctrl_module);
 
-    bool CheckTimerStop();
-    void InitSyncWrite();
+  bool isTimerStopped();
+  void initializeSyncWrite();
 
 public:
-    static const int            CONTROL_CYCLE_MSEC  = 8;    // 8 msec
+  static const int  CONTROL_CYCLE_MSEC  = 8;    // 8 msec
 
-    bool                        DEBUG_PRINT;
-    Robot                      *robot;
+  bool              DEBUG_PRINT;
+  Robot            *robot_;
 
-    bool                        gazebo_mode;
-    std::string                 gazebo_robot_name;
+  bool              gazebo_mode_;
+  std::string       gazebo_robot_name_;
 
-    /* bulk read */
-    std::map<std::string, GroupBulkRead *>  port_to_bulk_read;
+  /* bulk read */
+  std::map<std::string, dynamixel::GroupBulkRead *>   port_to_bulk_read_;
 
-    /* sync write */
-    std::map<std::string, GroupSyncWrite *> port_to_sync_write_position;
-    std::map<std::string, GroupSyncWrite *> port_to_sync_write_velocity;
-    std::map<std::string, GroupSyncWrite *> port_to_sync_write_torque;
-    std::map<std::string, GroupSyncWrite *> port_to_sync_write_position_p_gain;
+  /* sync write */
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_position_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_velocity_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_torque_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_position_p_gain_;
 
-    /* publisher */
-    ros::Publisher  goal_joint_state_pub;
-    ros::Publisher  present_joint_state_pub;
-    ros::Publisher  current_module_pub;
+  /* publisher */
+  ros::Publisher  goal_joint_state_pub_;
+  ros::Publisher  present_joint_state_pub_;
+  ros::Publisher  current_module_pub_;
 
-    std::map<std::string, ros::Publisher> gazebo_joint_pub;
+  std::map<std::string, ros::Publisher> gazebo_joint_pub_;
 
-    static void *ThreadProc(void *param);
+  static void *timerThread(void *param);
 
-    RobotisController();
+  RobotisController();
 
-    bool    Initialize(const std::string robot_file_path, const std::string init_file_path);
-    void    InitDevice(const std::string init_file_path);
-    void    Process();
+  bool    initialize(const std::string robot_file_path, const std::string init_file_path);
+  void    initializeDevice(const std::string init_file_path);
+  void    process();
 
-    void    AddMotionModule(MotionModule *module);
-    void    RemoveMotionModule(MotionModule *module);
-    void    AddSensorModule(SensorModule *module);
-    void    RemoveSensorModule(SensorModule *module);
+  void    addMotionModule(MotionModule *module);
+  void    removeMotionModule(MotionModule *module);
+  void    addSensorModule(SensorModule *module);
+  void    removeSensorModule(SensorModule *module);
 
-    void    StartTimer();
-    void    StopTimer();
-    bool    IsTimerRunning();
+  void    startTimer();
+  void    stopTimer();
+  bool    isTimerRunning();
 
-    void    LoadOffset(const std::string path);
+  void    loadOffset(const std::string path);
 
-    /* ROS Topic Callback Functions */
-    void    SyncWriteItemCallback(const robotis_controller_msgs::SyncWriteItem::ConstPtr &msg);
-    void    SetControllerModeCallback(const std_msgs::String::ConstPtr &msg);
-    void    SetJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
-    void    SetJointCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
-    void    SetCtrlModuleCallback(const std_msgs::String::ConstPtr &msg);
-    bool    GetCtrlModuleCallback(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
+  /* ROS Topic Callback Functions */
+  void    syncWriteItemCallback(const robotis_controller_msgs::SyncWriteItem::ConstPtr &msg);
+  void    setControllerModeCallback(const std_msgs::String::ConstPtr &msg);
+  void    setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
+  void    setJointCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
+  void    setCtrlModuleCallback(const std_msgs::String::ConstPtr &msg);
+  bool    getCtrlModuleCallback(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
 
-    void    GazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
+  void    gazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
 
-    int     Ping        (const std::string joint_name, UINT8_T *error = 0);
-    int     Ping        (const std::string joint_name, UINT16_T* model_number, UINT8_T *error = 0);
+  int     ping        (const std::string joint_name, uint8_t *error = 0);
+  int     ping        (const std::string joint_name, uint16_t* model_number, uint8_t *error = 0);
 
-    int     Action      (const std::string joint_name);
-    int     Reboot      (const std::string joint_name, UINT8_T *error = 0);
-    int     FactoryReset(const std::string joint_name, UINT8_T option = 0, UINT8_T *error = 0);
+  int     action      (const std::string joint_name);
+  int     reboot      (const std::string joint_name, uint8_t *error = 0);
+  int     factoryReset(const std::string joint_name, uint8_t option = 0, uint8_t *error = 0);
 
-    int     Read        (const std::string joint_name, UINT16_T address, UINT16_T length, UINT8_T *data, UINT8_T *error = 0);
-    int     ReadCtrlItem(const std::string joint_name, const std::string item_name, UINT32_T *data, UINT8_T *error = 0);
+  int     read        (const std::string joint_name, uint16_t address, uint16_t length, uint8_t *data, uint8_t *error = 0);
+  int     readCtrlItem(const std::string joint_name, const std::string item_name, uint32_t *data, uint8_t *error = 0);
 
-    int     Read1Byte   (const std::string joint_name, UINT16_T address, UINT8_T *data, UINT8_T *error = 0);
-    int     Read2Byte   (const std::string joint_name, UINT16_T address, UINT16_T *data, UINT8_T *error = 0);
-    int     Read4Byte   (const std::string joint_name, UINT16_T address, UINT32_T *data, UINT8_T *error = 0);
+  int     read1Byte   (const std::string joint_name, uint16_t address, uint8_t *data, uint8_t *error = 0);
+  int     read2Byte   (const std::string joint_name, uint16_t address, uint16_t *data, uint8_t *error = 0);
+  int     read4Byte   (const std::string joint_name, uint16_t address, uint32_t *data, uint8_t *error = 0);
 
-    int     Write       (const std::string joint_name, UINT16_T address, UINT16_T length, UINT8_T *data, UINT8_T *error = 0);
-    int     WriteCtrlItem(const std::string joint_name, const std::string item_name, UINT32_T data, UINT8_T *error = 0);
+  int     write       (const std::string joint_name, uint16_t address, uint16_t length, uint8_t *data, uint8_t *error = 0);
+  int     writeCtrlItem(const std::string joint_name, const std::string item_name, uint32_t data, uint8_t *error = 0);
 
-    int     Write1Byte  (const std::string joint_name, UINT16_T address, UINT8_T data, UINT8_T *error = 0);
-    int     Write2Byte  (const std::string joint_name, UINT16_T address, UINT16_T data, UINT8_T *error = 0);
-    int     Write4Byte  (const std::string joint_name, UINT16_T address, UINT32_T data, UINT8_T *error = 0);
+  int     write1Byte  (const std::string joint_name, uint16_t address, uint8_t data, uint8_t *error = 0);
+  int     write2Byte  (const std::string joint_name, uint16_t address, uint16_t data, uint8_t *error = 0);
+  int     write4Byte  (const std::string joint_name, uint16_t address, uint32_t data, uint8_t *error = 0);
 
-    int     RegWrite    (const std::string joint_name, UINT16_T address, UINT16_T length, UINT8_T *data, UINT8_T *error = 0);
+  int     regWrite    (const std::string joint_name, uint16_t address, uint16_t length, uint8_t *data, uint8_t *error = 0);
 };
 
 }
 
 
-#endif /* ROBOTIS_FRAMEWORK_ROBOTIS_CONTROLLER_INCLUDE_ROBOTIS_CONTROLLER_ROBOTISCONTROLLER_H_ */
+#endif /* ROBOTIS_CONTROLLER_ROBOTIS_CONTROLLER_H_ */

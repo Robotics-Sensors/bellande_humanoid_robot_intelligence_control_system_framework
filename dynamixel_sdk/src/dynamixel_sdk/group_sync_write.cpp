@@ -1,117 +1,147 @@
+/*******************************************************************************
+* Copyright (c) 2016, ROBOTIS CO., LTD.
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* * Redistributions of source code must retain the above copyright notice, this
+*   list of conditions and the following disclaimer.
+*
+* * Redistributions in binary form must reproduce the above copyright notice,
+*   this list of conditions and the following disclaimer in the documentation
+*   and/or other materials provided with the distribution.
+*
+* * Neither the name of ROBOTIS nor the names of its
+*   contributors may be used to endorse or promote products derived from
+*   this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************/
+
+/* Author: zerom, Leon Ryu Woon Jung */
+
 /*
- * GroupSyncWrite.cpp
+ * group_sync_write.cpp
  *
  *  Created on: 2016. 1. 28.
- *      Author: zerom, leon
  */
 #if defined(_WIN32) || defined(_WIN64)
 #define WINDLLEXPORT
 #endif
 
 #include <algorithm>
-#include "dynamixel_sdk/GroupSyncWrite.h"
+#include "dynamixel_sdk/group_sync_write.h"
 
-using namespace ROBOTIS;
+using namespace dynamixel;
 
-GroupSyncWrite::GroupSyncWrite(PortHandler *port, PacketHandler *ph, UINT16_T start_address, UINT16_T data_length)
-    : port_(port),
-      ph_(ph),
-      is_param_changed_(false),
-      param_(0),
-      start_address_(start_address),
-      data_length_(data_length)
+GroupSyncWrite::GroupSyncWrite(PortHandler *port, PacketHandler *ph, uint16_t start_address, uint16_t data_length)
+  : port_(port),
+    ph_(ph),
+    is_param_changed_(false),
+    param_(0),
+    start_address_(start_address),
+    data_length_(data_length)
 {
-    ClearParam();
+  clearParam();
 }
 
-void GroupSyncWrite::MakeParam()
+void GroupSyncWrite::makeParam()
 {
-    if(id_list_.size() == 0)
-        return;
+  if (id_list_.size() == 0) return;
 
-    if(param_ != 0)
-        delete[] param_;
-    param_ = 0;
+  if (param_ != 0)
+    delete[] param_;
+  param_ = 0;
 
-    param_ = new UINT8_T[id_list_.size() * (1 + data_length_)]; // ID(1) + DATA(data_length)
+  param_ = new uint8_t[id_list_.size() * (1 + data_length_)]; // ID(1) + DATA(data_length)
 
-    int _idx = 0;
-    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
-    {
-        UINT8_T _id = id_list_[_i];
-        if(data_list_[_id] == 0)
-            return;
+  int idx = 0;
+  for (unsigned int i = 0; i < id_list_.size(); i++)
+  {
+    uint8_t id = id_list_[i];
+    if (data_list_[id] == 0)
+      return;
 
-        param_[_idx++] = _id;
-        for(int _c = 0; _c < data_length_; _c++)
-            param_[_idx++] = (data_list_[_id])[_c];
-    }
+    param_[idx++] = id;
+    for (int c = 0; c < data_length_; c++)
+      param_[idx++] = (data_list_[id])[c];
+  }
 }
 
-bool GroupSyncWrite::AddParam(UINT8_T id, UINT8_T *data)
+bool GroupSyncWrite::addParam(uint8_t id, uint8_t *data)
 {
-    if(std::find(id_list_.begin(), id_list_.end(), id) != id_list_.end())   // id already exist
-        return false;
+  if (std::find(id_list_.begin(), id_list_.end(), id) != id_list_.end())   // id already exist
+    return false;
 
-    id_list_.push_back(id);
-    data_list_[id] = new UINT8_T[data_length_];
-    for(int _c = 0; _c < data_length_; _c++)
-        data_list_[id][_c] = data[_c];
+  id_list_.push_back(id);
+  data_list_[id]    = new uint8_t[data_length_];
+  for (int c = 0; c < data_length_; c++)
+    data_list_[id][c] = data[c];
 
-    is_param_changed_   = true;
-    return true;
+  is_param_changed_   = true;
+  return true;
 }
 
-void GroupSyncWrite::RemoveParam(UINT8_T id)
+void GroupSyncWrite::removeParam(uint8_t id)
 {
-    std::vector<UINT8_T>::iterator it = std::find(id_list_.begin(), id_list_.end(), id);
-    if(it == id_list_.end())    // NOT exist
-        return;
+  std::vector<uint8_t>::iterator it = std::find(id_list_.begin(), id_list_.end(), id);
+  if (it == id_list_.end())    // NOT exist
+    return;
 
-    id_list_.erase(it);
-    delete[] data_list_[id];
-    data_list_.erase(id);
+  id_list_.erase(it);
+  delete[] data_list_[id];
+  data_list_.erase(id);
 
-    is_param_changed_   = true;
+  is_param_changed_   = true;
 }
 
-bool GroupSyncWrite::ChangeParam(UINT8_T id, UINT8_T *data)
+bool GroupSyncWrite::changeParam(uint8_t id, uint8_t *data)
 {
-    std::vector<UINT8_T>::iterator it = std::find(id_list_.begin(), id_list_.end(), id);
-    if(it == id_list_.end())    // NOT exist
-        return false;
+  std::vector<uint8_t>::iterator it = std::find(id_list_.begin(), id_list_.end(), id);
+  if (it == id_list_.end())    // NOT exist
+    return false;
 
-    delete[] data_list_[id];
-    data_list_[id] = new UINT8_T[data_length_];
-    for(int _c = 0; _c < data_length_; _c++)
-        data_list_[id][_c] = data[_c];
+  delete[] data_list_[id];
+  data_list_[id]    = new uint8_t[data_length_];
+  for (int c = 0; c < data_length_; c++)
+    data_list_[id][c] = data[c];
 
-    is_param_changed_   = true;
-    return true;
+  is_param_changed_   = true;
+  return true;
 }
 
-void GroupSyncWrite::ClearParam()
+void GroupSyncWrite::clearParam()
 {
-    if(id_list_.size() == 0)
-        return;
+  if (id_list_.size() == 0)
+    return;
 
-    for(unsigned int _i = 0; _i < id_list_.size(); _i++)
-        delete[] data_list_[id_list_[_i]];
+  for (unsigned int i = 0; i < id_list_.size(); i++)
+    delete[] data_list_[id_list_[i]];
 
-    id_list_.clear();
-    data_list_.clear();
-    if(param_ != 0)
-        delete[] param_;
-    param_ = 0;
+  id_list_.clear();
+  data_list_.clear();
+  if (param_ != 0)
+    delete[] param_;
+  param_ = 0;
 }
 
-int GroupSyncWrite::TxPacket()
+int GroupSyncWrite::txPacket()
 {
-    if(id_list_.size() == 0)
-        return COMM_NOT_AVAILABLE;
+  if (id_list_.size() == 0)
+    return COMM_NOT_AVAILABLE;
 
-    if(is_param_changed_ == true)
-        MakeParam();
+  if (is_param_changed_ == true)
+    makeParam();
 
-    return ph_->SyncWriteTxOnly(port_, start_address_, data_length_, param_, id_list_.size() * (1 + data_length_));
+  return ph_->syncWriteTxOnly(port_, start_address_, data_length_, param_, id_list_.size() * (1 + data_length_));
 }

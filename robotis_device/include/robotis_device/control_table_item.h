@@ -1,54 +1,84 @@
+/*******************************************************************************
+ * Copyright (c) 2016, ROBOTIS CO., LTD.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of ROBOTIS nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 /*
- * ControlTableItem.h
+ * control_table_item.h
  *
  *  Created on: 2015. 12. 16.
  *      Author: zerom
  */
 
-#ifndef ROBOTIS_FRAMEWORK_ROBOTIS_DEVICE_INCLUDE_DEVICE_CONTROLTABLEITEM_H_
-#define ROBOTIS_FRAMEWORK_ROBOTIS_DEVICE_INCLUDE_DEVICE_CONTROLTABLEITEM_H_
+#ifndef ROBOTIS_DEVICE_CONTROL_TABLE_ITEM_H_
+#define ROBOTIS_DEVICE_CONTROL_TABLE_ITEM_H_
 
 
-#include <robotis_framework_common/RobotisDef.h>
+#include <stdint.h>
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
-enum ACCESS_TYPE {
-    READ,
-    READ_WRITE
+enum AccessType {
+  Read,
+  ReadWrite
 };
 
-enum MEMORY_TYPE {
-    EEPROM,
-    RAM
+enum MemoryType {
+  EEPROM,
+  RAM
 };
 
 class ControlTableItem
 {
 public:
-    std::string item_name;
-    UINT16_T    address;
-    ACCESS_TYPE access_type;
-    MEMORY_TYPE memory_type;
-    UINT8_T     data_length;
-    INT32_T     data_min_value;
-    INT32_T     data_max_value;
-    bool        is_signed;
+  std::string item_name_;
+  uint16_t    address_;
+  AccessType  access_type_;
+  MemoryType  memory_type_;
+  uint8_t     data_length_;
+  int32_t     data_min_value_;
+  int32_t     data_max_value_;
+  bool        is_signed_;
 
-    ControlTableItem()
-        : item_name(""),
-          address(0),
-          access_type(READ),
-          memory_type(RAM),
-          data_length(0),
-          data_min_value(0),
-          data_max_value(0),
-          is_signed(false)
-    { }
+  ControlTableItem()
+    : item_name_(""),
+      address_(0),
+      access_type_(Read),
+      memory_type_(RAM),
+      data_length_(0),
+      data_min_value_(0),
+      data_max_value_(0),
+      is_signed_(false)
+  { }
 };
 
 }
 
 
-#endif /* ROBOTIS_FRAMEWORK_ROBOTIS_DEVICE_INCLUDE_DEVICE_CONTROLTABLEITEM_H_ */
+#endif /* ROBOTIS_DEVICE_CONTROL_TABLE_ITEM_H_ */

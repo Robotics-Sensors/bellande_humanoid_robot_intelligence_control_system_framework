@@ -42,9 +42,9 @@ include_directories(
 
 ## Declare a C++ library
 add_library(robotis_math
-   src/RobotisMathBase.cpp
-   src/RobotisTrajectoryCalculator.cpp
-   src/RobotisLinearAlgebra.cpp
+   src/robotis_math_base.cpp
+   src/robotis_trajectory_calculator.cpp
+   src/robotis_linear_algebra.cpp
 )
 
 ## Add cmake target dependencies of the library

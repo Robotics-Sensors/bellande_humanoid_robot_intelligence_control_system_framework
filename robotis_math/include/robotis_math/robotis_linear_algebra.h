@@ -15,7 +15,7 @@
 
 #include <Eigen/Dense>
 
-namespace ROBOTIS
+namespace robotis_framework
 {
 
 Eigen::MatrixXd transitionXYZ ( double position_x, double position_y, double position_z );

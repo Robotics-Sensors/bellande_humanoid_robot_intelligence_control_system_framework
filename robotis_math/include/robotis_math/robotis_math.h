@@ -8,6 +8,6 @@
 #ifndef ROBOTIS_MATH_H_
 #define ROBOTIS_MATH_H_
 
-#include "RobotisTrajectoryCalculator.h"
+#include "robotis_trajectory_calculator.h"
 
 #endif /* ROBOTIS_MATH_H_ */
