@@ -31,12 +31,12 @@
 /*
  * robotis_trajectory_calculator.h
  *
- *  Created on: June 6, 2016
+ *  Created on: June 7, 2016
  *      Author: sch
  */
 
-#ifndef ROBOTIS_TRAJECTORY_CALCULATOR_H_
-#define ROBOTIS_TRAJECTORY_CALCULATOR_H_
+#ifndef ROBOTIS_MATH_ROBOTIS_TRAJECTORY_CALCULATOR_H_
+#define ROBOTIS_MATH_ROBOTIS_TRAJECTORY_CALCULATOR_H_
 
 #include "robotis_linear_algebra.h"
 #include "robotis_math_base.h"
@@ -62,4 +62,4 @@ Eigen::MatrixXd calcArc3dTra(double smp_time, double mov_time,
 
 }
 
-#endif /* ROBOTIS_TRAJECTORY_CALCULATOR_H_ */
+#endif /* ROBOTIS_MATH_ROBOTIS_TRAJECTORY_CALCULATOR_H_ */

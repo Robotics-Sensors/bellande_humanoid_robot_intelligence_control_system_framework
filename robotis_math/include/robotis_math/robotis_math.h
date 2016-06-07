@@ -31,13 +31,13 @@
 /*
  * robotis_math.h
  *
- *  Created on: June 6, 2016
+ *  Created on: June 7, 2016
  *      Author: sch
  */
 
-#ifndef ROBOTIS_MATH_H_
-#define ROBOTIS_MATH_H_
+#ifndef ROBOTIS_MATH_ROBOTIS_MATH_H_
+#define ROBOTIS_MATH_ROBOTIS_MATH_H_
 
 #include "robotis_trajectory_calculator.h"
 
-#endif /* ROBOTIS_MATH_H_ */
+#endif /* ROBOTIS_MATH_ROBOTIS_MATH_H_ */

@@ -31,7 +31,7 @@
 /*
  * robotis_linear_algebra.cpp
  *
- *  Created on: June 6, 2016
+ *  Created on: June 7, 2016
  *      Author: sch
  */
 
@@ -224,7 +224,7 @@ Eigen::MatrixXd convertQuaternionToRotation(Eigen::Quaterniond quaternion)
   return rotation;
 }
 
-Eigen::MatrixXd hatto(Eigen::MatrixXd matrix3d)
+Eigen::MatrixXd calcHatto(Eigen::MatrixXd matrix3d)
 {
   Eigen::MatrixXd hatto(3,3);
 
@@ -236,7 +236,7 @@ Eigen::MatrixXd hatto(Eigen::MatrixXd matrix3d)
   return hatto;
 }
 
-Eigen::MatrixXd rodrigues(Eigen::MatrixXd hat_matrix, double angle)
+Eigen::MatrixXd calcRodrigues(Eigen::MatrixXd hat_matrix, double angle)
 {
   Eigen::MatrixXd identity = Eigen::MatrixXd::Identity(3,3);
   Eigen::MatrixXd rodrigues = identity+hat_matrix*sin(angle)+hat_matrix*hat_matrix*(1-cos(angle));
@@ -244,18 +244,18 @@ Eigen::MatrixXd rodrigues(Eigen::MatrixXd hat_matrix, double angle)
   return rodrigues;
 }
 
-Eigen::MatrixXd rot2omega(Eigen::MatrixXd rotation)
+Eigen::MatrixXd convertRotToOmega(Eigen::MatrixXd rotation)
 {
   double eps = 1e-12;
 
   double alpha = (rotation.coeff(0,0)+rotation.coeff(1,1)+rotation.coeff(2,2)-1.0)/2.0;
   double alpha_dash = fabs( alpha - 1.0 );
 
-  Eigen::MatrixXd rot2omega(3,1);
+  Eigen::MatrixXd rot_to_omega(3,1);
 
   if( alpha_dash < eps )
   {
-    rot2omega <<
+    rot_to_omega <<
         0.0,
         0.0,
         0.0;
@@ -264,18 +264,18 @@ Eigen::MatrixXd rot2omega(Eigen::MatrixXd rotation)
   {
     double theta = acos(alpha);
 
-    rot2omega <<
+    rot_to_omega <<
         rotation.coeff(2,1)-rotation.coeff(1,2),
         rotation.coeff(0,2)-rotation.coeff(2,0),
         rotation.coeff(1,0)-rotation.coeff(0,1);
 
-    rot2omega = 0.5*(theta/sin(theta))*rot2omega;
+    rot_to_omega = 0.5*(theta/sin(theta))*rot_to_omega;
   }
 
-  return rot2omega;
+  return rot_to_omega;
 }
 
-Eigen::MatrixXd cross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b)
+Eigen::MatrixXd calcCross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b)
 {
   Eigen::MatrixXd cross(3,1);
 
@@ -287,7 +287,7 @@ Eigen::MatrixXd cross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b)
   return cross;
 }
 
-double dot(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b)
+double calcInner(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b)
 {
   return vector3d_a.dot(vector3d_b);
 }

@@ -31,12 +31,12 @@
 /*
  * robotis_math_base.h
  *
- *  Created on: June 6, 2016
+ *  Created on: June 7, 2016
  *      Author: sch
  */
 
-#ifndef ROBOTIS_MATH_BASE_H_
-#define ROBOTIS_MATH_BASE_H_
+#ifndef ROBOTIS_MATH_ROBOTIS_MATH_BASE_H_
+#define ROBOTIS_MATH_ROBOTIS_MATH_BASE_H_
 
 #include <cmath>
 
@@ -60,4 +60,4 @@ double sign(double x);
 
 
 
-#endif /* ROBOTIS_MATH_BASE_H_ */
+#endif /* ROBOTIS_MATH_ROBOTIS_MATH_BASE_H_ */

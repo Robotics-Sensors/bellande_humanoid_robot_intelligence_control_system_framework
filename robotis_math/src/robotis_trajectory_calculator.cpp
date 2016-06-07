@@ -31,7 +31,7 @@
 /*
  * robotis_trajectory_calculator.cpp
  *
- *  Created on: June 6, 2016
+ *  Created on: June 7, 2016
  *      Author: sch
  */
 

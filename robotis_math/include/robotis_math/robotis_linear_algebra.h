@@ -31,12 +31,12 @@
 /*
  * robotis_linear_algebra.h
  *
- *  Created on: June 6, 2016
+ *  Created on: June 7, 2016
  *      Author: sch
  */
 
-#ifndef ROBOTIS_LINEAR_ALGEBRA_H_
-#define ROBOTIS_LINEAR_ALGEBRA_H_
+#ifndef ROBOTIS_MATH_ROBOTIS_LINEAR_ALGEBRA_H_
+#define ROBOTIS_MATH_ROBOTIS_LINEAR_ALGEBRA_H_
 
 #include <cmath>
 
@@ -64,14 +64,14 @@ Eigen::Quaterniond convertRotationToQuaternion(Eigen::MatrixXd rotation);
 Eigen::MatrixXd convertQuaternionToRPY(Eigen::Quaterniond quaternion);
 Eigen::MatrixXd convertQuaternionToRotation(Eigen::Quaterniond quaternion);
 
-Eigen::MatrixXd hatto(Eigen::MatrixXd matrix3d);
-Eigen::MatrixXd rodrigues(Eigen::MatrixXd hat_matrix, double angle);
-Eigen::MatrixXd rot2omega(Eigen::MatrixXd rotation);
-Eigen::MatrixXd cross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
-double dot(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
+Eigen::MatrixXd calcHatto(Eigen::MatrixXd matrix3d);
+Eigen::MatrixXd calcRodrigues(Eigen::MatrixXd hat_matrix, double angle);
+Eigen::MatrixXd convertRotToOmega(Eigen::MatrixXd rotation);
+Eigen::MatrixXd calcCross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
+double calcInner(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
 
 }
 
 
 
-#endif /* ROBOTIS_LINEAR_ALGEBRA_H_ */
+#endif /* ROBOTIS_MATH_ROBOTIS_LINEAR_ALGEBRA_H_ */
