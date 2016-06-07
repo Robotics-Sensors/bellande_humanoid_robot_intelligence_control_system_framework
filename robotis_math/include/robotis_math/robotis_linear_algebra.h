@@ -31,8 +31,8 @@
 /*
  * robotis_linear_algebra.h
  *
- *  Created on: Mar 18, 2016
- *      Author: jay
+ *  Created on: June 6, 2016
+ *      Author: sch
  */
 
 #ifndef ROBOTIS_LINEAR_ALGEBRA_H_
@@ -48,32 +48,27 @@
 namespace robotis_framework
 {
 
-Eigen::MatrixXd transitionXYZ ( double position_x, double position_y, double position_z );
-Eigen::MatrixXd transformationXYZRPY ( double position_x, double position_y, double position_z , double roll , double pitch , double yaw );
-Eigen::MatrixXd inverseTransformation(Eigen::MatrixXd transform);
+Eigen::MatrixXd getTransitionXYZ(double position_x, double position_y, double position_z);
+Eigen::MatrixXd getTransformationXYZRPY(double position_x, double position_y, double position_z , double roll, double pitch, double yaw);
+Eigen::MatrixXd getInverseTransformation(Eigen::MatrixXd transform);
+Eigen::MatrixXd getInertiaXYZ(double ixx, double ixy, double ixz , double iyy , double iyz, double izz);
+Eigen::MatrixXd getRotationX(double angle);
+Eigen::MatrixXd getRotationY(double angle);
+Eigen::MatrixXd getRotationZ(double angle);
+Eigen::MatrixXd getRotation4d(double roll, double pitch, double yaw);
 
-Eigen::MatrixXd inertiaXYZ( double ixx, double ixy, double ixz , double iyy , double iyz, double izz );
+Eigen::MatrixXd convertRotationToRPY(Eigen::MatrixXd rotation);
+Eigen::MatrixXd convertRPYToRotation(double roll, double pitch, double yaw);
+Eigen::Quaterniond convertRPYToQuaternion(double roll, double pitch, double yaw);
+Eigen::Quaterniond convertRotationToQuaternion(Eigen::MatrixXd rotation);
+Eigen::MatrixXd convertQuaternionToRPY(Eigen::Quaterniond quaternion);
+Eigen::MatrixXd convertQuaternionToRotation(Eigen::Quaterniond quaternion);
 
-Eigen::MatrixXd rotationX( double angle );
-Eigen::MatrixXd rotationY( double angle );
-Eigen::MatrixXd rotationZ( double angle );
-
-Eigen::MatrixXd rotation2rpy( Eigen::MatrixXd rotation );
-Eigen::MatrixXd rpy2rotation( double roll, double pitch, double yaw );
-
-Eigen::Quaterniond rpy2quaternion( double roll, double pitch, double yaw );
-Eigen::Quaterniond rotation2quaternion( Eigen::MatrixXd rotation );
-
-Eigen::MatrixXd quaternion2rpy( Eigen::Quaterniond quaternion );
-Eigen::MatrixXd quaternion2rotation( Eigen::Quaterniond quaternion );
-
-Eigen::MatrixXd rotation4d( double roll, double pitch, double yaw );
-
-Eigen::MatrixXd hatto( Eigen::MatrixXd matrix3d );
-Eigen::MatrixXd rodrigues( Eigen::MatrixXd hat_matrix , double angle );
-Eigen::MatrixXd rot2omega(Eigen::MatrixXd rotation );
-Eigen::MatrixXd cross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b );
-double dot(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b );
+Eigen::MatrixXd hatto(Eigen::MatrixXd matrix3d);
+Eigen::MatrixXd rodrigues(Eigen::MatrixXd hat_matrix, double angle);
+Eigen::MatrixXd rot2omega(Eigen::MatrixXd rotation);
+Eigen::MatrixXd cross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
+double dot(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
 
 }
 

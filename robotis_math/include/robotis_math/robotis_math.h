@@ -31,8 +31,8 @@
 /*
  * robotis_math.h
  *
- *  Created on: Mar 18, 2016
- *      Author: jay
+ *  Created on: June 6, 2016
+ *      Author: sch
  */
 
 #ifndef ROBOTIS_MATH_H_

@@ -31,8 +31,8 @@
 /*
  * robotis_math_base.h
  *
- *  Created on: 2016. 3. 28.
- *      Author: JaySong
+ *  Created on: June 6, 2016
+ *      Author: sch
  */
 
 #ifndef ROBOTIS_MATH_BASE_H_
@@ -54,7 +54,7 @@ inline double powDI(double a, int b)
 	return (b == 0 ? 1 : (b > 0 ? a * powDI(a, b - 1) : 1 / powDI(a, -b)));
 }
 
-double sign( double x );
+double sign(double x);
 
 }
 
