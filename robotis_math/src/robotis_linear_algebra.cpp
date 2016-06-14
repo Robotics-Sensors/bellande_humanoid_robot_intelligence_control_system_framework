@@ -168,6 +168,19 @@ Eigen::MatrixXd getRotation4d(double roll, double pitch, double yaw )
   return mat_rpy;
 }
 
+Eigen::MatrixXd getTranslation4D(double position_x, double position_y, double position_z)
+{
+  Eigen::MatrixXd mat_translation(4,4);
+
+  mat_translation <<
+      1, 0, 0, position_x,
+      0, 1, 0, position_y,
+      0, 0, 1, position_z,
+      0, 0, 0,          1;
+
+  return mat_translation;
+}
+
 Eigen::MatrixXd convertRotationToRPY(Eigen::MatrixXd rotation)
 {
   Eigen::MatrixXd rpy = Eigen::MatrixXd::Zero(3,1);

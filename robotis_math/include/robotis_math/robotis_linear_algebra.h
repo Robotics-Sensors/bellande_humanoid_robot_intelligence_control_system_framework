@@ -56,6 +56,7 @@ Eigen::MatrixXd getRotationX(double angle);
 Eigen::MatrixXd getRotationY(double angle);
 Eigen::MatrixXd getRotationZ(double angle);
 Eigen::MatrixXd getRotation4d(double roll, double pitch, double yaw);
+Eigen::MatrixXd getTranslation4D(double position_x, double position_y, double position_z);
 
 Eigen::MatrixXd convertRotationToRPY(Eigen::MatrixXd rotation);
 Eigen::MatrixXd convertRPYToRotation(double roll, double pitch, double yaw);
