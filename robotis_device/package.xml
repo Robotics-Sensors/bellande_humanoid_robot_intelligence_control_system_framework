@@ -6,15 +6,11 @@
 
   <maintainer email="zerom@robotis.com">robotis</maintainer>
 
-
   <license>BSD</license>
-
 
   <!-- <url type="website">http://wiki.ros.org/robotis_device</url> -->
 
-
   <author email="zerom@robotis.com">robotis</author>
-
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -26,9 +22,4 @@
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>dynamixel_sdk</run_depend>
-
-
-  <export>
-
-  </export>
 </package>

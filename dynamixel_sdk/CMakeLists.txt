@@ -20,15 +20,15 @@ include_directories(
 
 ## Declare a C++ library
 add_library(dynamixel_sdk
-  src/${PROJECT_NAME}/PacketHandler.cpp
-  src/${PROJECT_NAME}/Protocol1PacketHandler.cpp
-  src/${PROJECT_NAME}/Protocol2PacketHandler.cpp
-  src/${PROJECT_NAME}/GroupSyncRead.cpp
-  src/${PROJECT_NAME}/GroupSyncWrite.cpp
-  src/${PROJECT_NAME}/GroupBulkRead.cpp
-  src/${PROJECT_NAME}/GroupBulkWrite.cpp
-  src/${PROJECT_NAME}/PortHandler.cpp
-  src/${PROJECT_NAME}_linux/PortHandlerLinux.cpp
+  src/${PROJECT_NAME}/packet_handler.cpp
+  src/${PROJECT_NAME}/protocol1_packet_handler.cpp
+  src/${PROJECT_NAME}/protocol2_packet_handler.cpp
+  src/${PROJECT_NAME}/group_sync_read.cpp
+  src/${PROJECT_NAME}/group_sync_write.cpp
+  src/${PROJECT_NAME}/group_bulk_read.cpp
+  src/${PROJECT_NAME}/group_bulk_write.cpp
+  src/${PROJECT_NAME}/port_handler.cpp
+  src/${PROJECT_NAME}_linux/port_handler_linux.cpp
 )
 
 ## Specify libraries to link a library or executable target against
