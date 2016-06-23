@@ -631,6 +631,8 @@ void RobotisController::startTimer()
       it->second->txPacket();
     }
 
+    usleep(8 * 1000);
+
     int error;
     struct sched_param param;
     pthread_attr_t attr;
