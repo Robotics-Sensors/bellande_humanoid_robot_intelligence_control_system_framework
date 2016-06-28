@@ -433,7 +433,7 @@ void RobotisController::initializeDevice(const std::string init_file_path)
 
       if (dxl == NULL)
       {
-        ROS_WARN("Joint [%s] does not found.", joint_name.c_str());
+        ROS_WARN("Joint [%s] was not found.", joint_name.c_str());
         continue;
       }
       if (DEBUG_PRINT)
@@ -451,7 +451,7 @@ void RobotisController::initializeDevice(const std::string init_file_path)
         ControlTableItem *item = dxl->ctrl_table_[item_name];
         if (item == NULL)
         {
-          ROS_WARN("Control Item [%s] does not found.", item_name.c_str());
+          ROS_WARN("Control Item [%s] was not found.", item_name.c_str());
           continue;
         }
 
@@ -596,9 +596,9 @@ void *RobotisController::timerThread(void *param)
     {
       if (controller->DEBUG_PRINT == true)
       {
-        ROS_WARN("[RobotisController::ThreadProc] NEXT TIME < CURR TIME.. (%f)[%ld.%09ld / %ld.%09ld]",
-                 delta_nsec / 1000000.0, (long )next_time.tv_sec, (long )next_time.tv_nsec,
-                 (long )curr_time.tv_sec, (long )curr_time.tv_nsec);
+        fprintf(stderr, "[RobotisController::ThreadProc] NEXT TIME < CURR TIME.. (%f)[%ld.%09ld / %ld.%09ld]",
+                         delta_nsec / 1000000.0, (long )next_time.tv_sec, (long )next_time.tv_nsec,
+                         (long )curr_time.tv_sec, (long )curr_time.tv_nsec);
       }
 
       // next_time = curr_time + 3 msec
@@ -866,7 +866,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    ROS_INFO("(%2.6f) BulkRead Rx & update state", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) BulkRead Rx & update state", time_duration.nsec * 0.000001);
   }
 
   // Call SensorModule Process()
@@ -885,7 +885,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    ROS_INFO("(%2.6f) SensorModule Process() & save result", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) SensorModule Process() & save result", time_duration.nsec * 0.000001);
   }
 
   if (controller_mode_ == MotionModuleMode)
@@ -917,7 +917,7 @@ void RobotisController::process()
 
             if (result_state == NULL)
             {
-              ROS_INFO("[%s] %s", (*module_it)->getModuleName().c_str(), joint_name.c_str());
+              fprintf(stderr, "[%s] %s", (*module_it)->getModuleName().c_str(), joint_name.c_str());
               continue;
             }
 
@@ -1005,7 +1005,7 @@ void RobotisController::process()
     if (DEBUG_PRINT)
     {
       time_duration = ros::Time::now() - start_time;
-      ROS_INFO("(%2.6f) MotionModule Process() & save result", time_duration.nsec * 0.000001);
+      fprintf(stderr, "(%2.6f) MotionModule Process() & save result", time_duration.nsec * 0.000001);
     }
 
     // SyncWrite
@@ -1087,7 +1087,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    ROS_INFO("(%2.6f) SyncWrite & BulkRead Tx", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) SyncWrite & BulkRead Tx", time_duration.nsec * 0.000001);
   }
 
   // publish present & goal position
@@ -1114,7 +1114,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    ROS_WARN("(%2.6f) Process() DONE", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) Process() DONE", time_duration.nsec * 0.000001);
   }
 
   is_process_running = false;
