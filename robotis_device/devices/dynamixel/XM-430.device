@@ -59,14 +59,14 @@ position_p_gain_item_name       = position_p_gain
    104 | goal_velocity            | 4      | RW     | RAM    | 0             | 1023        | N
    108 | profile_acceleration     | 4      | RW     | RAM    | 0             | 32767       | N
    112 | profile_velocity         | 4      | RW     | RAM    | 0             | 1023        | N
-   116 | goal_position            | 4      | RW     | RAM    | 0             | 4095        | N
+   116 | goal_position            | 4      | RW     | RAM    | -1048575      | 1048575     | Y
    120 | realtime_tick            | 2      | R      | RAM    | 0             | 32767       | N
    122 | moving                   | 1      | R      | RAM    | 0             | 1           | N
    123 | moving_status            | 1      | R      | RAM    | 0             | 255         | N
    124 | present_pwm              | 2      | R      | RAM    | 0             | 885         | N
    126 | present_current          | 2      | R      | RAM    | 0             | 1193        | N
    128 | present_velocity         | 4      | R      | RAM    | 0             | 1023        | N
-   132 | present_position         | 4      | R      | RAM    | 0             | 4095        | N
+   132 | present_position         | 4      | R      | RAM    | -2147483648   | 2147483647  | Y
    136 | velocity_trajectory      | 4      | R      | RAM    | 0             | 1023        | N
    140 | position_trajectory      | 4      | R      | RAM    | 0             | 4095        | N
    144 | present_input_voltage    | 2      | R      | RAM    | 95            | 160         | N

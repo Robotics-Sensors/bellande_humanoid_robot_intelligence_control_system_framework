@@ -47,7 +47,7 @@ position_p_gain_item_name       = position_p_gain
    30  | goal_position            | 2      | RW     | RAM    | -28672        | 28672       | Y
    32  | goal_velocity            | 2      | RW     | RAM    | 0             | 1023        | N
    34  | goal_torque              | 2      | RW     | RAM    | 0             | 1023        | N
-   36  | present_position         | 2      | R      | RAM    | 0             | 4095        | N
+   36  | present_position         | 2      | R      | RAM    | -32768        | 32767       | Y
    38  | present_velocity         | 2      | R      | RAM    | 0             | 2048        | N
    40  | present_load             | 2      | R      | RAM    | 0             | 2048        | N
    42  | present_voltage          | 1      | R      | RAM    | 50            | 250         | N
