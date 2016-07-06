@@ -3,7 +3,7 @@ model_name  = XM-430
 device_type = dynamixel
 
 [type info]
-current_ratio                   = 2.69
+torque_to_current_value_ratio   = 178.842161
 
 value_of_0_radian_position      = 2048
 value_of_min_radian_position    = 0

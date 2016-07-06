@@ -366,10 +366,10 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
         if (tokens.size() != 2)
           continue;
 
-        if (tokens[0] == "current_ratio")
-          dxl->current_ratio_ = std::atof(tokens[1].c_str());
-        else if (tokens[0] == "velocity_ratio")
-          dxl->velocity_ratio_ = std::atof(tokens[1].c_str());
+        if (tokens[0] == "torque_to_current_value_ratio")
+          dxl->torque_to_current_value_ratio_ = std::atof(tokens[1].c_str());
+        else if (tokens[0] == "velocity_to_value_ratio")
+          dxl->velocity_to_value_ratio_ = std::atof(tokens[1].c_str());
 
         else if (tokens[0] == "value_of_0_radian_position")
           dxl->value_of_0_radian_position_ = std::atoi(tokens[1].c_str());

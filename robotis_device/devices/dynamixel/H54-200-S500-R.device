@@ -3,7 +3,7 @@ model_name  = H54-200-S500-R
 device_type = dynamixel
 
 [type info]
-current_ratio                   = 16.11328125
+torque_to_current_value_ratio   = 9.09201
 
 value_of_0_radian_position      = 0
 value_of_min_radian_position    = -250950

@@ -41,8 +41,8 @@ using namespace robotis_framework;
 
 Dynamixel::Dynamixel(int id, std::string model_name, float protocol_version)
   : ctrl_module_name_("none"),
-    current_ratio_(1.0),
-    velocity_ratio_(1.0),
+    torque_to_current_value_ratio_(1.0),
+    velocity_to_value_ratio_(1.0),
     value_of_0_radian_position_(0),
     value_of_min_radian_position_(0),
     value_of_max_radian_position_(0),
@@ -128,20 +128,20 @@ int32_t Dynamixel::convertRadian2Value(double radian)
 
 double Dynamixel::convertValue2Velocity(int32_t value)
 {
-  return (double) value * velocity_ratio_;
+  return (double) value / velocity_to_value_ratio_;
 }
 
 int32_t Dynamixel::convertVelocity2Value(double velocity)
 {
-  return (int32_t) (velocity / velocity_ratio_);;
+  return (int32_t) (velocity * velocity_to_value_ratio_);;
 }
 
-double Dynamixel::convertValue2Current(int16_t value)
+double Dynamixel::convertValue2Torque(int16_t value)
 {
-  return (double) value * current_ratio_;
+  return (double) value / torque_to_current_value_ratio_;
 }
 
-int16_t Dynamixel::convertCurrent2Value(double current)
+int16_t Dynamixel::convertTorque2Value(double torque)
 {
-  return (int16_t) (current / current_ratio_);
+  return (int16_t) (torque * torque_to_current_value_ratio_);
 }

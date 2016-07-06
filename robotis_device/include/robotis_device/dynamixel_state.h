@@ -58,7 +58,7 @@ public:
   double    present_current_;
   double    goal_position_;
   double    goal_velocity_;
-  double    goal_current_;
+  double    goal_torque_;
   double    position_p_gain_;
 
   std::map<std::string, uint32_t> bulk_read_table_;
@@ -72,7 +72,7 @@ public:
       present_current_(0.0),
       goal_position_(0.0),
       goal_velocity_(0.0),
-      goal_current_(0.0),
+      goal_torque_(0.0),
       position_p_gain_(0.0),
       position_offset_(0.0)
   {

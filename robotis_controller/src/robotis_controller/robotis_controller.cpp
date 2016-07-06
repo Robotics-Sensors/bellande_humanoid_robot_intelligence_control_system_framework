@@ -159,8 +159,8 @@ void RobotisController::initializeSyncWrite()
         else if ((dxl->present_current_item_ != 0) &&
                  (dxl->bulk_read_items_[i]->item_name_ == dxl->present_current_item_->item_name_))
         {
-          dxl->dxl_state_->present_current_ = dxl->convertValue2Current(read_data);
-          dxl->dxl_state_->goal_current_ = dxl->dxl_state_->present_current_;
+          dxl->dxl_state_->present_current_ = dxl->convertValue2Torque(read_data);
+          dxl->dxl_state_->goal_torque_ = dxl->dxl_state_->present_current_;
         }
       }
     }
@@ -557,8 +557,12 @@ void RobotisController::msgQueueThread()
   {
     for (std::map<std::string, Dynamixel*>::iterator it = robot_->dxls_.begin(); it != robot_->dxls_.end(); it++)
     {
-      gazebo_joint_pub_[it->first] = ros_node.advertise<std_msgs::Float64>(
-                                          "/" + gazebo_robot_name_ + "/" + it->first + "_pos/command", 1);
+      gazebo_joint_position_pub_[it->first] = ros_node.advertise<std_msgs::Float64>(
+                                                "/" + gazebo_robot_name_ + "/" + it->first + "_position/command", 1);
+      gazebo_joint_velocity_pub_[it->first] = ros_node.advertise<std_msgs::Float64>(
+                                                "/" + gazebo_robot_name_ + "/" + it->first + "_velocity/command", 1);
+      gazebo_joint_effort_pub_[it->first]   = ros_node.advertise<std_msgs::Float64>(
+                                                "/" + gazebo_robot_name_ + "/" + it->first + "_effort/command", 1);
     }
   }
 
@@ -814,13 +818,13 @@ void RobotisController::process()
               else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
                 dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
               else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
-                dxl->dxl_state_->present_current_ = dxl->convertValue2Current(data);
+                dxl->dxl_state_->present_current_ = dxl->convertValue2Torque(data);
               else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
                 dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
               else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
                 dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
               else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
-                dxl->dxl_state_->goal_current_ = dxl->convertValue2Current(data);
+                dxl->dxl_state_->goal_torque_ = dxl->convertValue2Torque(data);
               else
                 dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
             }
@@ -982,11 +986,11 @@ void RobotisController::process()
             }
             else if ((*module_it)->getControlMode() == CurrentControl)
             {
-              dxl_state->goal_current_ = result_state->goal_current_;
+              dxl_state->goal_torque_ = result_state->goal_torque_;
 
               if (gazebo_mode_ == false)
               {
-                uint32_t curr_data = dxl->convertCurrent2Value(dxl_state->goal_current_);
+                uint32_t curr_data = dxl->convertTorque2Value(dxl_state->goal_torque_);
                 uint8_t sync_write_data[2] = { 0 };
                 sync_write_data[0] = DXL_LOBYTE(curr_data);
                 sync_write_data[1] = DXL_HIBYTE(curr_data);
@@ -1041,13 +1045,39 @@ void RobotisController::process()
     }
     else if (gazebo_mode_ == true)
     {
-      std_msgs::Float64 joint_msg;
-
-      for (std::map<std::string, Dynamixel *>::iterator dxl_it = robot_->dxls_.begin(); dxl_it != robot_->dxls_.end();
-          dxl_it++)
+      for (std::list<MotionModule*>::iterator module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
       {
-        joint_msg.data = dxl_it->second->dxl_state_->goal_position_;
-        gazebo_joint_pub_[dxl_it->first].publish(joint_msg);
+        if ((*module_it)->getModuleEnable() == false)
+          continue;
+
+        std_msgs::Float64 joint_msg;
+
+        for (std::map<std::string, Dynamixel *>::iterator dxl_it = robot_->dxls_.begin(); dxl_it != robot_->dxls_.end();
+            dxl_it++)
+        {
+          std::string     joint_name  = dxl_it->first;
+          Dynamixel      *dxl         = dxl_it->second;
+          DynamixelState *dxl_state   = dxl_it->second->dxl_state_;
+
+          if (dxl->ctrl_module_name_ == (*module_it)->getModuleName())
+          {
+            if ((*module_it)->getControlMode() == PositionControl)
+            {
+              joint_msg.data = dxl_state->goal_position_;
+              gazebo_joint_position_pub_[joint_name].publish(joint_msg);
+            }
+            else if ((*module_it)->getControlMode() == VelocityControl)
+            {
+              joint_msg.data = dxl_state->goal_velocity_;
+              gazebo_joint_velocity_pub_[joint_name].publish(joint_msg);
+            }
+            else if ((*module_it)->getControlMode() == CurrentControl)
+            {
+              joint_msg.data = dxl_state->goal_torque_;
+              gazebo_joint_effort_pub_[joint_name].publish(joint_msg);
+            }
+          }
+        }
       }
     }
   }
@@ -1104,7 +1134,7 @@ void RobotisController::process()
     goal_state.name.push_back(joint_name);
     goal_state.position.push_back(dxl->dxl_state_->goal_position_);
     goal_state.velocity.push_back(dxl->dxl_state_->goal_velocity_);
-    goal_state.effort.push_back(dxl->dxl_state_->goal_current_);
+    goal_state.effort.push_back(dxl->dxl_state_->goal_torque_);
   }
 
   // -> publish present joint_states & goal joint states topic
@@ -1510,7 +1540,7 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
             }
             else if (mode == CurrentControl)
             {
-              uint32_t curr_data = dxl->convertCurrent2Value(dxl->dxl_state_->goal_current_);
+              uint32_t curr_data = dxl->convertTorque2Value(dxl->dxl_state_->goal_torque_);
               uint8_t sync_write_data[4] = { 0 };
               sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(curr_data));
               sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(curr_data));
