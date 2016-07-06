@@ -106,8 +106,8 @@ void RobotisController::initializeSyncWrite()
     if (it->second != NULL)
       it->second->clearParam();
   }
-  for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_torque_.begin();
-       it != port_to_sync_write_torque_.end(); it++)
+  for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_current_.begin();
+       it != port_to_sync_write_current_.end(); it++)
   {
     if (it->second != NULL)
       it->second->clearParam();
@@ -231,7 +231,7 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
 
       if (default_device->goal_current_item_ != 0)
       {
-        port_to_sync_write_torque_[port_name]
+        port_to_sync_write_current_[port_name]
             = new dynamixel::GroupSyncWrite(port,
                                             default_pkt_handler,
                                             default_device->goal_current_item_->address_,
@@ -707,8 +707,8 @@ void RobotisController::stopTimer()
         if (it->second != NULL)
           it->second->clearParam();
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_torque_.begin();
-           it != port_to_sync_write_torque_.end(); it++)
+      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_current_.begin();
+           it != port_to_sync_write_current_.end(); it++)
       {
         if (it->second != NULL)
           it->second->clearParam();
@@ -984,7 +984,7 @@ void RobotisController::process()
                   port_to_sync_write_velocity_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
               }
             }
-            else if ((*module_it)->getControlMode() == CurrentControl)
+            else if ((*module_it)->getControlMode() == TorqueControl)
             {
               dxl_state->goal_torque_ = result_state->goal_torque_;
 
@@ -995,8 +995,8 @@ void RobotisController::process()
                 sync_write_data[0] = DXL_LOBYTE(curr_data);
                 sync_write_data[1] = DXL_HIBYTE(curr_data);
 
-                if (port_to_sync_write_torque_[dxl->port_name_] != NULL)
-                  port_to_sync_write_torque_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
+                if (port_to_sync_write_current_[dxl->port_name_] != NULL)
+                  port_to_sync_write_current_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
               }
             }
           }
@@ -1036,8 +1036,8 @@ void RobotisController::process()
         if (it->second != NULL)
           it->second->txPacket();
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_torque_.begin();
-           it != port_to_sync_write_torque_.end(); it++)
+      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_current_.begin();
+           it != port_to_sync_write_current_.end(); it++)
       {
         if (it->second != NULL)
           it->second->txPacket();
@@ -1071,7 +1071,7 @@ void RobotisController::process()
               joint_msg.data = dxl_state->goal_velocity_;
               gazebo_joint_velocity_pub_[joint_name].publish(joint_msg);
             }
-            else if ((*module_it)->getControlMode() == CurrentControl)
+            else if ((*module_it)->getControlMode() == TorqueControl)
             {
               joint_msg.data = dxl_state->goal_torque_;
               gazebo_joint_effort_pub_[joint_name].publish(joint_msg);
@@ -1477,8 +1477,8 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
       if (port_to_sync_write_position_[dxl->port_name_] != NULL)
         port_to_sync_write_position_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
 
-      if (port_to_sync_write_torque_[dxl->port_name_] != NULL)
-        port_to_sync_write_torque_[dxl->port_name_]->removeParam(dxl->id_);
+      if (port_to_sync_write_current_[dxl->port_name_] != NULL)
+        port_to_sync_write_current_[dxl->port_name_]->removeParam(dxl->id_);
       if (port_to_sync_write_velocity_[dxl->port_name_] != NULL)
         port_to_sync_write_velocity_[dxl->port_name_]->removeParam(dxl->id_);
     }
@@ -1516,8 +1516,8 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
               if (port_to_sync_write_position_[dxl->port_name_] != NULL)
                 port_to_sync_write_position_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
 
-              if (port_to_sync_write_torque_[dxl->port_name_] != NULL)
-                port_to_sync_write_torque_[dxl->port_name_]->removeParam(dxl->id_);
+              if (port_to_sync_write_current_[dxl->port_name_] != NULL)
+                port_to_sync_write_current_[dxl->port_name_]->removeParam(dxl->id_);
               if (port_to_sync_write_velocity_[dxl->port_name_] != NULL)
                 port_to_sync_write_velocity_[dxl->port_name_]->removeParam(dxl->id_);
             }
@@ -1533,12 +1533,12 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
               if (port_to_sync_write_velocity_[dxl->port_name_] != NULL)
                 port_to_sync_write_velocity_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
 
-              if (port_to_sync_write_torque_[dxl->port_name_] != NULL)
-                port_to_sync_write_torque_[dxl->port_name_]->removeParam(dxl->id_);
+              if (port_to_sync_write_current_[dxl->port_name_] != NULL)
+                port_to_sync_write_current_[dxl->port_name_]->removeParam(dxl->id_);
               if (port_to_sync_write_position_[dxl->port_name_] != NULL)
                 port_to_sync_write_position_[dxl->port_name_]->removeParam(dxl->id_);
             }
-            else if (mode == CurrentControl)
+            else if (mode == TorqueControl)
             {
               uint32_t curr_data = dxl->convertTorque2Value(dxl->dxl_state_->goal_torque_);
               uint8_t sync_write_data[4] = { 0 };
@@ -1547,8 +1547,8 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
               sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(curr_data));
               sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(curr_data));
 
-              if (port_to_sync_write_torque_[dxl->port_name_] != NULL)
-                port_to_sync_write_torque_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
+              if (port_to_sync_write_current_[dxl->port_name_] != NULL)
+                port_to_sync_write_current_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
 
               if (port_to_sync_write_velocity_[dxl->port_name_] != NULL)
                 port_to_sync_write_velocity_[dxl->port_name_]->removeParam(dxl->id_);
