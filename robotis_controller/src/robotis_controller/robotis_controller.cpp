@@ -159,8 +159,8 @@ void RobotisController::initializeSyncWrite()
         else if ((dxl->present_current_item_ != 0) &&
                  (dxl->bulk_read_items_[i]->item_name_ == dxl->present_current_item_->item_name_))
         {
-          dxl->dxl_state_->present_current_ = dxl->convertValue2Torque(read_data);
-          dxl->dxl_state_->goal_torque_ = dxl->dxl_state_->present_current_;
+          dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(read_data);
+          dxl->dxl_state_->goal_torque_ = dxl->dxl_state_->present_torque_;
         }
       }
     }
@@ -818,7 +818,7 @@ void RobotisController::process()
               else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
                 dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
               else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
-                dxl->dxl_state_->present_current_ = dxl->convertValue2Torque(data);
+                dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(data);
               else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
                 dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
               else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
@@ -1129,7 +1129,7 @@ void RobotisController::process()
     present_state.name.push_back(joint_name);
     present_state.position.push_back(dxl->dxl_state_->present_position_);
     present_state.velocity.push_back(dxl->dxl_state_->present_velocity_);
-    present_state.effort.push_back(dxl->dxl_state_->present_current_);
+    present_state.effort.push_back(dxl->dxl_state_->present_torque_);
 
     goal_state.name.push_back(joint_name);
     goal_state.position.push_back(dxl->dxl_state_->goal_position_);
@@ -1607,7 +1607,7 @@ void RobotisController::gazeboJointStatesCallback(const sensor_msgs::JointState:
     {
       d_it->second->dxl_state_->present_position_ = msg->position[i];
       d_it->second->dxl_state_->present_velocity_ = msg->velocity[i];
-      d_it->second->dxl_state_->present_current_ = msg->effort[i];
+      d_it->second->dxl_state_->present_torque_ = msg->effort[i];
     }
   }
 

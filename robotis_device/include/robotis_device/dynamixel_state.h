@@ -55,7 +55,7 @@ public:
 
   double    present_position_;
   double    present_velocity_;
-  double    present_current_;
+  double    present_torque_;
   double    goal_position_;
   double    goal_velocity_;
   double    goal_torque_;
@@ -69,7 +69,7 @@ public:
     : update_time_stamp_(0, 0),
       present_position_(0.0),
       present_velocity_(0.0),
-      present_current_(0.0),
+      present_torque_(0.0),
       goal_position_(0.0),
       goal_velocity_(0.0),
       goal_torque_(0.0),
