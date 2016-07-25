@@ -870,7 +870,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    fprintf(stderr, "(%2.6f) BulkRead Rx & update state", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) BulkRead Rx & update state \n", time_duration.nsec * 0.000001);
   }
 
   // Call SensorModule Process()
@@ -889,7 +889,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    fprintf(stderr, "(%2.6f) SensorModule Process() & save result", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) SensorModule Process() & save result \n", time_duration.nsec * 0.000001);
   }
 
   if (controller_mode_ == MotionModuleMode)
@@ -1009,7 +1009,7 @@ void RobotisController::process()
     if (DEBUG_PRINT)
     {
       time_duration = ros::Time::now() - start_time;
-      fprintf(stderr, "(%2.6f) MotionModule Process() & save result", time_duration.nsec * 0.000001);
+      fprintf(stderr, "(%2.6f) MotionModule Process() & save result \n", time_duration.nsec * 0.000001);
     }
 
     // SyncWrite
@@ -1117,7 +1117,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    fprintf(stderr, "(%2.6f) SyncWrite & BulkRead Tx", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) SyncWrite & BulkRead Tx \n", time_duration.nsec * 0.000001);
   }
 
   // publish present & goal position
@@ -1144,7 +1144,7 @@ void RobotisController::process()
   if (DEBUG_PRINT)
   {
     time_duration = ros::Time::now() - start_time;
-    fprintf(stderr, "(%2.6f) Process() DONE", time_duration.nsec * 0.000001);
+    fprintf(stderr, "(%2.6f) Process() DONE \n", time_duration.nsec * 0.000001);
   }
 
   is_process_running = false;
