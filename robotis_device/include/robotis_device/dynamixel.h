@@ -56,8 +56,8 @@ public:
   std::string     ctrl_module_name_;
   DynamixelState *dxl_state_;
 
-  double  current_ratio_;
-  double  velocity_ratio_;
+  double  velocity_to_value_ratio_;
+  double  torque_to_current_value_ratio_;
 
   int32_t value_of_0_radian_position_;
   int32_t value_of_min_radian_position_;
@@ -82,8 +82,8 @@ public:
   double  convertValue2Velocity(int32_t value);
   int32_t convertVelocity2Value(double velocity);
 
-  double  convertValue2Current(int16_t value);
-  int16_t convertCurrent2Value(double current);
+  double  convertValue2Torque(int16_t value);
+  int16_t convertTorque2Value(double torque);
 };
 
 }

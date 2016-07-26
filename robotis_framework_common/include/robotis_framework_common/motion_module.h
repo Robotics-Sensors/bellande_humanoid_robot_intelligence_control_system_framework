@@ -53,7 +53,7 @@ enum ControlMode
 {
   PositionControl,
   VelocityControl,
-  CurrentControl
+  TorqueControl
 };
 
 class MotionModule

@@ -3,7 +3,7 @@ model_name  = H42-20-S300-R
 device_type = dynamixel
 
 [type info]
-current_ratio                   = 4.0283203125
+torque_to_current_value_ratio   = 27.15146
 
 value_of_0_radian_position      = 0
 value_of_min_radian_position    = -151900

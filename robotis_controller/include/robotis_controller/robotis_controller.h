@@ -107,7 +107,7 @@ public:
   /* sync write */
   std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_position_;
   std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_velocity_;
-  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_torque_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_current_;
   std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_position_p_gain_;
 
   /* publisher */
@@ -115,7 +115,9 @@ public:
   ros::Publisher  present_joint_state_pub_;
   ros::Publisher  current_module_pub_;
 
-  std::map<std::string, ros::Publisher> gazebo_joint_pub_;
+  std::map<std::string, ros::Publisher> gazebo_joint_position_pub_;
+  std::map<std::string, ros::Publisher> gazebo_joint_velocity_pub_;
+  std::map<std::string, ros::Publisher> gazebo_joint_effort_pub_;
 
   static void *timerThread(void *param);
 
