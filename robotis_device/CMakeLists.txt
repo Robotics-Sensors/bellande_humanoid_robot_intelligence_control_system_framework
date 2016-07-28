@@ -5,7 +5,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   dynamixel_sdk
-  robotis_framework_common
 )
 
 catkin_package(
