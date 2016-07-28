@@ -62,14 +62,9 @@ void RobotisController::initializeSyncWrite()
     return;
 
   ROS_INFO("FIRST BULKREAD");
-  // bulkread twice
-  for (std::map<std::string, dynamixel::GroupBulkRead *>::iterator it = port_to_bulk_read_.begin();
-       it != port_to_bulk_read_.end(); it++)
-  {
-    it->second->txRxPacket();
-  }
-  for (std::map<std::string, dynamixel::GroupBulkRead *>::iterator it = port_to_bulk_read_.begin();
-       it != port_to_bulk_read_.end(); it++)
+  for (auto& it : port_to_bulk_read_)
+    it.second->txRxPacket();
+  for(auto& it : port_to_bulk_read_)
   {
     int error_count = 0;
     int result = COMM_SUCCESS;
@@ -81,43 +76,39 @@ void RobotisController::initializeSyncWrite()
         exit(-1);
       }
       usleep(10 * 1000);
-      result = it->second->txRxPacket();
+      result = it.second->txRxPacket();
     } while (result != COMM_SUCCESS);
   }
   init_pose_loaded_ = true;
   ROS_INFO("FIRST BULKREAD END");
 
   // clear syncwrite param setting
-  for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_position_.begin();
-       it != port_to_sync_write_position_.end(); it++)
+  for (auto& it : port_to_sync_write_position_)
   {
-    if (it->second != NULL)
-      it->second->clearParam();
+    if (it.second != NULL)
+      it.second->clearParam();
   }
-  for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_position_p_gain_.begin();
-       it != port_to_sync_write_position_p_gain_.end(); it++)
+  for (auto& it : port_to_sync_write_position_p_gain_)
   {
-    if (it->second != NULL)
-      it->second->clearParam();
+    if (it.second != NULL)
+      it.second->clearParam();
   }
-  for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_velocity_.begin();
-       it != port_to_sync_write_velocity_.end(); it++)
+  for (auto& it : port_to_sync_write_velocity_)
   {
-    if (it->second != NULL)
-      it->second->clearParam();
+    if (it.second != NULL)
+      it.second->clearParam();
   }
-  for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_current_.begin();
-       it != port_to_sync_write_current_.end(); it++)
+  for (auto& it : port_to_sync_write_current_)
   {
-    if (it->second != NULL)
-      it->second->clearParam();
+    if (it.second != NULL)
+      it.second->clearParam();
   }
 
   // set init syncwrite param(from data of bulkread)
-  for (std::map<std::string, Dynamixel*>::iterator it = robot_->dxls_.begin(); it != robot_->dxls_.end(); it++)
+  for (auto& it : robot_->dxls_)
   {
-    std::string joint_name = it->first;
-    Dynamixel *dxl = it->second;
+    std::string joint_name = it.first;
+    Dynamixel *dxl = it.second;
 
     for (int i = 0; i < dxl->bulk_read_items_.size(); i++)
     {
@@ -180,11 +171,10 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
     return true;
   }
 
-  for (std::map<std::string, dynamixel::PortHandler *>::iterator it = robot_->ports_.begin();
-       it != robot_->ports_.end(); it++)
+  for (auto& it : robot_->ports_)
   {
-    std::string               port_name           = it->first;
-    dynamixel::PortHandler   *port                = it->second;
+    std::string               port_name           = it.first;
+    dynamixel::PortHandler   *port                = it.second;
     dynamixel::PacketHandler *default_pkt_handler = dynamixel::PacketHandler::getPacketHandler(2.0);
 
     if (port->setBaudRate(port->getBaudRate()) == false)
@@ -195,8 +185,8 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
 
     // get the default device info of the port
     std::string default_device_name = robot_->port_default_device_[port_name];
-    std::map<std::string, Dynamixel*>::iterator dxl_it = robot_->dxls_.find(default_device_name);
-    std::map<std::string, Sensor*>::iterator sensor_it = robot_->sensors_.find(default_device_name);
+    auto dxl_it = robot_->dxls_.find(default_device_name);
+    auto sensor_it = robot_->sensors_.find(default_device_name);
     if (dxl_it != robot_->dxls_.end())
     {
       Dynamixel *default_device = dxl_it->second;
@@ -248,10 +238,10 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
   }
 
   // (for loop) check all dxls are connected.
-  for (std::map<std::string, Dynamixel*>::iterator it = robot_->dxls_.begin(); it != robot_->dxls_.end(); it++)
+  for (auto& it : robot_->dxls_)
   {
-    std::string joint_name  = it->first;
-    Dynamixel  *dxl         = it->second;
+    std::string joint_name  = it.first;
+    Dynamixel  *dxl         = it.second;
 
     if (ping(joint_name) != 0)
     {
@@ -264,10 +254,10 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
   initializeDevice(init_file_path);
 
   // [ BulkRead ] StartAddress : Present Position , Length : 10 ( Position/Velocity/Current )
-  for (std::map<std::string, Dynamixel*>::iterator it = robot_->dxls_.begin(); it != robot_->dxls_.end(); it++)
+  for (auto& it : robot_->dxls_)
   {
-    std::string joint_name  = it->first;
-    Dynamixel  *dxl         = it->second;
+    std::string joint_name  = it.first;
+    Dynamixel  *dxl         = it.second;
 
     if (dxl == NULL)
       continue;
@@ -283,7 +273,7 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
 //    }
 
     // calculate bulk read start address & data length
-    std::map<std::string, ControlTableItem *>::iterator indirect_addr_it = dxl->ctrl_table_.find(INDIRECT_ADDRESS_1);
+    auto indirect_addr_it = dxl->ctrl_table_.find(INDIRECT_ADDRESS_1);
     if (indirect_addr_it != dxl->ctrl_table_.end()) // INDIRECT_ADDRESS_1 exist
     {
       if (dxl->bulk_read_items_.size() != 0)
@@ -338,10 +328,10 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
       writeCtrlItem(joint_name, dxl->torque_enable_item_->item_name_, 1);
   }
 
-  for (std::map<std::string, Sensor*>::iterator it = robot_->sensors_.begin(); it != robot_->sensors_.end(); it++)
+  for (auto& it : robot_->sensors_)
   {
-    std::string sensor_name = it->first;
-    Sensor *sensor = it->second;
+    std::string sensor_name = it.first;
+    Sensor     *sensor      = it.second;
 
     if (sensor == NULL)
       continue;
@@ -350,7 +340,7 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
     int bulkread_data_length = 0;
 
     // calculate bulk read start address & data length
-    std::map<std::string, ControlTableItem *>::iterator indirect_addr_it = sensor->ctrl_table_.find(INDIRECT_ADDRESS_1);
+    auto indirect_addr_it = sensor->ctrl_table_.find(INDIRECT_ADDRESS_1);
     if (indirect_addr_it != sensor->ctrl_table_.end()) // INDIRECT_ADDRESS_1 exist
     {
       if (sensor->bulk_read_items_.size() != 0)
@@ -427,7 +417,7 @@ void RobotisController::initializeDevice(const std::string init_file_path)
         continue;
 
       Dynamixel *dxl = NULL;
-      std::map<std::string, Dynamixel*>::iterator dxl_it = robot_->dxls_.find(joint_name);
+      auto dxl_it = robot_->dxls_.find(joint_name);
       if (dxl_it != robot_->dxls_.end())
         dxl = dxl_it->second;
 
@@ -555,14 +545,14 @@ void RobotisController::msgQueueThread()
 
   if (gazebo_mode_ == true)
   {
-    for (std::map<std::string, Dynamixel*>::iterator it = robot_->dxls_.begin(); it != robot_->dxls_.end(); it++)
+    for (auto& it : robot_->dxls_)
     {
-      gazebo_joint_position_pub_[it->first] = ros_node.advertise<std_msgs::Float64>(
-                                                "/" + gazebo_robot_name_ + "/" + it->first + "_position/command", 1);
-      gazebo_joint_velocity_pub_[it->first] = ros_node.advertise<std_msgs::Float64>(
-                                                "/" + gazebo_robot_name_ + "/" + it->first + "_velocity/command", 1);
-      gazebo_joint_effort_pub_[it->first]   = ros_node.advertise<std_msgs::Float64>(
-                                                "/" + gazebo_robot_name_ + "/" + it->first + "_effort/command", 1);
+      gazebo_joint_position_pub_[it.first] = ros_node.advertise<std_msgs::Float64>(
+                                                "/" + gazebo_robot_name_ + "/" + it.first + "_position/command", 1);
+      gazebo_joint_velocity_pub_[it.first] = ros_node.advertise<std_msgs::Float64>(
+                                                "/" + gazebo_robot_name_ + "/" + it.first + "_velocity/command", 1);
+      gazebo_joint_effort_pub_[it.first]   = ros_node.advertise<std_msgs::Float64>(
+                                                "/" + gazebo_robot_name_ + "/" + it.first + "_effort/command", 1);
     }
   }
 
@@ -629,10 +619,9 @@ void RobotisController::startTimer()
   {
     initializeSyncWrite();
 
-    for (std::map<std::string, dynamixel::GroupBulkRead *>::iterator it = port_to_bulk_read_.begin();
-         it != port_to_bulk_read_.end(); it++)
+    for (auto& it : port_to_bulk_read_)
     {
-      it->second->txPacket();
+      it.second->txPacket();
     }
 
     usleep(8 * 1000);
@@ -682,36 +671,31 @@ void RobotisController::stopTimer()
       if ((error = pthread_join(this->timer_thread_, NULL)) != 0)
         exit(-1);
 
-      for (std::map<std::string, dynamixel::GroupBulkRead *>::iterator it = port_to_bulk_read_.begin();
-           it != port_to_bulk_read_.end(); it++)
+      for (auto& it : port_to_bulk_read_)
       {
-        if (it->second != NULL)
-          it->second->rxPacket();
+        if (it.second != NULL)
+          it.second->rxPacket();
       }
 
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_position_.begin();
-           it != port_to_sync_write_position_.end(); it++)
+      for (auto& it : port_to_sync_write_position_)
       {
-        if (it->second != NULL)
-          it->second->clearParam();
+        if (it.second != NULL)
+          it.second->clearParam();
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_position_p_gain_.begin();
-           it != port_to_sync_write_position_p_gain_.end(); it++)
+      for (auto& it : port_to_sync_write_position_p_gain_)
       {
-        if (it->second != NULL)
-          it->second->clearParam();
+        if (it.second != NULL)
+          it.second->clearParam();
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_velocity_.begin();
-           it != port_to_sync_write_velocity_.end(); it++)
+      for (auto& it : port_to_sync_write_velocity_)
       {
-        if (it->second != NULL)
-          it->second->clearParam();
+        if (it.second != NULL)
+          it.second->clearParam();
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_current_.begin();
-           it != port_to_sync_write_current_.end(); it++)
+      for (auto& it : port_to_sync_write_current_)
       {
-        if (it->second != NULL)
-          it->second->clearParam();
+        if (it.second != NULL)
+          it.second->clearParam();
       }
     }
     else
@@ -752,7 +736,7 @@ void RobotisController::loadOffset(const std::string path)
     std::string joint_name = it->first.as<std::string>();
     double offset = it->second.as<double>();
 
-    std::map<std::string, Dynamixel*>::iterator dxl_it = robot_->dxls_.find(joint_name);
+    auto dxl_it = robot_->dxls_.find(joint_name);
     if (dxl_it != robot_->dxls_.end())
       dxl_it->second->dxl_state_->position_offset_ = offset;
   }
@@ -786,21 +770,19 @@ void RobotisController::process()
   if (gazebo_mode_ == false)
   {
     // BulkRead Rx
-    for (std::map<std::string, dynamixel::GroupBulkRead *>::iterator it = port_to_bulk_read_.begin();
-         it != port_to_bulk_read_.end(); it++)
+    for (auto& it : port_to_bulk_read_)
     {
-      robot_->ports_[it->first]->setPacketTimeout(0.0);
-      it->second->rxPacket();
+      robot_->ports_[it.first]->setPacketTimeout(0.0);
+      it.second->rxPacket();
     }
 
     if (robot_->dxls_.size() > 0)
     {
-      for (std::map<std::string, Dynamixel *>::iterator dxl_it = robot_->dxls_.begin();
-           dxl_it != robot_->dxls_.end(); dxl_it++)
+      for (auto& dxl_it : robot_->dxls_)
       {
-        Dynamixel *dxl = dxl_it->second;
-        std::string port_name = dxl_it->second->port_name_;
-        std::string joint_name = dxl_it->first;
+        Dynamixel  *dxl         = dxl_it.second;
+        std::string port_name   = dxl_it.second->port_name_;
+        std::string joint_name  = dxl_it.first;
 
         if (dxl->bulk_read_items_.size() > 0)
         {
@@ -838,12 +820,11 @@ void RobotisController::process()
 
     if (robot_->sensors_.size() > 0)
     {
-      for (std::map<std::string, Sensor *>::iterator sensor_it = robot_->sensors_.begin();
-           sensor_it != robot_->sensors_.end(); sensor_it++)
+      for (auto& sensor_it : robot_->sensors_)
       {
-        Sensor *sensor = sensor_it->second;
-        std::string port_name = sensor_it->second->port_name_;
-        std::string sensor_name = sensor_it->first;
+        Sensor     *sensor      = sensor_it.second;
+        std::string port_name   = sensor_it.second->port_name_;
+        std::string sensor_name = sensor_it.first;
 
         if (sensor->bulk_read_items_.size() > 0)
         {
@@ -877,12 +858,12 @@ void RobotisController::process()
   // -> for loop : call SensorModule list -> Process()
   if (sensor_modules_.size() > 0)
   {
-    for (std::list<SensorModule*>::iterator module_it = sensor_modules_.begin(); module_it != sensor_modules_.end(); module_it++)
+    for (auto module_it = sensor_modules_.begin(); module_it != sensor_modules_.end(); module_it++)
     {
       (*module_it)->process(robot_->dxls_, robot_->sensors_);
 
-      for (std::map<std::string, double>::iterator it = (*module_it)->result_.begin(); it != (*module_it)->result_.end(); it++)
-        sensor_result_[it->first] = it->second;
+      for (auto& it : (*module_it)->result_)
+        sensor_result_[it.first] = it.second;
     }
   }
 
@@ -900,7 +881,7 @@ void RobotisController::process()
     {
       queue_mutex_.lock();
 
-      for (std::list<MotionModule*>::iterator module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
+      for (auto module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
       {
         if ((*module_it)->getModuleEnable() == false)
           continue;
@@ -908,11 +889,11 @@ void RobotisController::process()
         (*module_it)->process(robot_->dxls_, sensor_result_);
 
         // for loop : joint list
-        for (std::map<std::string, Dynamixel *>::iterator dxl_it = robot_->dxls_.begin(); dxl_it != robot_->dxls_.end(); dxl_it++)
+        for (auto& dxl_it : robot_->dxls_)
         {
-          std::string     joint_name  = dxl_it->first;
-          Dynamixel      *dxl         = dxl_it->second;
-          DynamixelState *dxl_state   = dxl_it->second->dxl_state_;
+          std::string     joint_name  = dxl_it.first;
+          Dynamixel      *dxl         = dxl_it.second;
+          DynamixelState *dxl_state   = dxl_it.second->dxl_state_;
 
           if (dxl->ctrl_module_name_ == (*module_it)->getModuleName())
           {
@@ -1017,47 +998,42 @@ void RobotisController::process()
     {
       if (port_to_sync_write_position_p_gain_.size() > 0)
       {
-        for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_position_p_gain_.begin();
-             it != port_to_sync_write_position_p_gain_.end(); it++)
+        for (auto& it : port_to_sync_write_position_p_gain_)
         {
-          it->second->txPacket();
-          it->second->clearParam();
+          it.second->txPacket();
+          it.second->clearParam();
         }
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_position_.begin();
-           it != port_to_sync_write_position_.end(); it++)
+      for (auto& it : port_to_sync_write_position_)
       {
-        if (it->second != NULL)
-          it->second->txPacket();
+        if (it.second != NULL)
+          it.second->txPacket();
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_velocity_.begin();
-           it != port_to_sync_write_velocity_.end(); it++)
+      for (auto& it : port_to_sync_write_velocity_)
       {
-        if (it->second != NULL)
-          it->second->txPacket();
+        if (it.second != NULL)
+          it.second->txPacket();
       }
-      for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_current_.begin();
-           it != port_to_sync_write_current_.end(); it++)
+      for (auto& it : port_to_sync_write_current_)
       {
-        if (it->second != NULL)
-          it->second->txPacket();
+        if (it.second != NULL)
+          it.second->txPacket();
       }
     }
     else if (gazebo_mode_ == true)
     {
-      for (std::list<MotionModule*>::iterator module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
+      for (auto module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
       {
         if ((*module_it)->getModuleEnable() == false)
           continue;
 
         std_msgs::Float64 joint_msg;
 
-        for (std::map<std::string, Dynamixel *>::iterator dxl_it = robot_->dxls_.begin(); dxl_it != robot_->dxls_.end();
-            dxl_it++)
+        for (auto& dxl_it : robot_->dxls_)
         {
-          std::string     joint_name  = dxl_it->first;
-          Dynamixel      *dxl         = dxl_it->second;
-          DynamixelState *dxl_state   = dxl_it->second->dxl_state_;
+          std::string     joint_name  = dxl_it.first;
+          Dynamixel      *dxl         = dxl_it.second;
+          DynamixelState *dxl_state   = dxl_it.second->dxl_state_;
 
           if (dxl->ctrl_module_name_ == (*module_it)->getModuleName())
           {
@@ -1085,11 +1061,10 @@ void RobotisController::process()
   {
     queue_mutex_.lock();
 
-    for (std::map<std::string, dynamixel::GroupSyncWrite *>::iterator it = port_to_sync_write_position_.begin();
-         it != port_to_sync_write_position_.end(); it++)
+    for (auto& it : port_to_sync_write_position_)
     {
-      it->second->txPacket();
-      it->second->clearParam();
+      it.second->txPacket();
+      it.second->clearParam();
     }
 
     if (direct_sync_write_.size() > 0)
@@ -1110,8 +1085,8 @@ void RobotisController::process()
   // BulkRead Tx
   if (gazebo_mode_ == false)
   {
-    for (std::map<std::string, dynamixel::GroupBulkRead *>::iterator it = port_to_bulk_read_.begin(); it != port_to_bulk_read_.end(); it++)
-      it->second->txPacket();
+    for (auto& it : port_to_bulk_read_)
+      it.second->txPacket();
   }
 
   if (DEBUG_PRINT)
@@ -1121,10 +1096,10 @@ void RobotisController::process()
   }
 
   // publish present & goal position
-  for (std::map<std::string, Dynamixel *>::iterator dxl_it = robot_->dxls_.begin(); dxl_it != robot_->dxls_.end(); dxl_it++)
+  for (auto& dxl_it : robot_->dxls_)
   {
-    std::string joint_name = dxl_it->first;
-    Dynamixel *dxl = dxl_it->second;
+    std::string joint_name  = dxl_it.first;
+    Dynamixel  *dxl         = dxl_it.second;
 
     present_state.name.push_back(joint_name);
     present_state.position.push_back(dxl->dxl_state_->present_position_);
@@ -1153,7 +1128,7 @@ void RobotisController::process()
 void RobotisController::addMotionModule(MotionModule *module)
 {
   // check whether the module name already exists
-  for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+  for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
   {
     if ((*m_it)->getModuleName() == module->getModuleName())
     {
@@ -1175,7 +1150,7 @@ void RobotisController::removeMotionModule(MotionModule *module)
 void RobotisController::addSensorModule(SensorModule *module)
 {
   // check whether the module name already exists
-  for (std::list<SensorModule *>::iterator m_it = sensor_modules_.begin(); m_it != sensor_modules_.end(); m_it++)
+  for (auto m_it = sensor_modules_.begin(); m_it != sensor_modules_.end(); m_it++)
   {
     if ((*m_it)->getModuleName() == module->getModuleName())
     {
@@ -1301,7 +1276,7 @@ void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs
   for (unsigned int idx = 0; idx < msg->joint_name.size(); idx++)
   {
     Dynamixel *dxl = NULL;
-    std::map<std::string, Dynamixel*>::iterator dxl_it = robot_->dxls_.find((std::string) (msg->joint_name[idx]));
+    auto dxl_it = robot_->dxls_.find((std::string) (msg->joint_name[idx]));
     if (dxl_it != robot_->dxls_.end())
       dxl = dxl_it->second;
     else
@@ -1315,7 +1290,7 @@ void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs
     }
 
     // check whether the module is using this joint
-    for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+    for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
     {
       if ((*m_it)->getModuleName() == msg->module_name[idx])
       {
@@ -1328,15 +1303,15 @@ void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs
     }
   }
 
-  for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+  for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
   {
     // set all modules -> disable
     (*m_it)->setModuleEnable(false);
 
     // set all used modules -> enable
-    for (std::map<std::string, Dynamixel*>::iterator d_it = robot_->dxls_.begin(); d_it != robot_->dxls_.end(); d_it++)
+    for (auto& d_it : robot_->dxls_)
     {
-      if (d_it->second->ctrl_module_name_ == (*m_it)->getModuleName())
+      if (d_it.second->ctrl_module_name_ == (*m_it)->getModuleName())
       {
         (*m_it)->setModuleEnable(true);
         break;
@@ -1350,10 +1325,10 @@ void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs
   queue_mutex_.unlock();
 
   robotis_controller_msgs::JointCtrlModule current_module_msg;
-  for (std::map<std::string, Dynamixel *>::iterator dxl_iter = robot_->dxls_.begin(); dxl_iter != robot_->dxls_.end(); ++dxl_iter)
+  for (auto& dxl_iter : robot_->dxls_)
   {
-    current_module_msg.joint_name.push_back(dxl_iter->first);
-    current_module_msg.module_name.push_back(dxl_iter->second->ctrl_module_name_);
+    current_module_msg.joint_name.push_back(dxl_iter.first);
+    current_module_msg.module_name.push_back(dxl_iter.second->ctrl_module_name_);
   }
 
   if (current_module_msg.joint_name.size() == current_module_msg.module_name.size())
@@ -1365,7 +1340,7 @@ bool RobotisController::getCtrlModuleCallback(robotis_controller_msgs::GetJointM
 {
   for (unsigned int idx = 0; idx < req.joint_name.size(); idx++)
   {
-    std::map<std::string, Dynamixel*>::iterator d_it = robot_->dxls_.find((std::string) (req.joint_name[idx]));
+    auto d_it = robot_->dxls_.find((std::string) (req.joint_name[idx]));
     if (d_it != robot_->dxls_.end())
     {
       res.joint_name.push_back(req.joint_name[idx]);
@@ -1387,7 +1362,7 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   if (ctrl_module == "" || ctrl_module == "none")
   {
     // enqueue all modules in order to stop
-    for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+    for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
     {
       if ((*m_it)->getModuleEnable() == true)
         stop_modules.push_back(*m_it);
@@ -1395,24 +1370,22 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   }
   else
   {
-    for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+    for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
     {
       // if it exist
       if ((*m_it)->getModuleName() == ctrl_module)
       {
         // enqueue the module which lost control of joint in order to stop
-        for (std::map<std::string, DynamixelState*>::iterator result_it = (*m_it)->result_.begin();
-             result_it != (*m_it)->result_.end(); result_it++)
+        for (auto& result_it : (*m_it)->result_)
         {
-          std::map<std::string, Dynamixel*>::iterator d_it = robot_->dxls_.find(result_it->first);
+          auto d_it = robot_->dxls_.find(result_it.first);
 
           if (d_it != robot_->dxls_.end())
           {
             // enqueue
             if (d_it->second->ctrl_module_name_ != ctrl_module)
             {
-              for (std::list<MotionModule *>::iterator stop_m_it = motion_modules_.begin();
-                   stop_m_it != motion_modules_.end(); stop_m_it++)
+              for (auto stop_m_it = motion_modules_.begin(); stop_m_it != motion_modules_.end(); stop_m_it++)
               {
                 if (((*stop_m_it)->getModuleName() == d_it->second->ctrl_module_name_) &&
                     ((*stop_m_it)->getModuleEnable() == true))
@@ -1431,13 +1404,13 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
 
   // stop the module
   stop_modules.unique();
-  for (std::list<MotionModule *>::iterator stop_m_it = stop_modules.begin(); stop_m_it != stop_modules.end(); stop_m_it++)
+  for (auto stop_m_it = stop_modules.begin(); stop_m_it != stop_modules.end(); stop_m_it++)
   {
     (*stop_m_it)->stop();
   }
 
   // wait to stop
-  for (std::list<MotionModule *>::iterator stop_m_it = stop_modules.begin(); stop_m_it != stop_modules.end(); stop_m_it++)
+  for (auto stop_m_it = stop_modules.begin(); stop_m_it != stop_modules.end(); stop_m_it++)
   {
     while ((*stop_m_it)->isRunning())
       usleep(CONTROL_CYCLE_MSEC * 1000);
@@ -1453,15 +1426,15 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   if ((ctrl_module == "") || (ctrl_module == "none"))
   {
     // set all modules -> disable
-    for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+    for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
     {
       (*m_it)->setModuleEnable(false);
     }
 
     // set dxl's control module to "none"
-    for (std::map<std::string, Dynamixel*>::iterator d_it = robot_->dxls_.begin(); d_it != robot_->dxls_.end(); d_it++)
+    for (auto& d_it : robot_->dxls_)
     {
-      Dynamixel *dxl = d_it->second;
+      Dynamixel *dxl = d_it.second;
       dxl->ctrl_module_name_ = "none";
 
       if (gazebo_mode_ == true)
@@ -1486,16 +1459,15 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   else
   {
     // check whether the module exist
-    for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+    for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
     {
       // if it exist
       if ((*m_it)->getModuleName() == ctrl_module)
       {
         ControlMode mode = (*m_it)->getControlMode();
-        for (std::map<std::string, DynamixelState*>::iterator result_it = (*m_it)->result_.begin();
-             result_it != (*m_it)->result_.end(); result_it++)
+        for (auto& result_it : (*m_it)->result_)
         {
-          std::map<std::string, Dynamixel*>::iterator d_it = robot_->dxls_.find(result_it->first);
+          auto d_it = robot_->dxls_.find(result_it.first);
           if (d_it != robot_->dxls_.end())
           {
             Dynamixel *dxl = d_it->second;
@@ -1563,15 +1535,15 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
     }
   }
 
-  for (std::list<MotionModule *>::iterator m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
+  for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
   {
     // set all modules -> disable
     (*m_it)->setModuleEnable(false);
 
     // set all used modules -> enable
-    for (std::map<std::string, Dynamixel*>::iterator d_it = robot_->dxls_.begin(); d_it != robot_->dxls_.end(); d_it++)
+    for (auto& d_it : robot_->dxls_)
     {
-      if (d_it->second->ctrl_module_name_ == (*m_it)->getModuleName())
+      if (d_it.second->ctrl_module_name_ == (*m_it)->getModuleName())
       {
         (*m_it)->setModuleEnable(true);
         break;
@@ -1586,10 +1558,10 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
 
   // publish current module
   robotis_controller_msgs::JointCtrlModule current_module_msg;
-  for (std::map<std::string, Dynamixel *>::iterator dxl_iter = robot_->dxls_.begin(); dxl_iter != robot_->dxls_.end(); ++dxl_iter)
+  for (auto& dxl_iter : robot_->dxls_)
   {
-    current_module_msg.joint_name.push_back(dxl_iter->first);
-    current_module_msg.module_name.push_back(dxl_iter->second->ctrl_module_name_);
+    current_module_msg.joint_name.push_back(dxl_iter.first);
+    current_module_msg.module_name.push_back(dxl_iter.second->ctrl_module_name_);
   }
 
   if (current_module_msg.joint_name.size() == current_module_msg.module_name.size())
@@ -1602,7 +1574,7 @@ void RobotisController::gazeboJointStatesCallback(const sensor_msgs::JointState:
 
   for (unsigned int i = 0; i < msg->name.size(); i++)
   {
-    std::map<std::string, Dynamixel*>::iterator d_it = robot_->dxls_.find((std::string) msg->name[i]);
+    auto d_it = robot_->dxls_.find((std::string) msg->name[i]);
     if (d_it != robot_->dxls_.end())
     {
       d_it->second->dxl_state_->present_position_ = msg->position[i];
@@ -1613,8 +1585,8 @@ void RobotisController::gazeboJointStatesCallback(const sensor_msgs::JointState:
 
   if (init_pose_loaded_ == false)
   {
-    for (std::map<std::string, Dynamixel*>::iterator it = robot_->dxls_.begin(); it != robot_->dxls_.end(); it++)
-      it->second->dxl_state_->goal_position_ = it->second->dxl_state_->present_position_;
+    for (auto& it : robot_->dxls_)
+      it.second->dxl_state_->goal_position_ = it.second->dxl_state_->present_position_;
     init_pose_loaded_ = true;
   }
 
