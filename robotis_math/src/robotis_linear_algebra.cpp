@@ -305,4 +305,18 @@ double calcInner(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b)
   return vector3d_a.dot(vector3d_b);
 }
 
+Pose3D getPose3DfromTransformMatrix(Eigen::MatrixXd transform)
+{
+  Pose3D pose_3d;
+
+  pose_3d.x     = transform.coeff(0, 3);
+  pose_3d.y     = transform.coeff(1, 3);
+  pose_3d.z     = transform.coeff(2, 3);
+  pose_3d.roll  = atan2( transform.coeff(2,1), transform.coeff(2,2));
+  pose_3d.pitch = atan2(-transform.coeff(2,0), sqrt(transform.coeff(2,1)*transform.coeff(2,1) + transform.coeff(2,2)*transform.coeff(2,2)) );
+  pose_3d.yaw   = atan2( transform.coeff(1,0), transform.coeff(0,0));
+
+  return pose_3d;
+}
+
 }
