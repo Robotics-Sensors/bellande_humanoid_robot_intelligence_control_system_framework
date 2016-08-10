@@ -93,7 +93,7 @@ private:
   void initializeSyncWrite();
 
 public:
-  static const int  CONTROL_CYCLE_MSEC  = 4;    // 8 msec
+  static const int  CONTROL_CYCLE_MSEC  = 8;    // 8 msec
 
   bool              DEBUG_PRINT;
   Robot            *robot_;
