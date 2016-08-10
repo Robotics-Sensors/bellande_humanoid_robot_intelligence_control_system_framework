@@ -40,9 +40,11 @@
 namespace robotis_framework
 {
 
-Eigen::MatrixXd calcMinimumJerkTra(double pos_start, double vel_start, double accel_start,
-    double pos_end, double vel_end, double accel_end,
-    double smp_time, double mov_time)
+Eigen::MatrixXd calcMinimumJerkTra(
+    double pos_start, double vel_start, double accel_start,
+    double pos_end,   double vel_end,   double accel_end,
+    double smp_time,  double mov_time
+    )
 /*
    simple minimum jerk trajectory
 
@@ -92,6 +94,78 @@ Eigen::MatrixXd calcMinimumJerkTra(double pos_start, double vel_start, double ac
         poly_coeff.coeff(0,0)*pow(time.coeff(step,0),3) +
         poly_coeff.coeff(1,0)*pow(time.coeff(step,0),4) +
         poly_coeff.coeff(2,0)*pow(time.coeff(step,0),5);
+  }
+
+  return minimum_jerk_tra;
+}
+
+Eigen::MatrixXd calcMinimumJerkTraPlus(
+    double pos_start, double vel_start, double accel_start,
+    double pos_end,   double vel_end,   double accel_end,
+    double smp_time,  double mov_time
+    )
+/*
+   simple minimum jerk trajectory
+
+   pos_start : position at initial state
+   vel_start : velocity at initial state
+   accel_start : acceleration at initial state
+
+   pos_end : position at final state
+   vel_end : velocity at final state
+   accel_end : acceleration at final state
+
+   smp_time : sampling time
+   mov_time : movement time
+ */
+
+{
+  Eigen::MatrixXd poly_matrix(3,3);
+  Eigen::MatrixXd poly_vector(3,1);
+
+  poly_matrix <<
+      pow(mov_time,3), pow(mov_time,4), pow(mov_time,5),
+      3*pow(mov_time,2), 4*pow(mov_time,3), 5*pow(mov_time,4),
+      6*mov_time, 12*pow(mov_time,2), 20*pow(mov_time,3);
+
+  poly_vector <<
+      pos_end-pos_start-vel_start*mov_time-accel_start*pow(mov_time,2)/2,
+      vel_end-vel_start-accel_start*mov_time,
+      accel_end-accel_start ;
+
+  Eigen::Matrix<double,3,1> poly_coeff = poly_matrix.inverse() * poly_vector;
+
+  double time_steps = mov_time/smp_time;
+  int all_time_steps = round(time_steps+1);
+
+  Eigen::MatrixXd time = Eigen::MatrixXd::Zero(all_time_steps,1);
+  Eigen::MatrixXd minimum_jerk_tra = Eigen::MatrixXd::Zero(all_time_steps,3);
+
+  for (int step=0; step<all_time_steps; step++)
+    time.coeffRef(step,0) = step*smp_time;
+
+  for (int step=0; step<all_time_steps; step++)
+  {
+    minimum_jerk_tra.coeffRef( step , 0 ) =
+        pos_start +
+        vel_start*time.coeff(step,0) +
+        0.5*accel_start*pow(time.coeff(step,0),2) +
+        poly_coeff.coeff(0,0)*pow(time.coeff(step,0),3) +
+        poly_coeff.coeff(1,0)*pow(time.coeff(step,0),4) +
+        poly_coeff.coeff(2,0)*pow(time.coeff(step,0),5);
+
+    minimum_jerk_tra.coeffRef( step , 1 ) =
+        vel_start +
+        accel_start*time.coeff(step,0) +
+        3*poly_coeff.coeff(0,0)*pow(time.coeff(step,0),2) +
+        4*poly_coeff.coeff(1,0)*pow(time.coeff(step,0),3) +
+        5*poly_coeff.coeff(2,0)*pow(time.coeff(step,0),4);
+
+    minimum_jerk_tra.coeffRef( step , 2 ) =
+        accel_start +
+        6*poly_coeff.coeff(0,0)*time.coeff(step,0) +
+        12*poly_coeff.coeff(1,0)*pow(time.coeff(step,0),2) +
+        20*poly_coeff.coeff(2,0)*pow(time.coeff(step,0),3);
   }
 
   return minimum_jerk_tra;

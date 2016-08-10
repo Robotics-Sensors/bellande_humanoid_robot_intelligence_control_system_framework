@@ -50,6 +50,10 @@ Eigen::MatrixXd calcMinimumJerkTra(double pos_start, double vel_start, double ac
                                    double pos_end,   double vel_end,   double accel_end,
                                    double smp_time,  double mov_time);
 
+Eigen::MatrixXd calcMinimumJerkTraPlus(double pos_start, double vel_start, double accel_start,
+                                       double pos_end,   double vel_end,   double accel_end,
+                                       double smp_time,  double mov_time);
+
 Eigen::MatrixXd calcMinimumJerkTraWithViaPoints(int via_num,
                                                 double pos_start, double vel_start, double accel_start,
                                                 Eigen::MatrixXd pos_via,  Eigen::MatrixXd vel_via, Eigen::MatrixXd accel_via,
