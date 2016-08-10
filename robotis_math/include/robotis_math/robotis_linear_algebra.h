@@ -44,6 +44,7 @@
 #define EIGEN_NO_STATIC_ASSERT
 
 #include <Eigen/Dense>
+#include "step_data_define.h"
 
 namespace robotis_framework
 {
@@ -70,6 +71,8 @@ Eigen::MatrixXd calcRodrigues(Eigen::MatrixXd hat_matrix, double angle);
 Eigen::MatrixXd convertRotToOmega(Eigen::MatrixXd rotation);
 Eigen::MatrixXd calcCross(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
 double calcInner(Eigen::MatrixXd vector3d_a, Eigen::MatrixXd vector3d_b);
+
+Pose3D getPose3DfromTransformMatrix(Eigen::MatrixXd  transform);
 
 }
 
