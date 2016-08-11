@@ -1173,11 +1173,31 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
 {
   for (int i = 0; i < msg->joint_name.size(); i++)
   {
-    Dynamixel        *dxl   = robot_->dxls_[msg->joint_name[i]];
-    ControlTableItem *item  = dxl->ctrl_table_[msg->item_name];
+    Device           *device;
 
-    dynamixel::PortHandler   *port           = robot_->ports_[dxl->port_name_];
-    dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(dxl->protocol_version_);
+    auto d_it1 = robot_->dxls_.find(msg->joint_name[i]);
+    if (d_it1 != robot_->dxls_.end())
+    {
+      device = d_it1->second;
+    }
+    else
+    {
+      auto d_it2 = robot_->sensors_.find(msg->joint_name[i]);
+      if (d_it2 != robot_->sensors_.end())
+      {
+        device = d_it2->second;
+      }
+      else
+      {
+        // could not find the device
+        continue;
+      }
+    }
+
+    ControlTableItem *item  = device->ctrl_table_[msg->item_name];
+
+    dynamixel::PortHandler   *port           = robot_->ports_[device->port_name_];
+    dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(device->protocol_version_);
 
     if (item->access_type_ == Read)
       continue;
@@ -1215,7 +1235,7 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
       data[2] = DXL_LOBYTE(DXL_HIWORD((uint32_t)msg->value[i]));
       data[3] = DXL_HIBYTE(DXL_HIWORD((uint32_t)msg->value[i]));
     }
-    direct_sync_write_[idx]->addParam(dxl->id_, data);
+    direct_sync_write_[idx]->addParam(device->id_, data);
     delete[] data;
   }
 }
