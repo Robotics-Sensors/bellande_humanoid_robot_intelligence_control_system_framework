@@ -19,6 +19,9 @@ goal_current_item_name          =
 position_d_gain_item_name       = position_d_gain
 position_i_gain_item_name       = position_i_gain
 position_p_gain_item_name       = position_p_gain
+velocity_d_gain_item_name       = 
+velocity_i_gain_item_name       = 
+velocity_p_gain_item_name       = 
 
 [control table]
 # addr | item name                | length | access | memory |   min value   |  max value  | signed

@@ -55,7 +55,12 @@ Dynamixel::Dynamixel(int id, std::string model_name, float protocol_version)
     goal_position_item_(0),
     goal_velocity_item_(0),
     goal_current_item_(0),
-    position_p_gain_item_(0)
+    position_p_gain_item_(0),
+    position_i_gain_item_(0),
+    position_d_gain_item_(0),
+    velocity_p_gain_item_(0),
+    velocity_i_gain_item_(0),
+    velocity_d_gain_item_(0)
 {
   this->id_ = id;
   this->model_name_ = model_name;
