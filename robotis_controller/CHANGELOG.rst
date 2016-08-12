@@ -2,7 +2,7 @@
 Changelog for package robotis_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.1.1 (2016-08-12)
+0.1.0 (2016-08-12)
 -----------
 * first public release for Kinetic
 * modified the package information for release
