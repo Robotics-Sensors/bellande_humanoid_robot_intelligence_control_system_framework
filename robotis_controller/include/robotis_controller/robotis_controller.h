@@ -109,6 +109,11 @@ public:
   std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_velocity_;
   std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_current_;
   std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_position_p_gain_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_position_i_gain_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_position_d_gain_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_velocity_p_gain_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_velocity_i_gain_;
+  std::map<std::string, dynamixel::GroupSyncWrite *>  port_to_sync_write_velocity_d_gain_;
 
   /* publisher */
   ros::Publisher  goal_joint_state_pub_;
