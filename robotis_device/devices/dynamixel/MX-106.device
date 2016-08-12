@@ -1,5 +1,5 @@
 [device info]
-model_name  = MX-28
+model_name  = MX-106
 device_type = dynamixel
 
 [type info]
@@ -59,4 +59,8 @@ velocity_p_gain_item_name       =
    46  | is_moving                | 1      | R      | RAM    | 0             | 1           | N
    47  | EEPROM_lock              | 1      | RW     | RAM    | 0             | 1           | N
    48  | punch                    | 2      | RW     | RAM    | 0             | 1023        | N
+   68  | current_consumption      | 2      | RW     | RAM    | 0             | 4095        | N
+   70  | torque_control_mode      | 1      | RW     | RAM    | 0             | 1           | N
+   71  | torque_control_goal      | 2      | RW     | RAM    | 0             | 2047        | N
    73  | goal_acceleration        | 1      | RW     | RAM    | 0             | 254         | N
+

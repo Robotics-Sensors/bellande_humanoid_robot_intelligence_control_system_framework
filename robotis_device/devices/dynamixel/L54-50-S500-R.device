@@ -3,8 +3,6 @@ model_name  = L54-50-S500-R
 device_type = dynamixel
 
 [type info]
-current_ratio                   = 16.11328125
-
 value_of_0_radian_position      = 0
 value_of_min_radian_position    = -180684
 value_of_max_radian_position    =  180684
@@ -21,6 +19,9 @@ goal_current_item_name          = goal_torque
 position_d_gain_item_name       = 
 position_i_gain_item_name       = 
 position_p_gain_item_name       = position_p_gain
+velocity_d_gain_item_name       = 
+velocity_i_gain_item_name       = velocity_i_gain
+velocity_p_gain_item_name       = velocity_p_gain
 
 [control table]
 # addr | item name                | length | access | memory |   min value   |  max value  | signed

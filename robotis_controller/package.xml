@@ -6,15 +6,11 @@
 
   <maintainer email="zerom@robotis.com">ROBOTIS</maintainer>
 
-
   <license>BSD</license>
-
 
   <!-- <url type="website">http://wiki.ros.org/robotis_controller</url> -->
 
-
   <author email="zerom@robotis.com">ROBOTIS</author>
-
 
   <buildtool_depend>catkin</buildtool_depend>
   
