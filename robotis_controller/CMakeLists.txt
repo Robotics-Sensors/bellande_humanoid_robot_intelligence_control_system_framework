@@ -46,14 +46,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(robotis_controller
-  src/robotis_controller/robotis_controller.cpp
-)
-
-target_link_libraries(robotis_controller
-  yaml-cpp
-  ${catkin_LIBRARIES}
-)
+add_library(robotis_controller src/robotis_controller/robotis_controller.cpp)
+add_dependencies(robotis_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(robotis_controller yaml-cpp ${catkin_LIBRARIES})
 
 ################################################################################
 # Install
