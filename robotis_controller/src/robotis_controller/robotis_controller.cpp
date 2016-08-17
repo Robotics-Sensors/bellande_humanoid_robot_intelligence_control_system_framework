@@ -348,7 +348,119 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
 
   initializeDevice(init_file_path);
 
+  queue_thread_ = boost::thread(boost::bind(&RobotisController::msgQueueThread, this));
+  return true;
+}
+
+void RobotisController::initializeDevice(const std::string init_file_path)
+{
+  // device initialize
+  if (DEBUG_PRINT)
+    ROS_WARN("INIT FILE LOAD");
+
+  YAML::Node doc;
+  try
+  {
+    doc = YAML::LoadFile(init_file_path.c_str());
+
+    for (YAML::const_iterator it_doc = doc.begin(); it_doc != doc.end(); it_doc++)
+    {
+      std::string joint_name = it_doc->first.as<std::string>();
+
+      YAML::Node joint_node = doc[joint_name];
+      if (joint_node.size() == 0)
+        continue;
+
+      Dynamixel *dxl = NULL;
+      auto dxl_it = robot_->dxls_.find(joint_name);
+      if (dxl_it != robot_->dxls_.end())
+        dxl = dxl_it->second;
+
+      if (dxl == NULL)
+      {
+        ROS_WARN("Joint [%s] was not found.", joint_name.c_str());
+        continue;
+      }
+      if (DEBUG_PRINT)
+        ROS_INFO("JOINT_NAME: %s", joint_name.c_str());
+
+      for (YAML::const_iterator it_joint = joint_node.begin(); it_joint != joint_node.end(); it_joint++)
+      {
+        std::string item_name = it_joint->first.as<std::string>();
+
+        if (DEBUG_PRINT)
+          ROS_INFO("  ITEM_NAME: %s", item_name.c_str());
+
+        uint32_t value = it_joint->second.as<uint32_t>();
+
+        ControlTableItem *item = dxl->ctrl_table_[item_name];
+        if (item == NULL)
+        {
+          ROS_WARN("Control Item [%s] was not found.", item_name.c_str());
+          continue;
+        }
+
+        if (item->memory_type_ == EEPROM)
+        {
+          uint8_t   data8 = 0;
+          uint16_t  data16 = 0;
+          uint32_t  data32 = 0;
+
+          switch (item->data_length_)
+          {
+          case 1:
+            read1Byte(joint_name, item->address_, &data8);
+            if (data8 == value)
+              continue;
+            break;
+          case 2:
+            read2Byte(joint_name, item->address_, &data16);
+            if (data16 == value)
+              continue;
+            break;
+          case 4:
+            read4Byte(joint_name, item->address_, &data32);
+            if (data32 == value)
+              continue;
+            break;
+          default:
+            break;
+          }
+        }
+
+        switch (item->data_length_)
+        {
+        case 1:
+          write1Byte(joint_name, item->address_, (uint8_t) value);
+          break;
+        case 2:
+          write2Byte(joint_name, item->address_, (uint16_t) value);
+          break;
+        case 4:
+          write4Byte(joint_name, item->address_, value);
+          break;
+        default:
+          break;
+        }
+
+        if (item->memory_type_ == EEPROM)
+        {
+          // Write to EEPROM -> delay is required (max delay: 55 msec per byte)
+          usleep(item->data_length_ * 55 * 1000);
+        }
+      }
+    }
+  } catch (const std::exception& e)
+  {
+    ROS_INFO("Dynamixel Init file not found.");
+  }
+
   // [ BulkRead ] StartAddress : Present Position , Length : 10 ( Position/Velocity/Current )
+  for (auto& it : robot_->ports_)
+  {
+    if (port_to_bulk_read_[it.first] != 0)
+      port_to_bulk_read_[it.first]->clearParam();
+  }
   for (auto& it : robot_->dxls_)
   {
     std::string joint_name  = it.first;
@@ -486,113 +598,6 @@ bool RobotisController::initialize(const std::string robot_file_path, const std:
     //ROS_WARN("[%12s] start_addr: %d, data_length: %d", sensor_name.c_str(), bulkread_start_addr, bulkread_data_length);
     if (bulkread_start_addr != 0)
       port_to_bulk_read_[sensor->port_name_]->addParam(sensor->id_, bulkread_start_addr, bulkread_data_length);
-  }
-
-  queue_thread_ = boost::thread(boost::bind(&RobotisController::msgQueueThread, this));
-  return true;
-}
-
-void RobotisController::initializeDevice(const std::string init_file_path)
-{
-  // device initialize
-  if (DEBUG_PRINT)
-    ROS_WARN("INIT FILE LOAD");
-
-  YAML::Node doc;
-  try
-  {
-    doc = YAML::LoadFile(init_file_path.c_str());
-
-    for (YAML::const_iterator it_doc = doc.begin(); it_doc != doc.end(); it_doc++)
-    {
-      std::string joint_name = it_doc->first.as<std::string>();
-
-      YAML::Node joint_node = doc[joint_name];
-      if (joint_node.size() == 0)
-        continue;
-
-      Dynamixel *dxl = NULL;
-      auto dxl_it = robot_->dxls_.find(joint_name);
-      if (dxl_it != robot_->dxls_.end())
-        dxl = dxl_it->second;
-
-      if (dxl == NULL)
-      {
-        ROS_WARN("Joint [%s] was not found.", joint_name.c_str());
-        continue;
-      }
-      if (DEBUG_PRINT)
-        ROS_INFO("JOINT_NAME: %s", joint_name.c_str());
-
-      for (YAML::const_iterator it_joint = joint_node.begin(); it_joint != joint_node.end(); it_joint++)
-      {
-        std::string item_name = it_joint->first.as<std::string>();
-
-        if (DEBUG_PRINT)
-          ROS_INFO("  ITEM_NAME: %s", item_name.c_str());
-
-        uint32_t value = it_joint->second.as<uint32_t>();
-
-        ControlTableItem *item = dxl->ctrl_table_[item_name];
-        if (item == NULL)
-        {
-          ROS_WARN("Control Item [%s] was not found.", item_name.c_str());
-          continue;
-        }
-
-        if (item->memory_type_ == EEPROM)
-        {
-          uint8_t   data8 = 0;
-          uint16_t  data16 = 0;
-          uint32_t  data32 = 0;
-
-          switch (item->data_length_)
-          {
-          case 1:
-            read1Byte(joint_name, item->address_, &data8);
-            if (data8 == value)
-              continue;
-            break;
-          case 2:
-            read2Byte(joint_name, item->address_, &data16);
-            if (data16 == value)
-              continue;
-            break;
-          case 4:
-            read4Byte(joint_name, item->address_, &data32);
-            if (data32 == value)
-              continue;
-            break;
-          default:
-            break;
-          }
-        }
-
-        switch (item->data_length_)
-        {
-        case 1:
-          write1Byte(joint_name, item->address_, (uint8_t) value);
-          break;
-        case 2:
-          write2Byte(joint_name, item->address_, (uint16_t) value);
-          break;
-        case 4:
-          write4Byte(joint_name, item->address_, value);
-          break;
-        default:
-          break;
-        }
-
-        if (item->memory_type_ == EEPROM)
-        {
-          // Write to EEPROM -> delay is required (max delay: 55 msec per byte)
-          usleep(item->data_length_ * 55 * 1000);
-        }
-      }
-    }
-  } catch (const std::exception& e)
-  {
-    ROS_INFO("Dynamixel Init file not found.");
   }
 }
 
@@ -1186,6 +1191,16 @@ void RobotisController::process()
     // SyncWrite
     if (gazebo_mode_ == false && do_sync_write)
     {
+      if (direct_sync_write_.size() > 0)
+      {
+        for (int i = 0; i < direct_sync_write_.size(); i++)
+        {
+          direct_sync_write_[i]->txPacket();
+          direct_sync_write_[i]->clearParam();
+        }
+        direct_sync_write_.clear();
+      }
+
       if (port_to_sync_write_position_p_gain_.size() > 0)
       {
         for (auto& it : port_to_sync_write_position_p_gain_)
