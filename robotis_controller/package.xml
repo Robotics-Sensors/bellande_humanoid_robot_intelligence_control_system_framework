@@ -6,8 +6,8 @@
     The main package that controls THORMANG3.
   </description>
   <license>BSD</license>
-  <author email="zerom@robotis.com">zerom</author>
-  <maintainer email="pyo@robotis.com">pyo</maintainer>
+  <author email="zerom@robotis.com">Zerom</author>
+  <maintainer email="pyo@robotis.com">Pyo</maintainer>
   <url type="bugtracker">https://github.com/ROBOTIS-GIT/ROBOTIS-Framework/issues</url>
   <url type="repository">https://github.com/ROBOTIS-GIT/ROBOTIS-Framework</url>
   <url type="website">http://wiki.ros.org/robotis_controller</url>
