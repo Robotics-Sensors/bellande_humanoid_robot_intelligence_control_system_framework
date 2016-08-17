@@ -2,6 +2,10 @@
 Changelog for package robotis_device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.1 (2016-08-18)
+-----------
+* updated the package information
+
 0.1.0 (2016-08-12)
 -----------
 * first public release for Kinetic
