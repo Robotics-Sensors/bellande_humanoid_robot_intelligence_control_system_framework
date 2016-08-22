@@ -673,7 +673,7 @@ void *RobotisController::timerThread(void *param)
   static struct timespec next_time;
   static struct timespec curr_time;
 
-  ROS_INFO("controller::thread_proc");
+  ROS_DEBUG("controller::thread_proc started");
 
   clock_gettime(CLOCK_MONOTONIC, &next_time);
 
@@ -748,7 +748,7 @@ void RobotisController::startTimer()
     // create and start the thread
     if ((error = pthread_create(&this->timer_thread_, &attr, this->timerThread, this)) != 0)
     {
-      ROS_ERROR("timer thread create fail!!");
+      ROS_ERROR("Creating timer thread failed!!");
       exit(-1);
     }
   }
@@ -1035,8 +1035,6 @@ void RobotisController::process()
 
             if ((*module_it)->getControlMode() == PositionControl)
             {
-//              if(result_state->goal_position == 0 && dxl->id == 3)
-//                ROS_INFO("[MODULE:%s][ID:%2d] goal position = %f", (*module_it)->GetModuleName().c_str(), dxl->id, dxl_state->goal_position);
               dxl_state->goal_position_ = result_state->goal_position_;
 
               if (gazebo_mode_ == false)
@@ -1434,7 +1432,7 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
       }
       else
       {
-        // could not find the device
+        ROS_WARN("[SyncWriteItem] Unknown device : %s", msg->joint_name[i].c_str());
         continue;
       }
     }
