@@ -4,7 +4,7 @@ device_type = dynamixel
 
 [type info]
 torque_to_current_value_ratio   = 9.09201
-
+velocity_to_value_ratio         = 4793.01226
 value_of_0_radian_position      = 0
 value_of_min_radian_position    = -250950
 value_of_max_radian_position    =  250950
