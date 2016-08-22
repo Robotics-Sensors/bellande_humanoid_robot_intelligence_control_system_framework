@@ -1047,11 +1047,11 @@ void RobotisController::process()
                 sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(pos_data));
                 sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(pos_data));
 
-                if (abs(pos_data) > 151800)
-                {
-                  printf("goal_pos : %f |  position_offset : %f | pos_data : %d\n",
-                         dxl_state->goal_position_, dxl_state->position_offset_, pos_data);
-                }
+//                if (abs(pos_data) > 151800)
+//                {
+//                  printf("goal_pos : %f |  position_offset : %f | pos_data : %d\n",
+//                         dxl_state->goal_position_, dxl_state->position_offset_, pos_data);
+//                }
 
                 if (port_to_sync_write_position_[dxl->port_name_] != NULL)
                   port_to_sync_write_position_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
