@@ -663,7 +663,7 @@ void RobotisController::msgQueueThread()
   while (ros_node.ok())
   {
     callback_queue.callAvailable();
-    usleep(100);
+    usleep(1000);
   }
 }
 
