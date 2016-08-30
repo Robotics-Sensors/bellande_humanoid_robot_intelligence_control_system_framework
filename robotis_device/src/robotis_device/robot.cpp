@@ -327,6 +327,12 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
     std::string goal_position_item_name = "";
     std::string goal_velocity_item_name = "";
     std::string goal_current_item_name = "";
+    std::string position_d_gain_item_name = "";
+    std::string position_i_gain_item_name = "";
+    std::string position_p_gain_item_name = "";
+    std::string velocity_d_gain_item_name = "";
+    std::string velocity_i_gain_item_name = "";
+    std::string velocity_p_gain_item_name = "";
 
     while (!file.eof())
     {
@@ -396,6 +402,18 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
           goal_velocity_item_name = tokens[1];
         else if (tokens[0] == "goal_current_item_name")
           goal_current_item_name = tokens[1];
+        else if (tokens[0] == "position_d_gain_item_name")
+          position_d_gain_item_name = tokens[1];
+        else if (tokens[0] == "position_i_gain_item_name")
+          position_i_gain_item_name = tokens[1];
+        else if (tokens[0] == "position_p_gain_item_name")
+          position_p_gain_item_name = tokens[1];
+        else if (tokens[0] == "velocity_d_gain_item_name")
+          velocity_d_gain_item_name = tokens[1];
+        else if (tokens[0] == "velocity_i_gain_item_name")
+          velocity_i_gain_item_name = tokens[1];
+        else if (tokens[0] == "velocity_p_gain_item_name")
+          velocity_p_gain_item_name = tokens[1];
       }
       else if (session == SESSION_CONTROL_TABLE)
       {
@@ -444,6 +462,18 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
       dxl->goal_velocity_item_ = dxl->ctrl_table_[goal_velocity_item_name];
     if (dxl->ctrl_table_[goal_current_item_name] != NULL)
       dxl->goal_current_item_ = dxl->ctrl_table_[goal_current_item_name];
+    if (dxl->ctrl_table_[position_d_gain_item_name] != NULL)
+      dxl->position_d_gain_item_ = dxl->ctrl_table_[position_d_gain_item_name];
+    if (dxl->ctrl_table_[position_i_gain_item_name] != NULL)
+      dxl->position_i_gain_item_ = dxl->ctrl_table_[position_i_gain_item_name];
+    if (dxl->ctrl_table_[position_p_gain_item_name] != NULL)
+      dxl->position_p_gain_item_ = dxl->ctrl_table_[position_p_gain_item_name];
+    if (dxl->ctrl_table_[velocity_d_gain_item_name] != NULL)
+      dxl->velocity_d_gain_item_ = dxl->ctrl_table_[velocity_d_gain_item_name];
+    if (dxl->ctrl_table_[velocity_i_gain_item_name] != NULL)
+      dxl->velocity_i_gain_item_ = dxl->ctrl_table_[velocity_i_gain_item_name];
+    if (dxl->ctrl_table_[velocity_p_gain_item_name] != NULL)
+      dxl->velocity_p_gain_item_ = dxl->ctrl_table_[velocity_p_gain_item_name];
 
     fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), dxl->id_, dxl->model_name_.c_str());
     //std::cout << "[ID:" << (int)(_dxl->id) << "] " << _dxl->model_name << " added. (" << port << ")" << std::endl;
