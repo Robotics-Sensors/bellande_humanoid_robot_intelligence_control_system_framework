@@ -2,6 +2,19 @@
 Changelog for package robotis_device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.0 (2016-08-31)
+-----------
+* bug fixed (position pid gain & velocity pid gain sync write).
+* added velocity_to_value_ratio to DXL Pro-H series.
+* added velocity p/i/d gain and position i/d gain sync_write code.
+* fixed robotis_device build_depend.
+* added XM-430-W210 / XM-430-W350 device file.
+* rename (present_current\_ -> present_torque\_)
+* modified torque control code
+* added device file for MX-64 / MX-106
+* adjusted position min/max value. (MX-28, XM-430)
+* Contributors: Zerom, Pyo
+
 0.1.1 (2016-08-18)
 -----------
 * updated the package information
