@@ -47,7 +47,7 @@ include_directories(
 )
 
 add_library(robotis_controller src/robotis_controller/robotis_controller.cpp)
-add_dependencies(robotis_controller ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(robotis_controller ${catkin_EXPORTED_TARGETS})
 target_link_libraries(robotis_controller yaml-cpp ${catkin_LIBRARIES})
 
 ################################################################################
