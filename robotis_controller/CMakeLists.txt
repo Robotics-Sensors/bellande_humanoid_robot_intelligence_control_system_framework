@@ -14,11 +14,9 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   sensor_msgs
   std_msgs
-  robotis_device
   robotis_controller_msgs
   robotis_framework_common
   cmake_modules
-  dynamixel_sdk
 )
 
 ################################################################################
@@ -35,7 +33,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_controller
-  CATKIN_DEPENDS roscpp roslib sensor_msgs std_msgs
+  CATKIN_DEPENDS roscpp roslib sensor_msgs std_msgs robotis_framework_common
 )
 
 ################################################################################

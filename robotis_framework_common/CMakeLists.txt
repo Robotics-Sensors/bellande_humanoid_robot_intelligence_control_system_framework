@@ -25,7 +25,7 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES robotis_framework_common
+  LIBRARIES robotis_framework_common
   CATKIN_DEPENDS roscpp robotis_device
 )
 
@@ -36,6 +36,12 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
 )
+add_library(${PROJECT_NAME}
+  include/${PROJECT_NAME}/motion_module.h
+  include/${PROJECT_NAME}/sensor_module.h
+  include/${PROJECT_NAME}/singleton.h
+)
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 ################################################################################
 # Install
