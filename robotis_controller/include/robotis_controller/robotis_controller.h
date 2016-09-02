@@ -88,6 +88,7 @@ private:
   void gazeboTimerThread();
   void msgQueueThread();
   void setCtrlModuleThread(std::string ctrl_module);
+  void setJointCtrlModuleThread(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
 
   bool isTimerStopped();
   void initializeSyncWrite();
@@ -141,6 +142,7 @@ public:
   void    stopTimer();
   bool    isTimerRunning();
 
+  void    setCtrlModule(std::string module_name);
   void    loadOffset(const std::string path);
 
   /* ROS Topic Callback Functions */
