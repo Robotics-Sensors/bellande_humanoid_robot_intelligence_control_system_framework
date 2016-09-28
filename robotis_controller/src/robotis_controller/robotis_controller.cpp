@@ -1519,6 +1519,11 @@ void RobotisController::setCtrlModuleCallback(const std_msgs::String::ConstPtr &
 {
   std::string _module_name_to_set = msg->data;
 
+
+
+
+
+
   set_module_thread_ = boost::thread(boost::bind(&RobotisController::setCtrlModuleThread, this, _module_name_to_set));
 }
 
@@ -1532,7 +1537,7 @@ void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs
     return;
 
   set_module_thread_ = boost::thread(boost::bind(&RobotisController::setJointCtrlModuleThread, this, msg));
-  }
+}
 
 bool RobotisController::getCtrlModuleCallback(robotis_controller_msgs::GetJointModule::Request &req,
     robotis_controller_msgs::GetJointModule::Response &res)
@@ -1751,6 +1756,18 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   // stop module
   std::list<MotionModule *> stop_modules;
 
+  ROS_INFO("----- Before -----");
+  for (auto& d_it : robot_->dxls_)
+  {
+    std::string joint_name = d_it.first;
+
+    Dynamixel *dxl = d_it.second;
+    double goal_position = dxl->dxl_state_->goal_position_;
+
+    fprintf(stderr, "%s : %f \n", joint_name.c_str(), goal_position);
+  }
+  ROS_INFO("----- ----- -----");
+
   if (ctrl_module == "" || ctrl_module == "none")
   {
     // enqueue all modules in order to stop
@@ -1956,6 +1973,19 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
 
   if (current_module_msg.joint_name.size() == current_module_msg.module_name.size())
     current_module_pub_.publish(current_module_msg);
+
+
+  ROS_INFO("----- After -----");
+  for (auto& d_it : robot_->dxls_)
+  {
+    std::string joint_name = d_it.first;
+
+    Dynamixel *dxl = d_it.second;
+    double goal_position = dxl->dxl_state_->goal_position_;
+
+    fprintf(stderr, "%s : %f \n", joint_name.c_str(), goal_position);
+  }
+  ROS_INFO("----- ----- -----");
 }
 
 void RobotisController::gazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
