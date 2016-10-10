@@ -621,6 +621,8 @@ void RobotisController::msgQueueThread()
   ros_node.setCallbackQueue(&callback_queue);
 
   /* subscriber */
+  ros::Subscriber write_control_table_sub = ros_node.subscribe("/robotis/write_control_table", 5,
+                                                               &RobotisController::writeControlTableCallback, this);
   ros::Subscriber sync_write_item_sub     = ros_node.subscribe("/robotis/sync_write_item", 10,
                                                                &RobotisController::syncWriteItemCallback, this);
   ros::Subscriber joint_ctrl_modules_sub  = ros_node.subscribe("/robotis/set_joint_ctrl_modules", 10,
@@ -1405,6 +1407,52 @@ void RobotisController::removeSensorModule(SensorModule *module)
   sensor_modules_.remove(module);
 }
 
+void RobotisController::writeControlTableCallback(const robotis_controller_msgs::WriteControlTable::ConstPtr &msg)
+{
+  Device *device = NULL;
+
+  auto dev_it1 = robot_->dxls_.find(msg->joint_name);
+  if(dev_it1 != robot_->dxls_.end())
+  {
+    device = dev_it1->second;
+  }
+  else
+  {
+    auto dev_it2 = robot_->sensors_.find(msg->joint_name);
+    if(dev_it2 != robot_->sensors_.end())
+    {
+      device = dev_it2->second;
+    }
+    else
+    {
+      ROS_WARN("[WriteControlTable] Unknown device : %s", msg->joint_name.c_str());
+      return;
+    }
+  }
+
+  ControlTableItem *item = NULL;
+  auto item_it = device->ctrl_table_.find(msg->start_item_name);
+  if(item_it != device->ctrl_table_.end())
+  {
+    item = item_it->second;
+  }
+  else
+  {
+    ROS_WARN("WriteControlTable] Unknown item : %s", msg->start_item_name.c_str());
+    return;
+  }
+
+  dynamixel::PortHandler   *port           = robot_->ports_[device->port_name_];
+  dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(device->protocol_version_);
+
+  if (item->access_type_ == Read)
+    return;
+
+  direct_sync_write_.push_back(new dynamixel::GroupSyncWrite(port, packet_handler, item->address_, msg->data_length));
+
+  direct_sync_write_[direct_sync_write_.size() - 1]->addParam(device->id_, (uint8_t *)(msg->data.data()));
+}
+
 void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::SyncWriteItem::ConstPtr &msg)
 {
   for (int i = 0; i < msg->joint_name.size(); i++)
@@ -1430,7 +1478,18 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
       }
     }
 
-    ControlTableItem *item  = device->ctrl_table_[msg->item_name];
+//    ControlTableItem *item  = device->ctrl_table_[msg->item_name];
+    ControlTableItem *item  = NULL;
+    auto item_it = device->ctrl_table_.find(msg->item_name);
+    if(item_it != device->ctrl_table_.end())
+    {
+      item = item_it->second;
+    }
+    else
+    {
+      ROS_WARN("SyncWriteItem] Unknown item : %s", msg->item_name.c_str());
+      continue;
+    }
 
     dynamixel::PortHandler   *port           = robot_->ports_[device->port_name_];
     dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(device->protocol_version_);
@@ -1518,11 +1577,6 @@ void RobotisController::setJointStatesCallback(const sensor_msgs::JointState::Co
 void RobotisController::setCtrlModuleCallback(const std_msgs::String::ConstPtr &msg)
 {
   std::string _module_name_to_set = msg->data;
-
-
-
-
-
 
   set_module_thread_ = boost::thread(boost::bind(&RobotisController::setCtrlModuleThread, this, _module_name_to_set));
 }
@@ -1756,18 +1810,6 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   // stop module
   std::list<MotionModule *> stop_modules;
 
-  ROS_INFO("----- Before -----");
-  for (auto& d_it : robot_->dxls_)
-  {
-    std::string joint_name = d_it.first;
-
-    Dynamixel *dxl = d_it.second;
-    double goal_position = dxl->dxl_state_->goal_position_;
-
-    fprintf(stderr, "%s : %f \n", joint_name.c_str(), goal_position);
-  }
-  ROS_INFO("----- ----- -----");
-
   if (ctrl_module == "" || ctrl_module == "none")
   {
     // enqueue all modules in order to stop
@@ -1973,19 +2015,6 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
 
   if (current_module_msg.joint_name.size() == current_module_msg.module_name.size())
     current_module_pub_.publish(current_module_msg);
-
-
-  ROS_INFO("----- After -----");
-  for (auto& d_it : robot_->dxls_)
-  {
-    std::string joint_name = d_it.first;
-
-    Dynamixel *dxl = d_it.second;
-    double goal_position = dxl->dxl_state_->goal_position_;
-
-    fprintf(stderr, "%s : %f \n", joint_name.c_str(), goal_position);
-  }
-  ROS_INFO("----- ----- -----");
 }
 
 void RobotisController::gazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
