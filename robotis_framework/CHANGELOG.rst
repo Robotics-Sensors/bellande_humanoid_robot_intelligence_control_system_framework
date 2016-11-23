@@ -2,6 +2,10 @@
 Changelog for package robotis_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2016-11-23)
+-----------
+* Merge the changes and update
+
 0.2.0 (2016-08-31)
 -----------
 * updated CHANGLOG.rst for minor release
