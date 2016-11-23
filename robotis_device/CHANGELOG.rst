@@ -2,6 +2,14 @@
 Changelog for package robotis_device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2016-11-23)
+-----------
+* Merge the changes and update
+* mode change debugging
+* - convertRadian2Value / convertValue2Radian : commented out the code that limits the maximum/minimum value.
+* - modified dependency problem.
+* Contributors: Jay Song, Pyo, Zerom, SCH
+
 0.2.0 (2016-08-31)
 -----------
 * bug fixed (position pid gain & velocity pid gain sync write).

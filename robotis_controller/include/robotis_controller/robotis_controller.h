@@ -46,6 +46,7 @@
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/JointState.h>
 
+#include "robotis_controller_msgs/WriteControlTable.h"
 #include "robotis_controller_msgs/SyncWriteItem.h"
 #include "robotis_controller_msgs/JointCtrlModule.h"
 #include "robotis_controller_msgs/GetJointModule.h"
@@ -88,6 +89,7 @@ private:
   void gazeboTimerThread();
   void msgQueueThread();
   void setCtrlModuleThread(std::string ctrl_module);
+  void setJointCtrlModuleThread(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
 
   bool isTimerStopped();
   void initializeSyncWrite();
@@ -141,9 +143,11 @@ public:
   void    stopTimer();
   bool    isTimerRunning();
 
+  void    setCtrlModule(std::string module_name);
   void    loadOffset(const std::string path);
 
   /* ROS Topic Callback Functions */
+  void    writeControlTableCallback(const robotis_controller_msgs::WriteControlTable::ConstPtr &msg);
   void    syncWriteItemCallback(const robotis_controller_msgs::SyncWriteItem::ConstPtr &msg);
   void    setControllerModeCallback(const std_msgs::String::ConstPtr &msg);
   void    setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);

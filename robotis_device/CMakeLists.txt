@@ -27,7 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_device
-  CATKIN_DEPENDS roscpp rospy
+  CATKIN_DEPENDS roscpp rospy dynamixel_sdk
 )
 
 ################################################################################
@@ -43,7 +43,7 @@ add_library(robotis_device
   src/robotis_device/sensor.cpp
   src/robotis_device/dynamixel.cpp
 )
-add_dependencies(robotis_device ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(robotis_device ${catkin_EXPORTED_TARGETS})
 target_link_libraries(robotis_device ${catkin_LIBRARIES})
 
 ################################################################################
