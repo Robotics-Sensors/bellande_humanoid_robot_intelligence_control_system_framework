@@ -93,10 +93,10 @@ double Dynamixel::convertValue2Radian(int32_t value)
                / (double) (value_of_min_radian_position_ - value_of_0_radian_position_);
   }
 
-  if (radian > max_radian_)
-    return max_radian_;
-  else if (radian < min_radian_)
-    return min_radian_;
+//  if (radian > max_radian_)
+//    return max_radian_;
+//  else if (radian < min_radian_)
+//    return min_radian_;
 
   return radian;
 }
@@ -123,10 +123,10 @@ int32_t Dynamixel::convertRadian2Value(double radian)
   else
     value = value_of_0_radian_position_;
 
-  if (value > value_of_max_radian_position_)
-    return value_of_max_radian_position_;
-  else if (value < value_of_min_radian_position_)
-    return value_of_min_radian_position_;
+//  if (value > value_of_max_radian_position_)
+//    return value_of_max_radian_position_;
+//  else if (value < value_of_min_radian_position_)
+//    return value_of_min_radian_position_;
 
   return value;
 }

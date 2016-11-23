@@ -621,6 +621,8 @@ void RobotisController::msgQueueThread()
   ros_node.setCallbackQueue(&callback_queue);
 
   /* subscriber */
+  ros::Subscriber write_control_table_sub = ros_node.subscribe("/robotis/write_control_table", 5,
+                                                               &RobotisController::writeControlTableCallback, this);
   ros::Subscriber sync_write_item_sub     = ros_node.subscribe("/robotis/sync_write_item", 10,
                                                                &RobotisController::syncWriteItemCallback, this);
   ros::Subscriber joint_ctrl_modules_sub  = ros_node.subscribe("/robotis/set_joint_ctrl_modules", 10,
@@ -660,11 +662,9 @@ void RobotisController::msgQueueThread()
   ros::ServiceServer joint_module_server = ros_node.advertiseService("/robotis/get_present_joint_ctrl_modules",
                                                         &RobotisController::getCtrlModuleCallback, this);
 
-  while (ros_node.ok())
-  {
-    callback_queue.callAvailable();
-    usleep(100);
-  }
+  ros::WallDuration duration(CONTROL_CYCLE_MSEC / 1000.0);
+  while(ros_node.ok())
+    callback_queue.callAvailable(duration);
 }
 
 void *RobotisController::timerThread(void *param)
@@ -876,7 +876,6 @@ void RobotisController::process()
   is_process_running = true;
 
   // ROS_INFO("Controller::Process()");
-  bool do_sync_write = false;
 
   ros::Time start_time;
   ros::Duration time_duration;
@@ -890,93 +889,300 @@ void RobotisController::process()
   present_state.header.stamp = ros::Time::now();
   goal_state.header.stamp = present_state.header.stamp;
 
-  // BulkRead Rx
-  // -> save to Robot->dxls[]->dynamixel_state.present_position
-  if (gazebo_mode_ == false)
+  if (controller_mode_ == MotionModuleMode)
   {
-    // BulkRead Rx
-    for (auto& it : port_to_bulk_read_)
+    if (gazebo_mode_ == false)
     {
-      robot_->ports_[it.first]->setPacketTimeout(0.0);
-      it.second->rxPacket();
-    }
-
-    if (robot_->dxls_.size() > 0)
-    {
-      for (auto& dxl_it : robot_->dxls_)
+      // BulkRead Rx
+      for (auto& it : port_to_bulk_read_)
       {
-        Dynamixel  *dxl         = dxl_it.second;
-        std::string port_name   = dxl_it.second->port_name_;
-        std::string joint_name  = dxl_it.first;
+        robot_->ports_[it.first]->setPacketTimeout(0.0);
+        it.second->rxPacket();
+      }
 
-        if (dxl->bulk_read_items_.size() > 0)
+      // -> save to robot->dxls_[]->dxl_state_
+      if (robot_->dxls_.size() > 0)
+      {
+        for (auto& dxl_it : robot_->dxls_)
         {
-          uint32_t data = 0;
-          for (int i = 0; i < dxl->bulk_read_items_.size(); i++)
+          Dynamixel  *dxl         = dxl_it.second;
+          std::string port_name   = dxl_it.second->port_name_;
+          std::string joint_name  = dxl_it.first;
+
+          if (dxl->bulk_read_items_.size() > 0)
           {
-            ControlTableItem *item = dxl->bulk_read_items_[i];
-            if (port_to_bulk_read_[port_name]->isAvailable(dxl->id_, item->address_, item->data_length_) == true)
+            uint32_t data = 0;
+            for (int i = 0; i < dxl->bulk_read_items_.size(); i++)
             {
-              data = port_to_bulk_read_[port_name]->getData(dxl->id_, item->address_, item->data_length_);
+              ControlTableItem *item = dxl->bulk_read_items_[i];
+              if (port_to_bulk_read_[port_name]->isAvailable(dxl->id_, item->address_, item->data_length_) == true)
+              {
+                data = port_to_bulk_read_[port_name]->getData(dxl->id_, item->address_, item->data_length_);
 
-              // change dxl_state
-              if (dxl->present_position_item_ != 0 && item->item_name_ == dxl->present_position_item_->item_name_)
-                dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
-              else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
-                dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
-              else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
-                dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(data);
-              else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
-                dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
-              else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
-                dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
-              else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
-                dxl->dxl_state_->goal_torque_ = dxl->convertValue2Torque(data);
-              else
-                dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
+                // change dxl_state
+                if (dxl->present_position_item_ != 0 && item->item_name_ == dxl->present_position_item_->item_name_)
+                  dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
+                  dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
+                else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
+                  dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(data);
+                else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
+                  dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
+                  dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
+                else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
+                  dxl->dxl_state_->goal_torque_ = dxl->convertValue2Torque(data);
+                else
+                  dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
+              }
             }
-          }
 
-          // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
-          dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+            // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
+            dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+          }
         }
       }
-    }
 
-    if (robot_->sensors_.size() > 0)
-    {
-      for (auto& sensor_it : robot_->sensors_)
+      // -> save to robot->sensors_[]->sensor_state_
+      if (robot_->sensors_.size() > 0)
       {
-        Sensor     *sensor      = sensor_it.second;
-        std::string port_name   = sensor_it.second->port_name_;
-        std::string sensor_name = sensor_it.first;
-
-        if (sensor->bulk_read_items_.size() > 0)
+        for (auto& sensor_it : robot_->sensors_)
         {
-          uint32_t data = 0;
-          for (int i = 0; i < sensor->bulk_read_items_.size(); i++)
-          {
-            ControlTableItem *item = sensor->bulk_read_items_[i];
-            if (port_to_bulk_read_[port_name]->isAvailable(sensor->id_, item->address_, item->data_length_) == true)
-            {
-              data = port_to_bulk_read_[port_name]->getData(sensor->id_, item->address_, item->data_length_);
+          Sensor     *sensor      = sensor_it.second;
+          std::string port_name   = sensor_it.second->port_name_;
+          std::string sensor_name = sensor_it.first;
 
-              // change sensor_state
-              sensor->sensor_state_->bulk_read_table_[item->item_name_] = data;
+          if (sensor->bulk_read_items_.size() > 0)
+          {
+            uint32_t data = 0;
+            for (int i = 0; i < sensor->bulk_read_items_.size(); i++)
+            {
+              ControlTableItem *item = sensor->bulk_read_items_[i];
+              if (port_to_bulk_read_[port_name]->isAvailable(sensor->id_, item->address_, item->data_length_) == true)
+              {
+                data = port_to_bulk_read_[port_name]->getData(sensor->id_, item->address_, item->data_length_);
+
+                // change sensor_state
+                sensor->sensor_state_->bulk_read_table_[item->item_name_] = data;
+              }
+            }
+
+            // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
+            sensor->sensor_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+          }
+        }
+      }
+
+      if (DEBUG_PRINT)
+      {
+        time_duration = ros::Time::now() - start_time;
+        fprintf(stderr, "(%2.6f) BulkRead Rx & update state \n", time_duration.nsec * 0.000001);
+      }
+
+      // SyncWrite
+      queue_mutex_.lock();
+
+      if (direct_sync_write_.size() > 0)
+      {
+        for (int i = 0; i < direct_sync_write_.size(); i++)
+        {
+          direct_sync_write_[i]->txPacket();
+          direct_sync_write_[i]->clearParam();
+        }
+        direct_sync_write_.clear();
+      }
+
+      if (port_to_sync_write_position_p_gain_.size() > 0)
+      {
+        for (auto& it : port_to_sync_write_position_p_gain_)
+        {
+          it.second->txPacket();
+          it.second->clearParam();
+        }
+      }
+      if (port_to_sync_write_position_i_gain_.size() > 0)
+      {
+        for (auto& it : port_to_sync_write_position_i_gain_)
+        {
+          it.second->txPacket();
+          it.second->clearParam();
+        }
+      }
+      if (port_to_sync_write_position_d_gain_.size() > 0)
+      {
+        for (auto& it : port_to_sync_write_position_d_gain_)
+        {
+          it.second->txPacket();
+          it.second->clearParam();
+        }
+      }
+      if (port_to_sync_write_velocity_p_gain_.size() > 0)
+      {
+        for (auto& it : port_to_sync_write_velocity_p_gain_)
+        {
+          it.second->txPacket();
+          it.second->clearParam();
+        }
+      }
+      if (port_to_sync_write_velocity_i_gain_.size() > 0)
+      {
+        for (auto& it : port_to_sync_write_velocity_i_gain_)
+        {
+          it.second->txPacket();
+          it.second->clearParam();
+        }
+      }
+      if (port_to_sync_write_velocity_d_gain_.size() > 0)
+      {
+        for (auto& it : port_to_sync_write_velocity_d_gain_)
+        {
+          it.second->txPacket();
+          it.second->clearParam();
+        }
+      }
+      for (auto& it : port_to_sync_write_position_)
+      {
+        if (it.second != NULL)
+          it.second->txPacket();
+      }
+      for (auto& it : port_to_sync_write_velocity_)
+      {
+        if (it.second != NULL)
+          it.second->txPacket();
+      }
+      for (auto& it : port_to_sync_write_current_)
+      {
+        if (it.second != NULL)
+          it.second->txPacket();
+      }
+
+      queue_mutex_.unlock();
+
+      // BulkRead Tx
+      for (auto& it : port_to_bulk_read_)
+        it.second->txPacket();
+
+      if (DEBUG_PRINT)
+      {
+        time_duration = ros::Time::now() - start_time;
+        fprintf(stderr, "(%2.6f) SyncWrite & BulkRead Tx \n", time_duration.nsec * 0.000001);
+      }
+    }
+    else if (gazebo_mode_ == true)
+    {
+      for (auto module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
+      {
+        if ((*module_it)->getModuleEnable() == false)
+          continue;
+
+        std_msgs::Float64 joint_msg;
+
+        for (auto& dxl_it : robot_->dxls_)
+        {
+          std::string     joint_name  = dxl_it.first;
+          Dynamixel      *dxl         = dxl_it.second;
+          DynamixelState *dxl_state   = dxl_it.second->dxl_state_;
+
+          if (dxl->ctrl_module_name_ == (*module_it)->getModuleName())
+          {
+            if ((*module_it)->getControlMode() == PositionControl)
+            {
+              joint_msg.data = dxl_state->goal_position_;
+              gazebo_joint_position_pub_[joint_name].publish(joint_msg);
+            }
+            else if ((*module_it)->getControlMode() == VelocityControl)
+            {
+              joint_msg.data = dxl_state->goal_velocity_;
+              gazebo_joint_velocity_pub_[joint_name].publish(joint_msg);
+            }
+            else if ((*module_it)->getControlMode() == TorqueControl)
+            {
+              joint_msg.data = dxl_state->goal_torque_;
+              gazebo_joint_effort_pub_[joint_name].publish(joint_msg);
             }
           }
-
-          // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
-          sensor->sensor_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
         }
       }
     }
   }
-
-  if (DEBUG_PRINT)
+  else if (controller_mode_ == DirectControlMode)
   {
-    time_duration = ros::Time::now() - start_time;
-    fprintf(stderr, "(%2.6f) BulkRead Rx & update state \n", time_duration.nsec * 0.000001);
+    if(gazebo_mode_ == false)
+    {
+      // BulkRead Rx
+      for (auto& it : port_to_bulk_read_)
+      {
+        robot_->ports_[it.first]->setPacketTimeout(0.0);
+        it.second->rxPacket();
+      }
+
+      // -> save to robot->dxls_[]->dxl_state_
+      if (robot_->dxls_.size() > 0)
+      {
+        for (auto& dxl_it : robot_->dxls_)
+        {
+          Dynamixel  *dxl         = dxl_it.second;
+          std::string port_name   = dxl_it.second->port_name_;
+          std::string joint_name  = dxl_it.first;
+
+          if (dxl->bulk_read_items_.size() > 0)
+          {
+            uint32_t data = 0;
+            for (int i = 0; i < dxl->bulk_read_items_.size(); i++)
+            {
+              ControlTableItem *item = dxl->bulk_read_items_[i];
+              if (port_to_bulk_read_[port_name]->isAvailable(dxl->id_, item->address_, item->data_length_) == true)
+              {
+                data = port_to_bulk_read_[port_name]->getData(dxl->id_, item->address_, item->data_length_);
+
+                // change dxl_state
+                if (dxl->present_position_item_ != 0 && item->item_name_ == dxl->present_position_item_->item_name_)
+                  dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
+                  dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
+                else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
+                  dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(data);
+                else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
+                  dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
+                  dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
+                else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
+                  dxl->dxl_state_->goal_torque_ = dxl->convertValue2Torque(data);
+                else
+                  dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
+              }
+            }
+
+            // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
+            dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+          }
+        }
+      }
+
+      queue_mutex_.lock();
+
+//      for (auto& it : port_to_sync_write_position_)
+//      {
+//        it.second->txPacket();
+//        it.second->clearParam();
+//      }
+
+      if (direct_sync_write_.size() > 0)
+      {
+        for (int i = 0; i < direct_sync_write_.size(); i++)
+        {
+          direct_sync_write_[i]->txPacket();
+          direct_sync_write_[i]->clearParam();
+        }
+        direct_sync_write_.clear();
+      }
+
+      queue_mutex_.unlock();
+
+      // BulkRead Tx
+      for (auto& it : port_to_bulk_read_)
+        it.second->txPacket();
+    }
   }
 
   // Call SensorModule Process()
@@ -1022,7 +1228,7 @@ void RobotisController::process()
 
           if (dxl->ctrl_module_name_ == (*module_it)->getModuleName())
           {
-            do_sync_write = true;
+            //do_sync_write = true;
             DynamixelState *result_state = (*module_it)->result_[joint_name];
 
             if (result_state == NULL)
@@ -1046,12 +1252,6 @@ void RobotisController::process()
                 sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos_data));
                 sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(pos_data));
                 sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(pos_data));
-
-//                if (abs(pos_data) > 151800)
-//                {
-//                  printf("goal_pos : %f |  position_offset : %f | pos_data : %d\n",
-//                         dxl_state->goal_position_, dxl_state->position_offset_, pos_data);
-//                }
 
                 if (port_to_sync_write_position_[dxl->port_name_] != NULL)
                   port_to_sync_write_position_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
@@ -1185,157 +1385,6 @@ void RobotisController::process()
       time_duration = ros::Time::now() - start_time;
       fprintf(stderr, "(%2.6f) MotionModule Process() & save result \n", time_duration.nsec * 0.000001);
     }
-
-    // SyncWrite
-    if (gazebo_mode_ == false && do_sync_write)
-    {
-      if (direct_sync_write_.size() > 0)
-      {
-        for (int i = 0; i < direct_sync_write_.size(); i++)
-        {
-          direct_sync_write_[i]->txPacket();
-          direct_sync_write_[i]->clearParam();
-        }
-        direct_sync_write_.clear();
-      }
-
-      if (port_to_sync_write_position_p_gain_.size() > 0)
-      {
-        for (auto& it : port_to_sync_write_position_p_gain_)
-        {
-          it.second->txPacket();
-          it.second->clearParam();
-        }
-      }
-      if (port_to_sync_write_position_i_gain_.size() > 0)
-      {
-        for (auto& it : port_to_sync_write_position_i_gain_)
-        {
-          it.second->txPacket();
-          it.second->clearParam();
-        }
-      }
-      if (port_to_sync_write_position_d_gain_.size() > 0)
-      {
-        for (auto& it : port_to_sync_write_position_d_gain_)
-        {
-          it.second->txPacket();
-          it.second->clearParam();
-        }
-      }
-      if (port_to_sync_write_velocity_p_gain_.size() > 0)
-      {
-        for (auto& it : port_to_sync_write_velocity_p_gain_)
-        {
-          it.second->txPacket();
-          it.second->clearParam();
-        }
-      }
-      if (port_to_sync_write_velocity_i_gain_.size() > 0)
-      {
-        for (auto& it : port_to_sync_write_velocity_i_gain_)
-        {
-          it.second->txPacket();
-          it.second->clearParam();
-        }
-      }
-      if (port_to_sync_write_velocity_d_gain_.size() > 0)
-      {
-        for (auto& it : port_to_sync_write_velocity_d_gain_)
-        {
-          it.second->txPacket();
-          it.second->clearParam();
-        }
-      }
-      for (auto& it : port_to_sync_write_position_)
-      {
-        if (it.second != NULL)
-          it.second->txPacket();
-      }
-      for (auto& it : port_to_sync_write_velocity_)
-      {
-        if (it.second != NULL)
-          it.second->txPacket();
-      }
-      for (auto& it : port_to_sync_write_current_)
-      {
-        if (it.second != NULL)
-          it.second->txPacket();
-      }
-    }
-    else if (gazebo_mode_ == true)
-    {
-      for (auto module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
-      {
-        if ((*module_it)->getModuleEnable() == false)
-          continue;
-
-        std_msgs::Float64 joint_msg;
-
-        for (auto& dxl_it : robot_->dxls_)
-        {
-          std::string     joint_name  = dxl_it.first;
-          Dynamixel      *dxl         = dxl_it.second;
-          DynamixelState *dxl_state   = dxl_it.second->dxl_state_;
-
-          if (dxl->ctrl_module_name_ == (*module_it)->getModuleName())
-          {
-            if ((*module_it)->getControlMode() == PositionControl)
-            {
-              joint_msg.data = dxl_state->goal_position_;
-              gazebo_joint_position_pub_[joint_name].publish(joint_msg);
-            }
-            else if ((*module_it)->getControlMode() == VelocityControl)
-            {
-              joint_msg.data = dxl_state->goal_velocity_;
-              gazebo_joint_velocity_pub_[joint_name].publish(joint_msg);
-            }
-            else if ((*module_it)->getControlMode() == TorqueControl)
-            {
-              joint_msg.data = dxl_state->goal_torque_;
-              gazebo_joint_effort_pub_[joint_name].publish(joint_msg);
-            }
-          }
-        }
-      }
-    }
-  }
-  else if (controller_mode_ == DirectControlMode)
-  {
-    queue_mutex_.lock();
-
-    for (auto& it : port_to_sync_write_position_)
-    {
-      it.second->txPacket();
-      it.second->clearParam();
-    }
-
-    if (direct_sync_write_.size() > 0)
-    {
-      for (int i = 0; i < direct_sync_write_.size(); i++)
-      {
-        direct_sync_write_[i]->txPacket();
-        direct_sync_write_[i]->clearParam();
-      }
-      direct_sync_write_.clear();
-    }
-
-    queue_mutex_.unlock();
-  }
-
-  // TODO: User Read/Write
-
-  // BulkRead Tx
-  if (gazebo_mode_ == false)
-  {
-    for (auto& it : port_to_bulk_read_)
-      it.second->txPacket();
-  }
-
-  if (DEBUG_PRINT)
-  {
-    time_duration = ros::Time::now() - start_time;
-    fprintf(stderr, "(%2.6f) SyncWrite & BulkRead Tx \n", time_duration.nsec * 0.000001);
   }
 
   // publish present & goal position
@@ -1412,6 +1461,67 @@ void RobotisController::removeSensorModule(SensorModule *module)
   sensor_modules_.remove(module);
 }
 
+void RobotisController::writeControlTableCallback(const robotis_controller_msgs::WriteControlTable::ConstPtr &msg)
+{
+  fprintf(stderr, "[WriteControlTable] led control msg received\n");
+  Device *device = NULL;
+
+  auto dev_it1 = robot_->dxls_.find(msg->joint_name);
+  if(dev_it1 != robot_->dxls_.end())
+  {
+    device = dev_it1->second;
+  }
+  else
+  {
+    auto dev_it2 = robot_->sensors_.find(msg->joint_name);
+    if(dev_it2 != robot_->sensors_.end())
+    {
+      device = dev_it2->second;
+    }
+    else
+    {
+      ROS_WARN("[WriteControlTable] Unknown device : %s", msg->joint_name.c_str());
+      return;
+    }
+  }
+  fprintf(stderr, " #1 ");
+  ControlTableItem *item = NULL;
+  auto item_it = device->ctrl_table_.find(msg->start_item_name);
+  if(item_it != device->ctrl_table_.end())
+  {
+    item = item_it->second;
+  }
+  else
+  {
+    ROS_WARN("WriteControlTable] Unknown item : %s", msg->start_item_name.c_str());
+    return;
+  }
+
+  fprintf(stderr, " #2 ");
+  dynamixel::PortHandler   *port           = robot_->ports_[device->port_name_];
+  dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(device->protocol_version_);
+
+  if (item->access_type_ == Read)
+    return;
+
+  queue_mutex_.lock();
+
+
+  direct_sync_write_.push_back(new dynamixel::GroupSyncWrite(port, packet_handler, item->address_, msg->data_length));
+
+  fprintf(stderr, " #3 \n");
+
+  direct_sync_write_[direct_sync_write_.size() - 1]->addParam(device->id_, (uint8_t *)(msg->data.data()));
+  
+  fprintf(stderr, "[WriteControlTable] %s -> %s : ", msg->joint_name.c_str(), msg->start_item_name.c_str());
+  for (auto &dt : msg->data)
+	  fprintf(stderr, "%02X ", dt);
+  fprintf(stderr, "\n");
+
+  queue_mutex_.unlock();
+
+}
+
 void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::SyncWriteItem::ConstPtr &msg)
 {
   for (int i = 0; i < msg->joint_name.size(); i++)
@@ -1437,7 +1547,18 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
       }
     }
 
-    ControlTableItem *item  = device->ctrl_table_[msg->item_name];
+//    ControlTableItem *item  = device->ctrl_table_[msg->item_name];
+    ControlTableItem *item  = NULL;
+    auto item_it = device->ctrl_table_.find(msg->item_name);
+    if(item_it != device->ctrl_table_.end())
+    {
+      item = item_it->second;
+    }
+    else
+    {
+      ROS_WARN("SyncWriteItem] Unknown item : %s", msg->item_name.c_str());
+      continue;
+    }
 
     dynamixel::PortHandler   *port           = robot_->ports_[device->port_name_];
     dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(device->protocol_version_);
@@ -1486,9 +1607,22 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
 void RobotisController::setControllerModeCallback(const std_msgs::String::ConstPtr &msg)
 {
   if (msg->data == "DirectControlMode")
+  {
+    for (auto& it : port_to_bulk_read_)
+    {
+      robot_->ports_[it.first]->setPacketTimeout(0.0);
+      it.second->rxPacket();
+    }
     controller_mode_ = DirectControlMode;
+  }
   else if (msg->data == "MotionModuleMode")
+  {
+    for (auto& it : port_to_bulk_read_)
+    {
+      it.second->txPacket();
+    }
     controller_mode_ = MotionModuleMode;
+  }
 }
 
 void RobotisController::setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
@@ -1529,73 +1663,16 @@ void RobotisController::setCtrlModuleCallback(const std_msgs::String::ConstPtr &
   set_module_thread_ = boost::thread(boost::bind(&RobotisController::setCtrlModuleThread, this, _module_name_to_set));
 }
 
+void RobotisController::setCtrlModule(std::string module_name)
+{
+  set_module_thread_ = boost::thread(boost::bind(&RobotisController::setCtrlModuleThread, this, module_name));
+}
 void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg)
 {
   if (msg->joint_name.size() != msg->module_name.size())
     return;
 
-  queue_mutex_.lock();
-
-  for (unsigned int idx = 0; idx < msg->joint_name.size(); idx++)
-  {
-    Dynamixel *dxl = NULL;
-    auto dxl_it = robot_->dxls_.find((std::string) (msg->joint_name[idx]));
-    if (dxl_it != robot_->dxls_.end())
-      dxl = dxl_it->second;
-    else
-      continue;
-
-    // none
-    if (msg->module_name[idx] == "" || msg->module_name[idx] == "none")
-    {
-      dxl->ctrl_module_name_ = msg->module_name[idx];
-      continue;
-    }
-
-    // check whether the module is using this joint
-    for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
-    {
-      if ((*m_it)->getModuleName() == msg->module_name[idx])
-      {
-        if ((*m_it)->result_.find(msg->joint_name[idx]) != (*m_it)->result_.end())
-        {
-          dxl->ctrl_module_name_ = msg->module_name[idx];
-          break;
-        }
-      }
-    }
-  }
-
-  for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
-  {
-    // set all modules -> disable
-    (*m_it)->setModuleEnable(false);
-
-    // set all used modules -> enable
-    for (auto& d_it : robot_->dxls_)
-    {
-      if (d_it.second->ctrl_module_name_ == (*m_it)->getModuleName())
-      {
-        (*m_it)->setModuleEnable(true);
-        break;
-      }
-    }
-  }
-
-  // TODO: set indirect address
-  // -> check module's control_mode
-
-  queue_mutex_.unlock();
-
-  robotis_controller_msgs::JointCtrlModule current_module_msg;
-  for (auto& dxl_iter : robot_->dxls_)
-  {
-    current_module_msg.joint_name.push_back(dxl_iter.first);
-    current_module_msg.module_name.push_back(dxl_iter.second->ctrl_module_name_);
-  }
-
-  if (current_module_msg.joint_name.size() == current_module_msg.module_name.size())
-    current_module_pub_.publish(current_module_msg);
+  set_module_thread_ = boost::thread(boost::bind(&RobotisController::setJointCtrlModuleThread, this, msg));
 }
 
 bool RobotisController::getCtrlModuleCallback(robotis_controller_msgs::GetJointModule::Request &req,
@@ -1617,6 +1694,199 @@ bool RobotisController::getCtrlModuleCallback(robotis_controller_msgs::GetJointM
   return true;
 }
 
+void RobotisController::setJointCtrlModuleThread(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg)
+{
+  // stop module list
+  std::list<MotionModule *> _stop_modules;
+  std::list<MotionModule *> _enable_modules;
+
+  for(unsigned int idx = 0; idx < msg->joint_name.size(); idx++)
+  {
+    Dynamixel *_dxl = NULL;
+    std::map<std::string, Dynamixel*>::iterator _dxl_it = robot_->dxls_.find((std::string)(msg->joint_name[idx]));
+    if(_dxl_it != robot_->dxls_.end())
+      _dxl = _dxl_it->second;
+    else
+      continue;
+
+    // enqueue
+    if(_dxl->ctrl_module_name_ != msg->module_name[idx])
+    {
+      for(std::list<MotionModule *>::iterator _stop_m_it = motion_modules_.begin(); _stop_m_it != motion_modules_.end(); _stop_m_it++)
+      {
+        if((*_stop_m_it)->getModuleName() == _dxl->ctrl_module_name_ && (*_stop_m_it)->getModuleEnable() == true)
+          _stop_modules.push_back(*_stop_m_it);
+      }
+    }
+  }
+
+  // stop the module
+  _stop_modules.unique();
+  for(std::list<MotionModule *>::iterator _stop_m_it = _stop_modules.begin(); _stop_m_it != _stop_modules.end(); _stop_m_it++)
+  {
+    (*_stop_m_it)->stop();
+  }
+
+  // wait to stop
+  for(std::list<MotionModule *>::iterator _stop_m_it = _stop_modules.begin(); _stop_m_it != _stop_modules.end(); _stop_m_it++)
+  {
+    while((*_stop_m_it)->isRunning())
+      usleep(CONTROL_CYCLE_MSEC * 1000);
+  }
+
+  // disable module(s)
+  for(std::list<MotionModule *>::iterator _stop_m_it = _stop_modules.begin(); _stop_m_it != _stop_modules.end(); _stop_m_it++)
+  {
+    (*_stop_m_it)->setModuleEnable(false);
+  }
+
+  // set ctrl module
+  queue_mutex_.lock();
+
+  for(unsigned int idx = 0; idx < msg->joint_name.size(); idx++)
+  {
+    std::string ctrl_module = msg->module_name[idx];
+    std::string joint_name = msg->joint_name[idx];
+
+    Dynamixel *_dxl = NULL;
+    std::map<std::string, Dynamixel*>::iterator _dxl_it = robot_->dxls_.find(joint_name);
+    if(_dxl_it != robot_->dxls_.end())
+      _dxl = _dxl_it->second;
+    else
+      continue;
+
+    // none
+    if(ctrl_module == "" || ctrl_module == "none")
+    {
+      _dxl->ctrl_module_name_ = "none";
+
+      if(gazebo_mode_ == true)
+        continue;
+
+      uint32_t _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_);
+      uint8_t _sync_write_data[4];
+      _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_pos_data));
+      _sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(_pos_data));
+      _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_pos_data));
+      _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_pos_data));
+
+      if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+        port_to_sync_write_position_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
+
+      if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+        port_to_sync_write_current_[_dxl->port_name_]->removeParam(_dxl->id_);
+      if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+        port_to_sync_write_velocity_[_dxl->port_name_]->removeParam(_dxl->id_);
+    }
+    else
+    {
+      // check whether the module exist
+      for(std::list<MotionModule *>::iterator _m_it = motion_modules_.begin(); _m_it != motion_modules_.end(); _m_it++)
+      {
+        // if it exist
+        if((*_m_it)->getModuleName() == ctrl_module)
+        {
+          std::map<std::string, DynamixelState*>::iterator _result_it = (*_m_it)->result_.find(joint_name);
+          if(_result_it == (*_m_it)->result_.end())
+            break;
+
+          _dxl->ctrl_module_name_ = ctrl_module;
+
+          // enqueue enable module list
+          _enable_modules.push_back(*_m_it);
+          ControlMode _mode = (*_m_it)->getControlMode();
+
+          if(gazebo_mode_ == true)
+            break;
+
+          if(_mode == PositionControl)
+          {
+            uint32_t _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_);
+            uint8_t _sync_write_data[4];
+            _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_pos_data));
+            _sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(_pos_data));
+            _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_pos_data));
+            _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_pos_data));
+
+            if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+              port_to_sync_write_position_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
+
+            if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+              port_to_sync_write_current_[_dxl->port_name_]->removeParam(_dxl->id_);
+            if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+              port_to_sync_write_velocity_[_dxl->port_name_]->removeParam(_dxl->id_);
+          }
+          else if(_mode == VelocityControl)
+          {
+            uint32_t _vel_data = _dxl->convertVelocity2Value(_dxl->dxl_state_->goal_velocity_);
+            uint8_t _sync_write_data[4];
+            _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_vel_data));
+            _sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(_vel_data));
+            _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_vel_data));
+            _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_vel_data));
+
+            if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+              port_to_sync_write_velocity_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
+
+            if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+              port_to_sync_write_current_[_dxl->port_name_]->removeParam(_dxl->id_);
+            if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+              port_to_sync_write_position_[_dxl->port_name_]->removeParam(_dxl->id_);
+          }
+          else if(_mode == TorqueControl)
+          {
+            uint32_t _curr_data = _dxl->convertTorque2Value(_dxl->dxl_state_->goal_torque_);
+            uint8_t _sync_write_data[4];
+            _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_curr_data));
+            _sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(_curr_data));
+            _sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(_curr_data));
+            _sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(_curr_data));
+
+            if(port_to_sync_write_current_[_dxl->port_name_] != NULL)
+              port_to_sync_write_current_[_dxl->port_name_]->addParam(_dxl->id_, _sync_write_data);
+
+            if(port_to_sync_write_velocity_[_dxl->port_name_] != NULL)
+              port_to_sync_write_velocity_[_dxl->port_name_]->removeParam(_dxl->id_);
+            if(port_to_sync_write_position_[_dxl->port_name_] != NULL)
+              port_to_sync_write_position_[_dxl->port_name_]->removeParam(_dxl->id_);
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  // enable module(s)
+  _enable_modules.unique();
+  for(std::list<MotionModule *>::iterator _m_it = _enable_modules.begin(); _m_it != _enable_modules.end(); _m_it++)
+  {
+    (*_m_it)->setModuleEnable(true);
+  }
+
+  // TODO: set indirect address
+  // -> check module's control_mode
+
+  queue_mutex_.unlock();
+
+  // log
+//  std::cout << "Enable Joint Ctrl Module : " << std::endl;
+//  for(std::list<MotionModule *>::iterator _m_it = motion_modules_.begin(); _m_it != motion_modules_.end(); _m_it++)
+//  {
+//    if((*_m_it)->GetModuleEnable() == true)
+//      std::cout << "     - " << (*_m_it)->GetModuleName() << std::endl;
+//  }
+
+  // publish current module
+  robotis_controller_msgs::JointCtrlModule _current_module_msg;
+  for(std::map<std::string, Dynamixel *>::iterator _dxl_iter = robot_->dxls_.begin(); _dxl_iter  != robot_->dxls_.end(); ++_dxl_iter)
+  {
+    _current_module_msg.joint_name.push_back(_dxl_iter->first);
+    _current_module_msg.module_name.push_back(_dxl_iter->second->ctrl_module_name_);
+  }
+
+  if(_current_module_msg.joint_name.size() == _current_module_msg.module_name.size())
+    current_module_pub_.publish(_current_module_msg);
+}
 void RobotisController::setCtrlModuleThread(std::string ctrl_module)
 {
   // stop module
@@ -1679,6 +1949,13 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
       usleep(CONTROL_CYCLE_MSEC * 1000);
   }
 
+  // disable module(s)
+  for(std::list<MotionModule *>::iterator _stop_m_it = stop_modules.begin(); _stop_m_it != stop_modules.end(); _stop_m_it++)
+  {
+    (*_stop_m_it)->setModuleEnable(false);
+  }
+
+
   // set ctrl module
   queue_mutex_.lock();
 
@@ -1688,12 +1965,6 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   // none
   if ((ctrl_module == "") || (ctrl_module == "none"))
   {
-    // set all modules -> disable
-    for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
-    {
-      (*m_it)->setModuleEnable(false);
-    }
-
     // set dxl's control module to "none"
     for (auto& d_it : robot_->dxls_)
     {
@@ -1800,9 +2071,6 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
 
   for (auto m_it = motion_modules_.begin(); m_it != motion_modules_.end(); m_it++)
   {
-    // set all modules -> disable
-    (*m_it)->setModuleEnable(false);
-
     // set all used modules -> enable
     for (auto& d_it : robot_->dxls_)
     {
