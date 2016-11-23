@@ -2,6 +2,24 @@
 Changelog for package robotis_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2016-11-23)
+-----------
+* Merge the changes and update
+* - Direct Control Mode bug fixed.
+* update
+* - added writeControlTableCallback
+* - added WriteControlTable msg callback
+* mode change debugging
+* - optimized cpu usage by spin loop (by astumpf)
+* - robotis_controller process() : processing order changed.
+  * 1st : packet communication
+  * 2nd : processing modules
+* - dependencies fixed. (Pull requests `#26 <https://github.com/ROBOTIS-GIT/ROBOTIS-Framework/issues/26>`_)
+* - make setJointCtrlModuleCallback() to the thread function & improved.
+* - modified dependency problem.
+* - reduce CPU consumption
+* Contributors: Jay Song, Pyo, Zerom, SCH
+
 0.2.0 (2016-08-31)
 -----------
 * bug fixed (position pid gain & velocity pid gain sync write).
