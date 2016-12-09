@@ -95,13 +95,14 @@ private:
   void initializeSyncWrite();
 
 public:
-  static const int  CONTROL_CYCLE_MSEC  = 8;    // 8 msec
+  static const int  DEFAULT_CONTROL_CYCLE_MSEC  = 8;    // 8 msec
 
   bool              DEBUG_PRINT;
   Robot            *robot_;
 
   bool              gazebo_mode_;
   std::string       gazebo_robot_name_;
+  int               control_cycle_msec_;
 
   /* bulk read */
   std::map<std::string, dynamixel::GroupBulkRead *>   port_to_bulk_read_;
