@@ -48,17 +48,23 @@
 #define DYNAMIXEL             "dynamixel"
 #define SENSOR                "sensor"
 
+#define SESSION_CONTROL_INFO  "control info"
 #define SESSION_PORT_INFO     "port info"
 #define SESSION_DEVICE_INFO   "device info"
 
 #define SESSION_TYPE_INFO     "type info"
 #define SESSION_CONTROL_TABLE "control table"
 
+#define DEFAULT_CONTROL_CYCLE 8 // milliseconds
+
 namespace robotis_framework
 {
 
 class Robot
 {
+private:
+  int   control_cycle_msec_;
+
 public:
   std::map<std::string, dynamixel::PortHandler *> ports_;   // string: port name
   std::map<std::string, std::string>  port_default_device_; // port name, default device name
@@ -70,6 +76,8 @@ public:
 
   Sensor     *getSensor(std::string path, int id, std::string port, float protocol_version);
   Dynamixel  *getDynamixel(std::string path, int id, std::string port, float protocol_version);
+
+  int         getControlCycle();
 };
 
 }
