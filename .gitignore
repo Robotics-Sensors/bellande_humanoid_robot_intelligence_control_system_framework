@@ -1,1 +1,11 @@
-/robotis_device/devices/dynamixel/H54-100-B210-R-NR.device
+build
+devel
+bin
+lib
+msg_gen
+srv_gen
+qtcreator-build
+*~
+*.backup
+*.user
+*.autosave

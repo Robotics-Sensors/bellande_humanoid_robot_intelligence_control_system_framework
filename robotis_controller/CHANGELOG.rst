@@ -2,6 +2,47 @@
 Changelog for package robotis_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2016-11-23)
+-----------
+* Merge the changes and update
+* - Direct Control Mode bug fixed.
+* update
+* - added writeControlTableCallback
+* - added WriteControlTable msg callback
+* mode change debugging
+* - optimized cpu usage by spin loop (by astumpf)
+* - robotis_controller process() : processing order changed.
+  * 1st : packet communication
+  * 2nd : processing modules
+* - dependencies fixed. (Pull requests `#26 <https://github.com/ROBOTIS-GIT/ROBOTIS-Framework/issues/26>`_)
+* - make setJointCtrlModuleCallback() to the thread function & improved.
+* - modified dependency problem.
+* - reduce CPU consumption
+* Contributors: Jay Song, Pyo, Zerom, SCH
+
+0.2.0 (2016-08-31)
+-----------
+* bug fixed (position pid gain & velocity pid gain sync write).
+* added velocity_to_value_ratio to DXL Pro-H series.
+* changed some debug messages.
+* added velocity p/i/d gain and position i/d gain sync_write code.
+* SyncWriteItem bug fixed.
+* add function / modified the code simple (using auto / range based for loop)
+* added XM-430-W210 / XM-430-W350 device file.
+* rename ControlMode(CurrentControl -> TorqueControl)
+* rename (port_to_sync_write_torque\_ -> port_to_sync_write_current\_)
+* rename (present_current\_ -> present_torque\_)
+* modified torque control code
+* fixed typos / changed ROS_INFO -> fprintf (for processing speed)
+* startTimer() : after bulkread txpacket(), need some sleep()
+* changed the order of processing in the Process() function.
+* added missing mutex for gazebo
+* fixed crash when running in gazebo simulation
+* sync write bug fix.
+* added position_p_gain sync write
+* MotionModule/SensorModule member variable access changed (public -> protected).
+* Contributors: Jay Song, Zerom, Pyo, SCH
+
 0.1.1 (2016-08-18)
 -----------
 * updated the package information

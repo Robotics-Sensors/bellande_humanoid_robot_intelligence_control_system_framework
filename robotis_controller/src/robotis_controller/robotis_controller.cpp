@@ -603,7 +603,7 @@ void RobotisController::initializeDevice(const std::string init_file_path)
 
 void RobotisController::gazeboTimerThread()
 {
-  ros::Rate gazebo_rate(1000 / CONTROL_CYCLE_MSEC);
+  ros::Rate gazebo_rate(1000 / robot_->getControlCycle());
 
   while (!stop_timer_)
   {
@@ -662,7 +662,7 @@ void RobotisController::msgQueueThread()
   ros::ServiceServer joint_module_server = ros_node.advertiseService("/robotis/get_present_joint_ctrl_modules",
                                                         &RobotisController::getCtrlModuleCallback, this);
 
-  ros::WallDuration duration(CONTROL_CYCLE_MSEC / 1000.0);
+  ros::WallDuration duration(robot_->getControlCycle() / 1000.0);
   while(ros_node.ok())
     callback_queue.callAvailable(duration);
 }
@@ -679,8 +679,8 @@ void *RobotisController::timerThread(void *param)
 
   while (!controller->stop_timer_)
   {
-    next_time.tv_sec += (next_time.tv_nsec + CONTROL_CYCLE_MSEC * 1000000) / 1000000000;
-    next_time.tv_nsec = (next_time.tv_nsec + CONTROL_CYCLE_MSEC * 1000000) % 1000000000;
+    next_time.tv_sec += (next_time.tv_nsec + controller->robot_->getControlCycle() * 1000000) / 1000000000;
+    next_time.tv_nsec = (next_time.tv_nsec + controller->robot_->getControlCycle() * 1000000) % 1000000000;
 
     controller->process();
 
@@ -1109,13 +1109,63 @@ void RobotisController::process()
   {
     if(gazebo_mode_ == false)
     {
+      // BulkRead Rx
+      for (auto& it : port_to_bulk_read_)
+      {
+        robot_->ports_[it.first]->setPacketTimeout(0.0);
+        it.second->rxPacket();
+      }
+
+      // -> save to robot->dxls_[]->dxl_state_
+      if (robot_->dxls_.size() > 0)
+      {
+        for (auto& dxl_it : robot_->dxls_)
+        {
+          Dynamixel  *dxl         = dxl_it.second;
+          std::string port_name   = dxl_it.second->port_name_;
+          std::string joint_name  = dxl_it.first;
+
+          if (dxl->bulk_read_items_.size() > 0)
+          {
+            uint32_t data = 0;
+            for (int i = 0; i < dxl->bulk_read_items_.size(); i++)
+            {
+              ControlTableItem *item = dxl->bulk_read_items_[i];
+              if (port_to_bulk_read_[port_name]->isAvailable(dxl->id_, item->address_, item->data_length_) == true)
+              {
+                data = port_to_bulk_read_[port_name]->getData(dxl->id_, item->address_, item->data_length_);
+
+                // change dxl_state
+                if (dxl->present_position_item_ != 0 && item->item_name_ == dxl->present_position_item_->item_name_)
+                  dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
+                  dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
+                else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
+                  dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(data);
+                else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
+                  dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
+                  dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
+                else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
+                  dxl->dxl_state_->goal_torque_ = dxl->convertValue2Torque(data);
+                else
+                  dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
+              }
+            }
+
+            // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
+            dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+          }
+        }
+      }
+
       queue_mutex_.lock();
 
-      for (auto& it : port_to_sync_write_position_)
-      {
-        it.second->txPacket();
-        it.second->clearParam();
-      }
+//      for (auto& it : port_to_sync_write_position_)
+//      {
+//        it.second->txPacket();
+//        it.second->clearParam();
+//      }
 
       if (direct_sync_write_.size() > 0)
       {
@@ -1128,6 +1178,10 @@ void RobotisController::process()
       }
 
       queue_mutex_.unlock();
+
+      // BulkRead Tx
+      for (auto& it : port_to_bulk_read_)
+        it.second->txPacket();
     }
   }
 
@@ -1375,7 +1429,7 @@ void RobotisController::addMotionModule(MotionModule *module)
     }
   }
 
-  module->initialize(CONTROL_CYCLE_MSEC, robot_);
+  module->initialize(robot_->getControlCycle(), robot_);
   motion_modules_.push_back(module);
   motion_modules_.unique();
 }
@@ -1397,7 +1451,7 @@ void RobotisController::addSensorModule(SensorModule *module)
     }
   }
 
-  module->initialize(CONTROL_CYCLE_MSEC, robot_);
+  module->initialize(robot_->getControlCycle(), robot_);
   sensor_modules_.push_back(module);
   sensor_modules_.unique();
 }
@@ -1553,9 +1607,22 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
 void RobotisController::setControllerModeCallback(const std_msgs::String::ConstPtr &msg)
 {
   if (msg->data == "DirectControlMode")
+  {
+    for (auto& it : port_to_bulk_read_)
+    {
+      robot_->ports_[it.first]->setPacketTimeout(0.0);
+      it.second->rxPacket();
+    }
     controller_mode_ = DirectControlMode;
+  }
   else if (msg->data == "MotionModuleMode")
+  {
+    for (auto& it : port_to_bulk_read_)
+    {
+      it.second->txPacket();
+    }
     controller_mode_ = MotionModuleMode;
+  }
 }
 
 void RobotisController::setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
@@ -1664,7 +1731,7 @@ void RobotisController::setJointCtrlModuleThread(const robotis_controller_msgs::
   for(std::list<MotionModule *>::iterator _stop_m_it = _stop_modules.begin(); _stop_m_it != _stop_modules.end(); _stop_m_it++)
   {
     while((*_stop_m_it)->isRunning())
-      usleep(CONTROL_CYCLE_MSEC * 1000);
+      usleep(robot_->getControlCycle() * 1000);
   }
 
   // disable module(s)
@@ -1879,7 +1946,7 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   for (auto stop_m_it = stop_modules.begin(); stop_m_it != stop_modules.end(); stop_m_it++)
   {
     while ((*stop_m_it)->isRunning())
-      usleep(CONTROL_CYCLE_MSEC * 1000);
+      usleep(robot_->getControlCycle() * 1000);
   }
 
   // disable module(s)

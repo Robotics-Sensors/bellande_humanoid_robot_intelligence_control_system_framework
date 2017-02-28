@@ -76,6 +76,7 @@ static inline std::vector<std::string> split(const std::string &text, char sep)
 }
 
 Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
+  : control_cycle_msec_(DEFAULT_CONTROL_CYCLE)
 {
   if (dev_desc_dir_path.compare(dev_desc_dir_path.size() - 1, 1, "/") != 0)
     dev_desc_dir_path += "/";
@@ -106,7 +107,16 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
         continue;
       }
 
-      if (session == SESSION_PORT_INFO)
+      if (session == SESSION_CONTROL_INFO)
+      {
+        std::vector<std::string> tokens = split(input_str, '=');
+        if (tokens.size() != 2)
+          continue;
+
+        if (tokens[0] == "control_cycle")
+          control_cycle_msec_ = std::atoi(tokens[1].c_str());
+      }
+      else if (session == SESSION_PORT_INFO)
       {
         std::vector<std::string> tokens = split(input_str, '|');
         if (tokens.size() != 3)
@@ -485,3 +495,7 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port, float
   return dxl;
 }
 
+int Robot::getControlCycle()
+{
+  return control_cycle_msec_;
+}
