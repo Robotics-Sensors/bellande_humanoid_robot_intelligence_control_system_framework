@@ -61,7 +61,7 @@ void RobotisController::initializeSyncWrite()
   if (gazebo_mode_ == true)
     return;
 
-  ROS_INFO("FIRST BULKREAD");
+  //ROS_INFO("FIRST BULKREAD");
   for (auto& it : port_to_bulk_read_)
     it.second->txRxPacket();
   for(auto& it : port_to_bulk_read_)
@@ -72,7 +72,7 @@ void RobotisController::initializeSyncWrite()
     {
       if (++error_count > 10)
       {
-        ROS_ERROR("[RobotisController] bulk read fail!!");
+        ROS_ERROR("[RobotisController] first bulk read fail!!");
         exit(-1);
       }
       usleep(10 * 1000);
@@ -80,7 +80,7 @@ void RobotisController::initializeSyncWrite()
     } while (result != COMM_SUCCESS);
   }
   init_pose_loaded_ = true;
-  ROS_INFO("FIRST BULKREAD END");
+  //ROS_INFO("FIRST BULKREAD END");
 
   // clear syncwrite param setting
   for (auto& it : port_to_sync_write_position_)
