@@ -2,6 +2,12 @@
 Changelog for package robotis_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.2 (2017-04-24)
+-----------
+* updated robotis_controller.cpp
+* changed to read control cycle from .robot file
+* Contributors: Zerom
+
 0.2.1 (2016-11-23)
 -----------
 * Merge the changes and update

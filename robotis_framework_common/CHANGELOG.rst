@@ -2,6 +2,11 @@
 Changelog for package robotis_framework_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.2 (2017-04-24)
+-----------
+* updated for other packages
+* Contributors: Zerom, Kayman
+
 0.2.1 (2016-11-23)
 -----------
 * Merge the changes and update
