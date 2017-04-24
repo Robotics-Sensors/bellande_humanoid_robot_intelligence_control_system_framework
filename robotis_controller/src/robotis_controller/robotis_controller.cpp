@@ -61,7 +61,7 @@ void RobotisController::initializeSyncWrite()
   if (gazebo_mode_ == true)
     return;
 
-  ROS_INFO("FIRST BULKREAD");
+  //ROS_INFO("FIRST BULKREAD");
   for (auto& it : port_to_bulk_read_)
     it.second->txRxPacket();
   for(auto& it : port_to_bulk_read_)
@@ -72,7 +72,7 @@ void RobotisController::initializeSyncWrite()
     {
       if (++error_count > 10)
       {
-        ROS_ERROR("[RobotisController] bulk read fail!!");
+        ROS_ERROR("[RobotisController] first bulk read fail!!");
         exit(-1);
       }
       usleep(10 * 1000);
@@ -80,7 +80,7 @@ void RobotisController::initializeSyncWrite()
     } while (result != COMM_SUCCESS);
   }
   init_pose_loaded_ = true;
-  ROS_INFO("FIRST BULKREAD END");
+  //ROS_INFO("FIRST BULKREAD END");
 
   // clear syncwrite param setting
   for (auto& it : port_to_sync_write_position_)
@@ -603,7 +603,7 @@ void RobotisController::initializeDevice(const std::string init_file_path)
 
 void RobotisController::gazeboTimerThread()
 {
-  ros::Rate gazebo_rate(1000 / CONTROL_CYCLE_MSEC);
+  ros::Rate gazebo_rate(1000 / robot_->getControlCycle());
 
   while (!stop_timer_)
   {
@@ -662,7 +662,7 @@ void RobotisController::msgQueueThread()
   ros::ServiceServer joint_module_server = ros_node.advertiseService("/robotis/get_present_joint_ctrl_modules",
                                                         &RobotisController::getCtrlModuleCallback, this);
 
-  ros::WallDuration duration(CONTROL_CYCLE_MSEC / 1000.0);
+  ros::WallDuration duration(robot_->getControlCycle() / 1000.0);
   while(ros_node.ok())
     callback_queue.callAvailable(duration);
 }
@@ -679,8 +679,8 @@ void *RobotisController::timerThread(void *param)
 
   while (!controller->stop_timer_)
   {
-    next_time.tv_sec += (next_time.tv_nsec + CONTROL_CYCLE_MSEC * 1000000) / 1000000000;
-    next_time.tv_nsec = (next_time.tv_nsec + CONTROL_CYCLE_MSEC * 1000000) % 1000000000;
+    next_time.tv_sec += (next_time.tv_nsec + controller->robot_->getControlCycle() * 1000000) / 1000000000;
+    next_time.tv_nsec = (next_time.tv_nsec + controller->robot_->getControlCycle() * 1000000) % 1000000000;
 
     controller->process();
 
@@ -1429,7 +1429,7 @@ void RobotisController::addMotionModule(MotionModule *module)
     }
   }
 
-  module->initialize(CONTROL_CYCLE_MSEC, robot_);
+  module->initialize(robot_->getControlCycle(), robot_);
   motion_modules_.push_back(module);
   motion_modules_.unique();
 }
@@ -1451,7 +1451,7 @@ void RobotisController::addSensorModule(SensorModule *module)
     }
   }
 
-  module->initialize(CONTROL_CYCLE_MSEC, robot_);
+  module->initialize(robot_->getControlCycle(), robot_);
   sensor_modules_.push_back(module);
   sensor_modules_.unique();
 }
@@ -1731,7 +1731,7 @@ void RobotisController::setJointCtrlModuleThread(const robotis_controller_msgs::
   for(std::list<MotionModule *>::iterator _stop_m_it = _stop_modules.begin(); _stop_m_it != _stop_modules.end(); _stop_m_it++)
   {
     while((*_stop_m_it)->isRunning())
-      usleep(CONTROL_CYCLE_MSEC * 1000);
+      usleep(robot_->getControlCycle() * 1000);
   }
 
   // disable module(s)
@@ -1946,7 +1946,7 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
   for (auto stop_m_it = stop_modules.begin(); stop_m_it != stop_modules.end(); stop_m_it++)
   {
     while ((*stop_m_it)->isRunning())
-      usleep(CONTROL_CYCLE_MSEC * 1000);
+      usleep(robot_->getControlCycle() * 1000);
   }
 
   // disable module(s)
