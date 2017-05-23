@@ -2,6 +2,11 @@
 Changelog for package robotis_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.3 (2017-05-23)
+-----------
+* updated the cmake file for ros install
+* Contributors: SCH
+
 0.2.2 (2017-04-24)
 -----------
 * added a deivce: OpenCR
