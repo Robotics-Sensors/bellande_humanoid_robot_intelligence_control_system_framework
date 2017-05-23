@@ -2,6 +2,11 @@
 Changelog for package robotis_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.3 (2017-05-23)
+-----------
+* updated the cmake file for ros install
+* Contributors: SCH
+
 0.2.2 (2017-04-24)
 -----------
 * updated robotis_controller.cpp
