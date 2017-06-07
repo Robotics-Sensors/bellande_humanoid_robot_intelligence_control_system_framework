@@ -2,6 +2,11 @@
 Changelog for package robotis_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.4 (2017-06-07)
+-----------
+* added cmake_modules in package.xml
+* Contributors: SCH
+
 0.2.3 (2017-05-23)
 -----------
 * updated the cmake file for ros install
