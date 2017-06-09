@@ -2,6 +2,11 @@
 Changelog for package robotis_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.5 (2017-06-09)
+-----------
+* updated for yaml-cpp dependencies (robotis_controller)
+* Contributors: SCH
+
 0.2.4 (2017-06-07)
 -----------
 * added cmake_modules in package.xml

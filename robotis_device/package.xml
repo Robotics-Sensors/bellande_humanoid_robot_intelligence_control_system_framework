@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>robotis_device</name>
-  <version>0.2.4</version>
+  <version>0.2.5</version>
   <description>
     The package that manages device information of ROBOTIS robots.
     This package is used when reading device information with the robot information file
