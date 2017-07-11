@@ -1469,8 +1469,10 @@ void RobotisController::removeSensorModule(SensorModule *module)
 
 void RobotisController::writeControlTableCallback(const robotis_controller_msgs::WriteControlTable::ConstPtr &msg)
 {
-  fprintf(stderr, "[WriteControlTable] led control msg received\n");
   Device *device = NULL;
+
+  if (DEBUG_PRINT)
+    fprintf(stderr, "[WriteControlTable] led control msg received\n");
 
   auto dev_it1 = robot_->dxls_.find(msg->joint_name);
   if(dev_it1 != robot_->dxls_.end())
@@ -1490,7 +1492,7 @@ void RobotisController::writeControlTableCallback(const robotis_controller_msgs:
       return;
     }
   }
-  fprintf(stderr, " #1 ");
+
   ControlTableItem *item = NULL;
   auto item_it = device->ctrl_table_.find(msg->start_item_name);
   if(item_it != device->ctrl_table_.end())
@@ -1503,7 +1505,6 @@ void RobotisController::writeControlTableCallback(const robotis_controller_msgs:
     return;
   }
 
-  fprintf(stderr, " #2 ");
   dynamixel::PortHandler   *port           = robot_->ports_[device->port_name_];
   dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(device->protocol_version_);
 
@@ -1512,17 +1513,13 @@ void RobotisController::writeControlTableCallback(const robotis_controller_msgs:
 
   queue_mutex_.lock();
 
-
   direct_sync_write_.push_back(new dynamixel::GroupSyncWrite(port, packet_handler, item->address_, msg->data_length));
-
-  fprintf(stderr, " #3 \n");
-
   direct_sync_write_[direct_sync_write_.size() - 1]->addParam(device->id_, (uint8_t *)(msg->data.data()));
   
-  fprintf(stderr, "[WriteControlTable] %s -> %s : ", msg->joint_name.c_str(), msg->start_item_name.c_str());
-  for (auto &dt : msg->data)
-	  fprintf(stderr, "%02X ", dt);
-  fprintf(stderr, "\n");
+//  fprintf(stderr, "[WriteControlTable] %s -> %s : ", msg->joint_name.c_str(), msg->start_item_name.c_str());
+//  for (auto &dt : msg->data)
+//	  fprintf(stderr, "%02X ", dt);
+//  fprintf(stderr, "\n");
 
   queue_mutex_.unlock();
 
