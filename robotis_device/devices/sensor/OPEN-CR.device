@@ -10,7 +10,7 @@ device_type = sensor
    4   | baudrate                 | 1      | RW     | EEPROM | 0             | 252         | N
    5   | return_delay_time        | 1      | RW     | EEPROM | 0             | 254         | N
    16  | status_return_level      | 1      | RW     | EEPROM | 0             | 2           | N
-   24  | torque_enable            | 1      | RW     | RAM    | 0             | 1           | N
+   24  | dynamixel_power          | 1      | RW     | RAM    | 0             | 1           | N
    25  | LED                      | 1      | RW     | RAM    | 0             | 7           | N
    26  | LED_RGB                  | 2      | RW     | RAM    | 0             | 32767       | N
    28  | buzzer                   | 2      | RW     | RAM    | 0             | 65535       | N
