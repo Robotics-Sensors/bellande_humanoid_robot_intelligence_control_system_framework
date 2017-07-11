@@ -61,7 +61,7 @@ void RobotisController::initializeSyncWrite()
   if (gazebo_mode_ == true)
     return;
 
-  ROS_INFO("FIRST BULKREAD");
+  //ROS_INFO("FIRST BULKREAD");
   for (auto& it : port_to_bulk_read_)
     it.second->txRxPacket();
   for(auto& it : port_to_bulk_read_)
@@ -72,7 +72,7 @@ void RobotisController::initializeSyncWrite()
     {
       if (++error_count > 10)
       {
-        ROS_ERROR("[RobotisController] bulk read fail!!");
+        ROS_ERROR("[RobotisController] first bulk read fail!!");
         exit(-1);
       }
       usleep(10 * 1000);
@@ -80,7 +80,7 @@ void RobotisController::initializeSyncWrite()
     } while (result != COMM_SUCCESS);
   }
   init_pose_loaded_ = true;
-  ROS_INFO("FIRST BULKREAD END");
+  //ROS_INFO("FIRST BULKREAD END");
 
   // clear syncwrite param setting
   for (auto& it : port_to_sync_write_position_)
@@ -911,12 +911,14 @@ void RobotisController::process()
 
           if (dxl->bulk_read_items_.size() > 0)
           {
-            uint32_t data = 0;
+            bool      updated = false;
+            uint32_t  data    = 0;
             for (int i = 0; i < dxl->bulk_read_items_.size(); i++)
             {
               ControlTableItem *item = dxl->bulk_read_items_[i];
               if (port_to_bulk_read_[port_name]->isAvailable(dxl->id_, item->address_, item->data_length_) == true)
               {
+                updated = true;
                 data = port_to_bulk_read_[port_name]->getData(dxl->id_, item->address_, item->data_length_);
 
                 // change dxl_state
@@ -938,7 +940,8 @@ void RobotisController::process()
             }
 
             // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
-            dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+            if (updated == true)
+              dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
           }
         }
       }
@@ -954,12 +957,14 @@ void RobotisController::process()
 
           if (sensor->bulk_read_items_.size() > 0)
           {
-            uint32_t data = 0;
+            bool      updated = false;
+            uint32_t  data    = 0;
             for (int i = 0; i < sensor->bulk_read_items_.size(); i++)
             {
               ControlTableItem *item = sensor->bulk_read_items_[i];
               if (port_to_bulk_read_[port_name]->isAvailable(sensor->id_, item->address_, item->data_length_) == true)
               {
+                updated = true;
                 data = port_to_bulk_read_[port_name]->getData(sensor->id_, item->address_, item->data_length_);
 
                 // change sensor_state
@@ -968,7 +973,8 @@ void RobotisController::process()
             }
 
             // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
-            sensor->sensor_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+            if (updated == true)
+              sensor->sensor_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
           }
         }
       }
