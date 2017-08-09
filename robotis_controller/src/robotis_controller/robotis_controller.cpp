@@ -1501,7 +1501,7 @@ void RobotisController::writeControlTableCallback(const robotis_controller_msgs:
   }
   else
   {
-    ROS_WARN("WriteControlTable] Unknown item : %s", msg->start_item_name.c_str());
+    ROS_WARN("[WriteControlTable] Unknown item : %s", msg->start_item_name.c_str());
     return;
   }
 
@@ -1569,6 +1569,8 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
     if (item->access_type_ == Read)
       continue;
 
+    queue_mutex_.lock();
+
     int idx = 0;
     if (direct_sync_write_.size() == 0)
     {
@@ -1604,6 +1606,8 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
     }
     direct_sync_write_[idx]->addParam(device->id_, data);
     delete[] data;
+
+    queue_mutex_.unlock();
   }
 }
 
