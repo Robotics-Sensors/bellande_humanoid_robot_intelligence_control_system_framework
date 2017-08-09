@@ -911,12 +911,14 @@ void RobotisController::process()
 
           if (dxl->bulk_read_items_.size() > 0)
           {
-            uint32_t data = 0;
+            bool      updated = false;
+            uint32_t  data    = 0;
             for (int i = 0; i < dxl->bulk_read_items_.size(); i++)
             {
               ControlTableItem *item = dxl->bulk_read_items_[i];
               if (port_to_bulk_read_[port_name]->isAvailable(dxl->id_, item->address_, item->data_length_) == true)
               {
+                updated = true;
                 data = port_to_bulk_read_[port_name]->getData(dxl->id_, item->address_, item->data_length_);
 
                 // change dxl_state
@@ -938,7 +940,8 @@ void RobotisController::process()
             }
 
             // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
-            dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+            if (updated == true)
+              dxl->dxl_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
           }
         }
       }
@@ -954,12 +957,14 @@ void RobotisController::process()
 
           if (sensor->bulk_read_items_.size() > 0)
           {
-            uint32_t data = 0;
+            bool      updated = false;
+            uint32_t  data    = 0;
             for (int i = 0; i < sensor->bulk_read_items_.size(); i++)
             {
               ControlTableItem *item = sensor->bulk_read_items_[i];
               if (port_to_bulk_read_[port_name]->isAvailable(sensor->id_, item->address_, item->data_length_) == true)
               {
+                updated = true;
                 data = port_to_bulk_read_[port_name]->getData(sensor->id_, item->address_, item->data_length_);
 
                 // change sensor_state
@@ -968,7 +973,8 @@ void RobotisController::process()
             }
 
             // -> update time stamp to Robot->dxls[]->dynamixel_state.update_time_stamp
-            sensor->sensor_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
+            if (updated == true)
+              sensor->sensor_state_->update_time_stamp_ = TimeStamp(present_state.header.stamp.sec, present_state.header.stamp.nsec);
           }
         }
       }
@@ -1463,8 +1469,10 @@ void RobotisController::removeSensorModule(SensorModule *module)
 
 void RobotisController::writeControlTableCallback(const robotis_controller_msgs::WriteControlTable::ConstPtr &msg)
 {
-  fprintf(stderr, "[WriteControlTable] led control msg received\n");
   Device *device = NULL;
+
+  if (DEBUG_PRINT)
+    fprintf(stderr, "[WriteControlTable] led control msg received\n");
 
   auto dev_it1 = robot_->dxls_.find(msg->joint_name);
   if(dev_it1 != robot_->dxls_.end())
@@ -1484,7 +1492,7 @@ void RobotisController::writeControlTableCallback(const robotis_controller_msgs:
       return;
     }
   }
-  fprintf(stderr, " #1 ");
+
   ControlTableItem *item = NULL;
   auto item_it = device->ctrl_table_.find(msg->start_item_name);
   if(item_it != device->ctrl_table_.end())
@@ -1493,11 +1501,10 @@ void RobotisController::writeControlTableCallback(const robotis_controller_msgs:
   }
   else
   {
-    ROS_WARN("WriteControlTable] Unknown item : %s", msg->start_item_name.c_str());
+    ROS_WARN("[WriteControlTable] Unknown item : %s", msg->start_item_name.c_str());
     return;
   }
 
-  fprintf(stderr, " #2 ");
   dynamixel::PortHandler   *port           = robot_->ports_[device->port_name_];
   dynamixel::PacketHandler *packet_handler = dynamixel::PacketHandler::getPacketHandler(device->protocol_version_);
 
@@ -1506,17 +1513,13 @@ void RobotisController::writeControlTableCallback(const robotis_controller_msgs:
 
   queue_mutex_.lock();
 
-
   direct_sync_write_.push_back(new dynamixel::GroupSyncWrite(port, packet_handler, item->address_, msg->data_length));
-
-  fprintf(stderr, " #3 \n");
-
   direct_sync_write_[direct_sync_write_.size() - 1]->addParam(device->id_, (uint8_t *)(msg->data.data()));
   
-  fprintf(stderr, "[WriteControlTable] %s -> %s : ", msg->joint_name.c_str(), msg->start_item_name.c_str());
-  for (auto &dt : msg->data)
-	  fprintf(stderr, "%02X ", dt);
-  fprintf(stderr, "\n");
+//  fprintf(stderr, "[WriteControlTable] %s -> %s : ", msg->joint_name.c_str(), msg->start_item_name.c_str());
+//  for (auto &dt : msg->data)
+//	  fprintf(stderr, "%02X ", dt);
+//  fprintf(stderr, "\n");
 
   queue_mutex_.unlock();
 
@@ -1566,6 +1569,8 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
     if (item->access_type_ == Read)
       continue;
 
+    queue_mutex_.lock();
+
     int idx = 0;
     if (direct_sync_write_.size() == 0)
     {
@@ -1601,6 +1606,8 @@ void RobotisController::syncWriteItemCallback(const robotis_controller_msgs::Syn
     }
     direct_sync_write_[idx]->addParam(device->id_, data);
     delete[] data;
+
+    queue_mutex_.unlock();
   }
 }
 
