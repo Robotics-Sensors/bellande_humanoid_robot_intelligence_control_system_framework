@@ -2,6 +2,25 @@
 Changelog for package robotis_device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.5 (2017-06-09)
+-----------
+* none
+
+0.2.4 (2017-06-07)
+-----------
+* none
+
+0.2.3 (2017-05-23)
+-----------
+* updated the cmake file for ros install
+* Contributors: SCH
+
+0.2.2 (2017-04-24)
+-----------
+* added a deivce: OpenCR
+* changed to read control cycle from .robot file
+* Contributors: Zerom, Kayman
+
 0.2.1 (2016-11-23)
 -----------
 * Merge the changes and update
@@ -26,6 +45,7 @@ Changelog for package robotis_device
 0.1.1 (2016-08-18)
 -----------
 * updated the package information
+* Contributors: Zerom
 
 0.1.0 (2016-08-12)
 -----------
@@ -42,4 +62,4 @@ Changelog for package robotis_device
   ConvertRadian2Value / ConvertValue2Radian function bug fixed.
 * added code to support the gazebo simulator
 * renewal
-* Contributors: ROBOTIS, ROBOTIS-zerom, pyo
+* Contributors: Zerom

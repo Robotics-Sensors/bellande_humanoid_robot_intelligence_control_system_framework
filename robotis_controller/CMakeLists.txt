@@ -19,6 +19,10 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
 )
 
+set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CATKIN_DEVEL_PREFIX}/lib/pkgconfig")
+find_package(PkgConfig)
+pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
+
 ################################################################################
 # Declare ROS messages, services and actions
 ################################################################################
@@ -42,11 +46,12 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${yaml_cpp_INCLUDE_DIRS}
 )
 
 add_library(robotis_controller src/robotis_controller/robotis_controller.cpp)
 add_dependencies(robotis_controller ${catkin_EXPORTED_TARGETS})
-target_link_libraries(robotis_controller yaml-cpp ${catkin_LIBRARIES})
+target_link_libraries(robotis_controller ${yaml_cpp_LIBRARIES} ${catkin_LIBRARIES})
 
 ################################################################################
 # Install

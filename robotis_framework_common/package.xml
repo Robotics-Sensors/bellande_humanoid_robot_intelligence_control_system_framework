@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>robotis_framework_common</name>
-  <version>0.2.1</version>
+  <version>0.2.5</version>
   <description>
     The package contains commonly used Headers for the ROBOTIS Framework.
   </description>
