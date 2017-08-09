@@ -2,6 +2,12 @@
 Changelog for package robotis_device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.6 (2017-08-09)
+-----------
+* OpenCR control table item name changed. (torque_enable -> dynamixel_power)
+* fixed to not update update_time_stamp\_ if bulk read fails.
+* Contributors: Zerom
+
 0.2.5 (2017-06-09)
 -----------
 * none
