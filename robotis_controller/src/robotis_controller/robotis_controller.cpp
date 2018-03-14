@@ -485,6 +485,8 @@ void RobotisController::initializeDevice(const std::string init_file_path)
     {
       if (dxl->bulk_read_items_.size() != 0)
       {
+        uint16_t  data16 = 0;
+
         bulkread_start_addr = dxl->bulk_read_items_[0]->address_;
         bulkread_data_length = 0;
 
@@ -497,8 +499,12 @@ void RobotisController::initializeDevice(const std::string init_file_path)
           bulkread_data_length += addr_leng;
           for (int l = 0; l < addr_leng; l++)
           {
-//            ROS_WARN("[%12s] INDIR_ADDR: %d, ITEM_ADDR: %d", joint_name.c_str(), indirect_addr, dxl->ctrl_table[dxl->bulk_read_items[i]->item_name]->address + _l);
-            write2Byte(joint_name, indirect_addr, dxl->ctrl_table_[dxl->bulk_read_items_[i]->item_name_]->address_ + l);
+            //ROS_WARN("[%12s] INDIR_ADDR: %d, ITEM_ADDR: %d", joint_name.c_str(), indirect_addr, dxl->ctrl_table_[dxl->bulk_read_items_[i]->item_name_]->address_ + l);
+            read2Byte(joint_name, indirect_addr, &data16);
+            if (data16 != dxl->ctrl_table_[dxl->bulk_read_items_[i]->item_name_]->address_ + l)
+            {
+              write2Byte(joint_name, indirect_addr, dxl->ctrl_table_[dxl->bulk_read_items_[i]->item_name_]->address_ + l);
+            }
             indirect_addr += 2;
           }
         }
@@ -552,6 +558,8 @@ void RobotisController::initializeDevice(const std::string init_file_path)
     {
       if (sensor->bulk_read_items_.size() != 0)
       {
+        uint16_t  data16 = 0;
+
         bulkread_start_addr = sensor->bulk_read_items_[0]->address_;
         bulkread_data_length = 0;
 
@@ -565,9 +573,13 @@ void RobotisController::initializeDevice(const std::string init_file_path)
           for (int l = 0; l < addr_leng; l++)
           {
 //            ROS_WARN("[%12s] INDIR_ADDR: %d, ITEM_ADDR: %d", sensor_name.c_str(), indirect_addr, sensor->ctrl_table[sensor->bulk_read_items[i]->item_name]->address + _l);
-            write2Byte(sensor_name,
-                       indirect_addr,
-                       sensor->ctrl_table_[sensor->bulk_read_items_[i]->item_name_]->address_ + l);
+            read2Byte(sensor_name, indirect_addr, &data16);
+            if (data16 != sensor->ctrl_table_[sensor->bulk_read_items_[i]->item_name_]->address_ + l)
+            {
+              write2Byte(sensor_name,
+                         indirect_addr,
+                         sensor->ctrl_table_[sensor->bulk_read_items_[i]->item_name_]->address_ + l);
+            }
             indirect_addr += 2;
           }
         }
@@ -934,8 +946,8 @@ void RobotisController::process()
                   dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
                 else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
                   dxl->dxl_state_->goal_torque_ = dxl->convertValue2Torque(data);
-                else
-                  dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
+
+                dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
               }
             }
 
@@ -1154,8 +1166,8 @@ void RobotisController::process()
                   dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
                 else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
                   dxl->dxl_state_->goal_torque_ = dxl->convertValue2Torque(data);
-                else
-                  dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
+
+                dxl->dxl_state_->bulk_read_table_[item->item_name_] = data;
               }
             }
 
@@ -1239,7 +1251,7 @@ void RobotisController::process()
 
             if (result_state == NULL)
             {
-              fprintf(stderr, "[%s] %s", (*module_it)->getModuleName().c_str(), joint_name.c_str());
+              ROS_ERROR("[%s] %s ", (*module_it)->getModuleName().c_str(), joint_name.c_str());
               continue;
             }
 

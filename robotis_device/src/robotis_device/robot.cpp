@@ -154,6 +154,13 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
               uint16_t indirect_data_addr = dxl->ctrl_table_[INDIRECT_DATA_1]->address_;
               for (int _i = 0; _i < sub_tokens.size(); _i++)
               {
+                std::map<std::string, ControlTableItem *>::iterator bulkread_it = dxl->ctrl_table_.find(sub_tokens[_i]);
+                if(bulkread_it == dxl->ctrl_table_.end())
+                {
+                  fprintf(stderr, "\n  ##### BULK READ ITEM [ %s ] NOT FOUND!! #####\n\n", sub_tokens[_i].c_str());
+                  continue;
+                }
+
                 dxl->bulk_read_items_.push_back(new ControlTableItem());
                 ControlTableItem *dest_item = dxl->bulk_read_items_[_i];
                 ControlTableItem *src_item  = dxl->ctrl_table_[sub_tokens[_i]];
