@@ -9,7 +9,6 @@ project(robotis_device)
 ################################################################################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   dynamixel_sdk
 )
 
@@ -27,7 +26,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_device
-  CATKIN_DEPENDS roscpp rospy dynamixel_sdk
+  CATKIN_DEPENDS roscpp dynamixel_sdk
 )
 
 ################################################################################
@@ -59,8 +58,8 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-install(DIRECTORY devices/
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+install(DIRECTORY devices
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 ################################################################################

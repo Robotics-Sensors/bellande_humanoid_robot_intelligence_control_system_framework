@@ -12,16 +12,17 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   roslib
-  sensor_msgs
   std_msgs
+  sensor_msgs
   robotis_controller_msgs
+  dynamixel_sdk
+  robotis_device
   robotis_framework_common
   cmake_modules
 )
 
-set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CATKIN_DEVEL_PREFIX}/lib/pkgconfig")
-find_package(PkgConfig)
-pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
 
 ################################################################################
 # Declare ROS messages, services and actions
@@ -37,7 +38,7 @@ pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_controller
-  CATKIN_DEPENDS roscpp roslib sensor_msgs std_msgs robotis_framework_common
+  CATKIN_DEPENDS roscpp roslib std_msgs sensor_msgs robotis_controller_msgs dynamixel_sdk robotis_device robotis_framework_common cmake_modules
 )
 
 ################################################################################
