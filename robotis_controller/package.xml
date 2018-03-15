@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>robotis_controller</name>
-  <version>0.2.6</version>
+  <version>0.2.7</version>
   <description>
     robotis_controller package for ROBOTIS's platform like Manipulator-H, THORMANG and OP series
   </description>
   <license>Apache 2.0</license>
   <author email="zerom@robotis.com">Zerom</author>
+  <author email="sch@robotis.com">SCH</author>
   <maintainer email="pyo@robotis.com">Pyo</maintainer>
   <url type="bugtracker">https://github.com/ROBOTIS-GIT/ROBOTIS-Framework/issues</url>
   <url type="repository">https://github.com/ROBOTIS-GIT/ROBOTIS-Framework</url>
