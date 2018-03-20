@@ -1,13 +1,14 @@
 ################################################################################
-# CMake
+# Set minimum required version of cmake, project name and compile options
 ################################################################################
 cmake_minimum_required(VERSION 2.8.3)
 project(robotis_controller)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+## Compile as C++11, supported in ROS Kinetic and newer
+add_compile_options(-std=c++11)
 
 ################################################################################
-# Packages
+# Find catkin packages and libraries for catkin and system dependencies
 ################################################################################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -21,8 +22,15 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
 )
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
+find_package(yaml-cpp REQUIRED)
+
+# find_package(PkgConfig REQUIRED)
+# pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
+# pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
+
+################################################################################
+# Setup for python modules and scripts
+################################################################################
 
 ################################################################################
 # Declare ROS messages, services and actions
@@ -33,12 +41,13 @@ pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
 ################################################################################
 
 ################################################################################
-# Catkin specific configuration
+# Declare catkin specific configuration to be passed to dependent projects
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_controller
   CATKIN_DEPENDS roscpp roslib std_msgs sensor_msgs robotis_controller_msgs dynamixel_sdk robotis_device robotis_framework_common cmake_modules
+  DEPENDS YAML_CPP
 )
 
 ################################################################################
