@@ -2,6 +2,11 @@
 Changelog for package robotis_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.8 (2018-03-20)
+------------------
+* modified CMakeLists.txt for system dependencies (yaml-cpp)
+* Contributors: Zerom, Pyo
+
 0.2.7 (2018-03-15)
 ------------------
 * changed the License and package format to version 2

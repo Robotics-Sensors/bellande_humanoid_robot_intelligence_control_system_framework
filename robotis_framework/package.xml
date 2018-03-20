@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>robotis_framework</name>
-  <version>0.2.7</version>
+  <version>0.2.8</version>
   <description>
     ROS packages for the robotis_framework (meta package)
   </description>
