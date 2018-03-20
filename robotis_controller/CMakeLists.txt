@@ -22,7 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
+pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
 
 ################################################################################
 # Declare ROS messages, services and actions
