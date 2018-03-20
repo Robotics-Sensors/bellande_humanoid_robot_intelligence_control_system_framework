@@ -22,11 +22,23 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
 )
 
-find_package(yaml-cpp REQUIRED)
+# Resolve system dependency on yaml-cpp, which apparently does not
+# provide a CMake find_package() module.
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
+find_path(YAML_CPP_INCLUDE_DIR
+  NAMES yaml_cpp.h
+  PATHS ${YAML_CPP_INCLUDE_DIRS}
+)
+find_library(YAML_CPP_LIBRARY
+  NAMES YAML_CPP
+  PATHS ${YAML_CPP_LIBRARY_DIRS}
+)
+link_directories(${YAML_CPP_LIBRARY_DIRS})
 
-# find_package(PkgConfig REQUIRED)
-# pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
-# pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
+if(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
+add_definitions(-DHAVE_NEW_YAMLCPP)
+endif(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
 
 ################################################################################
 # Setup for python modules and scripts
@@ -47,7 +59,6 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_controller
   CATKIN_DEPENDS roscpp roslib std_msgs sensor_msgs robotis_controller_msgs dynamixel_sdk robotis_device robotis_framework_common cmake_modules
-  DEPENDS YAML_CPP
 )
 
 ################################################################################
@@ -56,12 +67,12 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${yaml_cpp_INCLUDE_DIRS}
+  ${YAML_CPP_INCLUDE_DIRS}
 )
 
 add_library(robotis_controller src/robotis_controller/robotis_controller.cpp)
 add_dependencies(robotis_controller ${catkin_EXPORTED_TARGETS})
-target_link_libraries(robotis_controller ${yaml_cpp_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(robotis_controller ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 ################################################################################
 # Install
