@@ -2,6 +2,11 @@
 Changelog for package robotis_framework_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.8 (2018-03-20)
+------------------
+* tested for system dependencies
+* Contributors: Pyo
+
 0.2.7 (2018-03-15)
 ------------------
 * change the License and package format to version 2

@@ -2,8 +2,13 @@
 Changelog for package robotis_device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.8 (2018-03-20)
+------------------
+* added RH-P12-RN.device file
+* Contributors: Zerom, Pyo
+
 0.2.7 (2018-03-15)
--------------------------
+------------------
 * fixed a bug that occur when handling bulk read item that does not exist
 * changed the License and package format to version 2
 * Contributors: SCH, Pyo 

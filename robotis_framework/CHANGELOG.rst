@@ -2,6 +2,12 @@
 Changelog for package robotis_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.8 (2018-03-20)
+------------------
+* added RH-P12-RN.device file
+* modified CMakeLists.txt for system dependencies (yaml-cpp)
+* Contributors: Zerom, Pyo
+
 0.2.7 (2018-03-15)
 ------------------
 * changed all values read by bulk read are saved to dxl_state\_->bulk_read_table\_.

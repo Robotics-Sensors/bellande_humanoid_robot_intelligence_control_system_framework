@@ -1,13 +1,14 @@
 ################################################################################
-# CMake
+# Set minimum required version of cmake, project name and compile options
 ################################################################################
 cmake_minimum_required(VERSION 2.8.3)
 project(robotis_controller)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+## Compile as C++11, supported in ROS Kinetic and newer
+add_compile_options(-std=c++11)
 
 ################################################################################
-# Packages
+# Find catkin packages and libraries for catkin and system dependencies
 ################################################################################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -21,8 +22,27 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
 )
 
+# Resolve system dependency on yaml-cpp, which apparently does not
+# provide a CMake find_package() module.
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
+pkg_check_modules(YAML_CPP REQUIRED yaml-cpp)
+find_path(YAML_CPP_INCLUDE_DIR
+  NAMES yaml_cpp.h
+  PATHS ${YAML_CPP_INCLUDE_DIRS}
+)
+find_library(YAML_CPP_LIBRARY
+  NAMES YAML_CPP
+  PATHS ${YAML_CPP_LIBRARY_DIRS}
+)
+link_directories(${YAML_CPP_LIBRARY_DIRS})
+
+if(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
+add_definitions(-DHAVE_NEW_YAMLCPP)
+endif(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
+
+################################################################################
+# Setup for python modules and scripts
+################################################################################
 
 ################################################################################
 # Declare ROS messages, services and actions
@@ -33,7 +53,7 @@ pkg_check_modules(yaml_cpp yaml-cpp REQUIRED)
 ################################################################################
 
 ################################################################################
-# Catkin specific configuration
+# Declare catkin specific configuration to be passed to dependent projects
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
@@ -47,12 +67,12 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${yaml_cpp_INCLUDE_DIRS}
+  ${YAML_CPP_INCLUDE_DIRS}
 )
 
 add_library(robotis_controller src/robotis_controller/robotis_controller.cpp)
 add_dependencies(robotis_controller ${catkin_EXPORTED_TARGETS})
-target_link_libraries(robotis_controller ${yaml_cpp_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(robotis_controller ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 ################################################################################
 # Install
