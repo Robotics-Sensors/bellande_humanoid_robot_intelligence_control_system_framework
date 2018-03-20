@@ -1,16 +1,20 @@
 ################################################################################
-# CMake
+# Set minimum required version of cmake, project name and compile options
 ################################################################################
 cmake_minimum_required(VERSION 2.8.3)
 project(robotis_framework_common)
 
 ################################################################################
-# Packages
+# Find catkin packages and libraries for catkin and system dependencies
 ################################################################################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   robotis_device
 )
+
+################################################################################
+# Setup for python modules and scripts
+################################################################################
 
 ################################################################################
 # Declare ROS messages, services and actions
@@ -21,11 +25,11 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################################################
 
 ################################################################################
-# Catkin specific configuration
+# Declare catkin specific configuration to be passed to dependent projects
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES robotis_framework_common
+  LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS roscpp robotis_device
 )
 
@@ -42,7 +46,6 @@ add_library(${PROJECT_NAME}
   include/${PROJECT_NAME}/sensor_module.h
   include/${PROJECT_NAME}/singleton.h
 )
-
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 ################################################################################
