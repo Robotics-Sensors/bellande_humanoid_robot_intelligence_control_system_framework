@@ -1935,14 +1935,6 @@ void RobotisController::setJointCtrlModuleThread(const robotis_controller_msgs::
 
   queue_mutex_.unlock();
 
-  // log
-//  std::cout << "Enable Joint Ctrl Module : " << std::endl;
-//  for(std::list<MotionModule *>::iterator _m_it = motion_modules_.begin(); _m_it != motion_modules_.end(); _m_it++)
-//  {
-//    if((*_m_it)->GetModuleEnable() == true)
-//      std::cout << "     - " << (*_m_it)->GetModuleName() << std::endl;
-//  }
-
   // publish current module
   robotis_controller_msgs::JointCtrlModule _current_module_msg;
   for(std::map<std::string, Dynamixel *>::iterator _dxl_iter = robot_->dxls_.begin(); _dxl_iter  != robot_->dxls_.end(); ++_dxl_iter)
