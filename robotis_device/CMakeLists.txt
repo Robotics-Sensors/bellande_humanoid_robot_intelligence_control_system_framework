@@ -1,17 +1,20 @@
 ################################################################################
-# CMake
+# Set minimum required version of cmake, project name and compile options
 ################################################################################
 cmake_minimum_required(VERSION 2.8.3)
 project(robotis_device)
 
 ################################################################################
-# Packages
+# Find catkin packages and libraries for catkin and system dependencies
 ################################################################################
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   dynamixel_sdk
 )
+
+################################################################################
+# Setup for python modules and scripts
+################################################################################
 
 ################################################################################
 # Declare ROS messages, services and actions
@@ -22,12 +25,12 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################################################
 
 ################################################################################
-# Catkin specific configuration
+# Declare catkin specific configuration to be passed to dependent projects
 ################################################################################
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_device
-  CATKIN_DEPENDS roscpp rospy dynamixel_sdk
+  CATKIN_DEPENDS roscpp dynamixel_sdk
 )
 
 ################################################################################
@@ -59,8 +62,8 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-install(DIRECTORY devices/
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+install(DIRECTORY devices
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 ################################################################################
