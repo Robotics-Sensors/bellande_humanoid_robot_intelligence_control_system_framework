@@ -2,6 +2,10 @@
 Changelog for package robotis_framework_common
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.9 (2018-03-22)
+------------------
+* none
+
 0.2.8 (2018-03-20)
 ------------------
 * tested for system dependencies

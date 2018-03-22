@@ -2,6 +2,15 @@
 Changelog for package robotis_framework
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.9 (2018-03-22)
+------------------
+* added serivce for setting module
+* deleted comment for debug
+* modified to prevent duplicate indirect address write
+* added boost system dependencies
+* fixed a bug that occure when handling bulk read item that does not exist
+* Contributors: Kayman, Zerom, Pyo
+
 0.2.8 (2018-03-20)
 ------------------
 * added RH-P12-RN.device file

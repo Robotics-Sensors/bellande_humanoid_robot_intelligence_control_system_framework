@@ -2,6 +2,12 @@
 Changelog for package robotis_device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.9 (2018-03-22)
+------------------
+* modified to prevent duplicate indirect address write
+* fixed a bug that occure when handling bulk read item that does not exist
+* Contributors: Zerom
+
 0.2.8 (2018-03-20)
 ------------------
 * added RH-P12-RN.device file

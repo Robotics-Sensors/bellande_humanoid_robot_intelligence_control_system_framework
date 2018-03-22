@@ -22,6 +22,8 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules
 )
 
+find_package(Boost REQUIRED)
+
 # Resolve system dependency on yaml-cpp, which apparently does not
 # provide a CMake find_package() module.
 find_package(PkgConfig REQUIRED)
@@ -59,6 +61,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_controller
   CATKIN_DEPENDS roscpp roslib std_msgs sensor_msgs robotis_controller_msgs dynamixel_sdk robotis_device robotis_framework_common cmake_modules
+  DEPENDS Boost
 )
 
 ################################################################################
@@ -67,12 +70,13 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
   ${YAML_CPP_INCLUDE_DIRS}
 )
 
 add_library(robotis_controller src/robotis_controller/robotis_controller.cpp)
 add_dependencies(robotis_controller ${catkin_EXPORTED_TARGETS})
-target_link_libraries(robotis_controller ${catkin_LIBRARIES} ${YAML_CPP_LIBRARIES})
+target_link_libraries(robotis_controller ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${YAML_CPP_LIBRARIES})
 
 ################################################################################
 # Install
