@@ -36,6 +36,8 @@
 #include "robotis_controller_msgs/SyncWriteItem.h"
 #include "robotis_controller_msgs/JointCtrlModule.h"
 #include "robotis_controller_msgs/GetJointModule.h"
+#include "robotis_controller_msgs/SetJointModule.h"
+#include "robotis_controller_msgs/SetModule.h"
 
 #include "robotis_device/robot.h"
 #include "robotis_framework_common/motion_module.h"
@@ -137,7 +139,9 @@ public:
   void    setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
   void    setJointCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
   void    setCtrlModuleCallback(const std_msgs::String::ConstPtr &msg);
-  bool    getCtrlModuleCallback(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
+  bool    getJointCtrlModuleService(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
+  bool    setJointCtrlModuleService(robotis_controller_msgs::SetJointModule::Request &req, robotis_controller_msgs::SetJointModule::Response &res);
+  bool    setCtrlModuleService(robotis_controller_msgs::SetModule::Request &req, robotis_controller_msgs::SetModule::Response &res);
 
   void    gazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
 
