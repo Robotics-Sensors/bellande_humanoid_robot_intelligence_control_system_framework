@@ -850,7 +850,7 @@ void RobotisController::loadOffset(const std::string path)
     doc = YAML::LoadFile(path.c_str());
   } catch (const std::exception& e)
   {
-    ROS_ERROR("Fail to load offset yaml.");
+    ROS_WARN("Fail to load offset yaml.");
     return;
   }
 
