@@ -1648,12 +1648,12 @@ void RobotisController::setJointStatesCallback(const sensor_msgs::JointState::Co
     if ((controller_mode_ == DirectControlMode) || 
         (controller_mode_ == MotionModuleMode && dxl->ctrl_module_name_ == "none"))
     {
-      dxl->dxl_state->goal_position_ = (double) msg->position[i];
+      dxl->dxl_state_->goal_position_ = (double) msg->position[i];
       
       if (gazebo_mode_ == false)
       {
         // add offset
-        uint32_t pos_data = dxl->convertRadian2Value(dxl->dxl_state->goal_position_ + dxl->dxl_state->position_offset_);
+        uint32_t pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
         uint8_t sync_write_data[4] = { 0 };
         sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(pos_data));
         sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos_data));
