@@ -1661,7 +1661,7 @@ void RobotisController::setJointStatesCallback(const sensor_msgs::JointState::Co
         sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(pos_data));
         
         if (port_to_sync_write_position_[dxl->port_name_] != NULL)
-          port_to_sync_write_position_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
+          port_to_sync_write_position_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
       }
     }
   }
