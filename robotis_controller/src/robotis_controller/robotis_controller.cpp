@@ -850,7 +850,7 @@ void RobotisController::loadOffset(const std::string path)
     doc = YAML::LoadFile(path.c_str());
   } catch (const std::exception& e)
   {
-    ROS_ERROR("Fail to load offset yaml.");
+    ROS_WARN("Fail to load offset yaml.");
     return;
   }
 
@@ -1637,30 +1637,33 @@ void RobotisController::setControllerModeCallback(const std_msgs::String::ConstP
 
 void RobotisController::setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg)
 {
-  if (controller_mode_ != DirectControlMode)
-    return;
-
   queue_mutex_.lock();
 
   for (int i = 0; i < msg->name.size(); i++)
   {
-    int32_t pos = 0;
-
     Dynamixel *dxl = robot_->dxls_[msg->name[i]];
     if (dxl == NULL)
       continue;
 
-    dxl->dxl_state_->goal_position_ = msg->position[i];
-    pos = dxl->convertRadian2Value((double) msg->position[i]);
-
-    uint8_t sync_write_data[4];
-    sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(pos));
-    sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos));
-    sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(pos));
-    sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(pos));
-
-    if (port_to_sync_write_position_[dxl->port_name_] != NULL)
-      port_to_sync_write_position_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
+    if ((controller_mode_ == DirectControlMode) || 
+        (controller_mode_ == MotionModuleMode && dxl->ctrl_module_name_ == "none"))
+    {
+      dxl->dxl_state_->goal_position_ = (double) msg->position[i];
+      
+      if (gazebo_mode_ == false)
+      {
+        // add offset
+        uint32_t pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
+        uint8_t sync_write_data[4] = { 0 };
+        sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(pos_data));
+        sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos_data));
+        sync_write_data[2] = DXL_LOBYTE(DXL_HIWORD(pos_data));
+        sync_write_data[3] = DXL_HIBYTE(DXL_HIWORD(pos_data));
+        
+        if (port_to_sync_write_position_[dxl->port_name_] != NULL)
+          port_to_sync_write_position_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
+      }
+    }
   }
 
   queue_mutex_.unlock();
