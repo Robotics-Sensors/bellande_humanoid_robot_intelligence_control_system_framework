@@ -64,6 +64,7 @@ private:
 
   bool            init_pose_loaded_;
   bool            is_timer_running_;
+  bool            is_offset_enabled_;
   bool            stop_timer_;
   pthread_t       timer_thread_;
   ControllerMode  controller_mode_;
@@ -142,6 +143,8 @@ public:
   bool    getJointCtrlModuleService(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
   bool    setJointCtrlModuleService(robotis_controller_msgs::SetJointModule::Request &req, robotis_controller_msgs::SetJointModule::Response &res);
   bool    setCtrlModuleService(robotis_controller_msgs::SetModule::Request &req, robotis_controller_msgs::SetModule::Response &res);
+  bool    enableOffsetService(robotis_controller_msgs::EnableOffset::Request &req, robotis_controller_msgs::EnableOffset::Response &res);
+  bool    loadOffsetService(robotis_controller_msgs::LoadOffset::Request &req, robotis_controller_msgs::LoadOffset::Response &res);
 
   void    gazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
 
