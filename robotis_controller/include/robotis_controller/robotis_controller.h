@@ -38,6 +38,8 @@
 #include "robotis_controller_msgs/GetJointModule.h"
 #include "robotis_controller_msgs/SetJointModule.h"
 #include "robotis_controller_msgs/SetModule.h"
+#include "robotis_controller_msgs/EnableOffset.h"
+#include "robotis_controller_msgs/LoadOffset.h"
 
 #include "robotis_device/robot.h"
 #include "robotis_framework_common/motion_module.h"
