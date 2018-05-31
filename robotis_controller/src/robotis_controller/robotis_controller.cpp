@@ -636,6 +636,8 @@ void RobotisController::msgQueueThread()
                                                                &RobotisController::setControllerModeCallback, this);
   ros::Subscriber joint_states_sub        = ros_node.subscribe("/robotis/set_joint_states", 10,
                                                                &RobotisController::setJointStatesCallback, this);
+  ros::Subscriber enable_offset_sub       = ros_node.subscribe("/robotis/enable_offset", 10,
+                                                               &RobotisController::enableOffsetCallback, this);
 
   ros::Subscriber gazebo_joint_states_sub;
   if (gazebo_mode_ == true)
@@ -668,8 +670,6 @@ void RobotisController::msgQueueThread()
                                                         &RobotisController::setJointCtrlModuleService, this);
   ros::ServiceServer set_module_server = ros_node.advertiseService("/robotis/set_present_ctrl_modules",
                                                         &RobotisController::setCtrlModuleService, this);
-  ros::ServiceServer enable_offset_server = ros_node.advertiseService("/robotis/enable_offset",
-                                                        &RobotisController::enableOffsetService, this);
   ros::ServiceServer load_offset_server = ros_node.advertiseService("/robotis/load_offset",
                                                         &RobotisController::loadOffsetService, this);
 
@@ -1735,6 +1735,11 @@ void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs
   set_module_thread_ = boost::thread(boost::bind(&RobotisController::setJointCtrlModuleThread, this, msg));
 }
 
+void RobotisController::enableOffsetCallback(const std_msgs::Bool::ConstPtr &msg)
+{
+  is_offset_enabled_ = (bool)msg->data;
+}
+
 bool RobotisController::getJointCtrlModuleService(robotis_controller_msgs::GetJointModule::Request &req,
     robotis_controller_msgs::GetJointModule::Response &res)
 {
@@ -1786,13 +1791,6 @@ bool RobotisController::setCtrlModuleService(robotis_controller_msgs::SetModule:
 
   set_module_thread_.join();
 
-  res.result = true;
-  return true;
-}
-
-bool RobotisController::enableOffsetService(robotis_controller_msgs::EnableOffset::Request &req, robotis_controller_msgs::EnableOffset::Response &res)
-{
-  is_offset_enabled_ = (bool)req.enable;
   res.result = true;
   return true;
 }
