@@ -1299,7 +1299,7 @@ void RobotisController::process()
                   port_to_sync_write_position_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
 
                 // if position p gain value is changed -> sync write
-                if (dxl_state->position_p_gain_ != result_state->position_p_gain_)
+                if (result_state->position_p_gain_ != 65535 && dxl_state->position_p_gain_ != result_state->position_p_gain_)
                 {
                   dxl_state->position_p_gain_ = result_state->position_p_gain_;
                   uint8_t sync_write_data[4] = { 0 };
@@ -1313,7 +1313,7 @@ void RobotisController::process()
                 }
 
                 // if position i gain value is changed -> sync write
-                if (dxl_state->position_i_gain_ != result_state->position_i_gain_)
+                if (result_state->position_i_gain_ != 65535 && dxl_state->position_i_gain_ != result_state->position_i_gain_)
                 {
                   dxl_state->position_i_gain_ = result_state->position_i_gain_;
                   uint8_t sync_write_data[4] = { 0 };
@@ -1327,7 +1327,7 @@ void RobotisController::process()
                 }
 
                 // if position d gain value is changed -> sync write
-                if (dxl_state->position_d_gain_ != result_state->position_d_gain_)
+                if (result_state->position_d_gain_ != 65535 && dxl_state->position_d_gain_ != result_state->position_d_gain_)
                 {
                   dxl_state->position_d_gain_ = result_state->position_d_gain_;
                   uint8_t sync_write_data[4] = { 0 };
@@ -1358,7 +1358,7 @@ void RobotisController::process()
                   port_to_sync_write_velocity_[dxl->port_name_]->changeParam(dxl->id_, sync_write_data);
 
                 // if velocity p gain gain value is changed -> sync write
-                if (dxl_state->velocity_p_gain_ != result_state->velocity_p_gain_)
+                if (result_state->velocity_p_gain_ != 65535 && dxl_state->velocity_p_gain_ != result_state->velocity_p_gain_)
                 {
                   dxl_state->velocity_p_gain_ = result_state->velocity_p_gain_;
                   uint8_t sync_write_data[4] = { 0 };
@@ -1372,7 +1372,7 @@ void RobotisController::process()
                 }
 
                 // if velocity i gain value is changed -> sync write
-                if (dxl_state->velocity_i_gain_ != result_state->velocity_i_gain_)
+                if (result_state->velocity_i_gain_ != 65535 && dxl_state->velocity_i_gain_ != result_state->velocity_i_gain_)
                 {
                   dxl_state->velocity_i_gain_ = result_state->velocity_i_gain_;
                   uint8_t sync_write_data[4] = { 0 };
@@ -1386,7 +1386,7 @@ void RobotisController::process()
                 }
 
                 // if velocity d gain value is changed -> sync write
-                if (dxl_state->velocity_d_gain_ != result_state->velocity_d_gain_)
+                if (result_state->velocity_d_gain_ != 65535 && dxl_state->velocity_d_gain_ != result_state->velocity_d_gain_)
                 {
                   dxl_state->velocity_d_gain_ = result_state->velocity_d_gain_;
                   uint8_t sync_write_data[4] = { 0 };

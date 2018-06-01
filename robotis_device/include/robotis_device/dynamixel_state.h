@@ -64,12 +64,12 @@ public:
       goal_position_(0.0),
       goal_velocity_(0.0),
       goal_torque_(0.0),
-      position_p_gain_(0),
-      position_i_gain_(0),
-      position_d_gain_(0),
-      velocity_p_gain_(0),
-      velocity_i_gain_(0),
-      velocity_d_gain_(0),
+      position_p_gain_(65535),
+      position_i_gain_(65535),
+      position_d_gain_(65535),
+      velocity_p_gain_(65535),
+      velocity_i_gain_(65535),
+      velocity_d_gain_(65535),
       position_offset_(0)
   {
     bulk_read_table_.clear();
