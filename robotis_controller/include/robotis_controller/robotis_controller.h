@@ -28,6 +28,7 @@
 #include <ros/ros.h>
 #include <boost/thread.hpp>
 #include <yaml-cpp/yaml.h>
+#include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float64.h>
 #include <sensor_msgs/JointState.h>
@@ -38,6 +39,7 @@
 #include "robotis_controller_msgs/GetJointModule.h"
 #include "robotis_controller_msgs/SetJointModule.h"
 #include "robotis_controller_msgs/SetModule.h"
+#include "robotis_controller_msgs/LoadOffset.h"
 
 #include "robotis_device/robot.h"
 #include "robotis_framework_common/motion_module.h"
@@ -64,6 +66,7 @@ private:
 
   bool            init_pose_loaded_;
   bool            is_timer_running_;
+  bool            is_offset_enabled_;
   bool            stop_timer_;
   pthread_t       timer_thread_;
   ControllerMode  controller_mode_;
@@ -139,9 +142,11 @@ public:
   void    setJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
   void    setJointCtrlModuleCallback(const robotis_controller_msgs::JointCtrlModule::ConstPtr &msg);
   void    setCtrlModuleCallback(const std_msgs::String::ConstPtr &msg);
+  void    enableOffsetCallback(const std_msgs::Bool::ConstPtr &msg);
   bool    getJointCtrlModuleService(robotis_controller_msgs::GetJointModule::Request &req, robotis_controller_msgs::GetJointModule::Response &res);
   bool    setJointCtrlModuleService(robotis_controller_msgs::SetJointModule::Request &req, robotis_controller_msgs::SetJointModule::Response &res);
   bool    setCtrlModuleService(robotis_controller_msgs::SetModule::Request &req, robotis_controller_msgs::SetModule::Response &res);
+  bool    loadOffsetService(robotis_controller_msgs::LoadOffset::Request &req, robotis_controller_msgs::LoadOffset::Response &res);
 
   void    gazeboJointStatesCallback(const sensor_msgs::JointState::ConstPtr &msg);
 
