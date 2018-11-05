@@ -30,6 +30,7 @@ using namespace robotis_framework;
 
 RobotisController::RobotisController()
   : is_timer_running_(false),
+    is_offset_enabled_(true),
     stop_timer_(false),
     init_pose_loaded_(false),
     timer_thread_(0),
@@ -142,7 +143,10 @@ void RobotisController::initializeSyncWrite()
         if ((dxl->present_position_item_ != 0) &&
             (dxl->bulk_read_items_[i]->item_name_ == dxl->present_position_item_->item_name_))
         {
-          dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(read_data) - dxl->dxl_state_->position_offset_;   // remove offset
+          if(is_offset_enabled_)
+            dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(read_data) - dxl->dxl_state_->position_offset_;   // remove offset
+          else
+            dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(read_data);
           dxl->dxl_state_->goal_position_ = dxl->dxl_state_->present_position_;
 
           port_to_sync_write_position_[dxl->port_name_]->addParam(dxl->id_, sync_write_data);
@@ -632,6 +636,8 @@ void RobotisController::msgQueueThread()
                                                                &RobotisController::setControllerModeCallback, this);
   ros::Subscriber joint_states_sub        = ros_node.subscribe("/robotis/set_joint_states", 10,
                                                                &RobotisController::setJointStatesCallback, this);
+  ros::Subscriber enable_offset_sub       = ros_node.subscribe("/robotis/enable_offset", 10,
+                                                               &RobotisController::enableOffsetCallback, this);
 
   ros::Subscriber gazebo_joint_states_sub;
   if (gazebo_mode_ == true)
@@ -664,6 +670,8 @@ void RobotisController::msgQueueThread()
                                                         &RobotisController::setJointCtrlModuleService, this);
   ros::ServiceServer set_module_server = ros_node.advertiseService("/robotis/set_present_ctrl_modules",
                                                         &RobotisController::setCtrlModuleService, this);
+  ros::ServiceServer load_offset_server = ros_node.advertiseService("/robotis/load_offset",
+                                                        &RobotisController::loadOffsetService, this);
 
   ros::WallDuration duration(robot_->getControlCycle() / 1000.0);
   while(ros_node.ok())
@@ -926,13 +934,23 @@ void RobotisController::process()
 
                 // change dxl_state
                 if (dxl->present_position_item_ != 0 && item->item_name_ == dxl->present_position_item_->item_name_)
-                  dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                {
+                  if(is_offset_enabled_)
+                    dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                  else
+                    dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data);
+                }
                 else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
                   dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
                 else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
                   dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(data);
                 else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
-                  dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                {
+                  if(is_offset_enabled_)
+                    dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                  else
+                    dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data);
+                }
                 else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
                   dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
                 else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
@@ -1146,13 +1164,23 @@ void RobotisController::process()
 
                 // change dxl_state
                 if (dxl->present_position_item_ != 0 && item->item_name_ == dxl->present_position_item_->item_name_)
-                  dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                {
+                  if(is_offset_enabled_)
+                    dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                  else
+                    dxl->dxl_state_->present_position_ = dxl->convertValue2Radian(data);
+                }
                 else if (dxl->present_velocity_item_ != 0 && item->item_name_ == dxl->present_velocity_item_->item_name_)
                   dxl->dxl_state_->present_velocity_ = dxl->convertValue2Velocity(data);
                 else if (dxl->present_current_item_ != 0 && item->item_name_ == dxl->present_current_item_->item_name_)
                   dxl->dxl_state_->present_torque_ = dxl->convertValue2Torque(data);
                 else if (dxl->goal_position_item_ != 0 && item->item_name_ == dxl->goal_position_item_->item_name_)
-                  dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                {
+                  if(is_offset_enabled_)
+                    dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data) - dxl->dxl_state_->position_offset_; // remove offset
+                  else
+                    dxl->dxl_state_->goal_position_ = dxl->convertValue2Radian(data);
+                }
                 else if (dxl->goal_velocity_item_ != 0 && item->item_name_ == dxl->goal_velocity_item_->item_name_)
                   dxl->dxl_state_->goal_velocity_ = dxl->convertValue2Velocity(data);
                 else if (dxl->goal_current_item_ != 0 && item->item_name_ == dxl->goal_current_item_->item_name_)
@@ -1255,7 +1283,12 @@ void RobotisController::process()
               if (gazebo_mode_ == false)
               {
                 // add offset
-                uint32_t pos_data = dxl->convertRadian2Value(dxl_state->goal_position_ + dxl_state->position_offset_);
+                uint32_t pos_data;
+                if(is_offset_enabled_)
+                  pos_data= dxl->convertRadian2Value(dxl_state->goal_position_ + dxl_state->position_offset_);
+                else
+                  pos_data= dxl->convertRadian2Value(dxl_state->goal_position_);
+
                 uint8_t sync_write_data[4] = { 0 };
                 sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(pos_data));
                 sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos_data));
@@ -1653,7 +1686,12 @@ void RobotisController::setJointStatesCallback(const sensor_msgs::JointState::Co
       if (gazebo_mode_ == false)
       {
         // add offset
-        uint32_t pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
+        uint32_t pos_data;
+        if(is_offset_enabled_)
+          pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
+        else
+          pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_);
+
         uint8_t sync_write_data[4] = { 0 };
         sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(pos_data));
         sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos_data));
@@ -1695,6 +1733,11 @@ void RobotisController::setJointCtrlModuleCallback(const robotis_controller_msgs
     set_module_thread_.join();
 
   set_module_thread_ = boost::thread(boost::bind(&RobotisController::setJointCtrlModuleThread, this, msg));
+}
+
+void RobotisController::enableOffsetCallback(const std_msgs::Bool::ConstPtr &msg)
+{
+  is_offset_enabled_ = (bool)msg->data;
 }
 
 bool RobotisController::getJointCtrlModuleService(robotis_controller_msgs::GetJointModule::Request &req,
@@ -1748,6 +1791,14 @@ bool RobotisController::setCtrlModuleService(robotis_controller_msgs::SetModule:
 
   set_module_thread_.join();
 
+  res.result = true;
+  return true;
+}
+
+bool RobotisController::loadOffsetService(robotis_controller_msgs::LoadOffset::Request &req, robotis_controller_msgs::LoadOffset::Response &res)
+{
+  loadOffset((std::string)req.file_path);
+  res.result = true;
   return true;
 }
 
@@ -1820,7 +1871,12 @@ void RobotisController::setJointCtrlModuleThread(const robotis_controller_msgs::
       if(gazebo_mode_ == true)
         continue;
 
-      uint32_t _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_);
+      uint32_t _pos_data;
+      if(is_offset_enabled_)
+        _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_);
+      else
+        _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_);
+
       uint8_t _sync_write_data[4];
       _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_pos_data));
       _sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(_pos_data));
@@ -1858,7 +1914,12 @@ void RobotisController::setJointCtrlModuleThread(const robotis_controller_msgs::
 
           if(_mode == PositionControl)
           {
-            uint32_t _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_);
+            uint32_t _pos_data;
+            if(is_offset_enabled_)
+              _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_ + _dxl->dxl_state_->position_offset_);
+            else
+              _pos_data = _dxl->convertRadian2Value(_dxl->dxl_state_->goal_position_);
+
             uint8_t _sync_write_data[4];
             _sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(_pos_data));
             _sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(_pos_data));
@@ -2024,7 +2085,12 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
       if (gazebo_mode_ == true)
         continue;
 
-      uint32_t pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
+      uint32_t pos_data;
+      if(is_offset_enabled_)
+        pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
+      else
+        pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_);
+
       uint8_t sync_write_data[4] = { 0 };
       sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(pos_data));
       sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos_data));
@@ -2062,7 +2128,12 @@ void RobotisController::setCtrlModuleThread(std::string ctrl_module)
 
             if (mode == PositionControl)
             {
-              uint32_t pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
+              uint32_t pos_data;
+              if(is_offset_enabled_)
+                pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_ + dxl->dxl_state_->position_offset_);
+              else
+                pos_data = dxl->convertRadian2Value(dxl->dxl_state_->goal_position_);
+
               uint8_t sync_write_data[4] = { 0 };
               sync_write_data[0] = DXL_LOBYTE(DXL_LOWORD(pos_data));
               sync_write_data[1] = DXL_HIBYTE(DXL_LOWORD(pos_data));
