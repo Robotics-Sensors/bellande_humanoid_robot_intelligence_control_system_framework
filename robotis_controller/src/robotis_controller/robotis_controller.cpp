@@ -1097,12 +1097,25 @@ void RobotisController::process()
     }
     else if (gazebo_mode_ == true)
     {
+      std_msgs::Float64 joint_msg;
+
+      for (auto& dxl_it : robot_->dxls_)
+      {
+        std::string     joint_name  = dxl_it.first;
+        Dynamixel      *dxl         = dxl_it.second;
+        DynamixelState *dxl_state   = dxl_it.second->dxl_state_;
+        
+        if (dxl->ctrl_module_name_ == "none")
+        {
+          joint_msg.data = dxl_state->goal_position_;
+          gazebo_joint_position_pub_[joint_name].publish(joint_msg);
+        }
+      }
+
       for (auto module_it = motion_modules_.begin(); module_it != motion_modules_.end(); module_it++)
       {
         if ((*module_it)->getModuleEnable() == false)
           continue;
-
-        std_msgs::Float64 joint_msg;
 
         for (auto& dxl_it : robot_->dxls_)
         {
