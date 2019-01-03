@@ -30,7 +30,7 @@ velocity_p_gain_item_name       =
    7   | ID                       | 1      | RW     | EEPROM | 0             | 252         | N
    8   | baudrate                 | 1      | RW     | EEPROM | 0             | 8           | N
    9   | return_delay_time        | 1      | RW     | EEPROM | 0             | 254         | N
-   11  | operating_mode           | 1      | RW     | EEPROM | 0             | 4           | N
+   11  | operating_mode           | 1      | RW     | EEPROM | 0             | 5           | N
    17  | moving_threshold         | 4      | RW     | EEPROM | 0             | 2147483647  | N
    21  | max_temperature_limit    | 1      | RW     | EEPROM | 0             | 100         | N
    22  | max_voltage_limit        | 2      | RW     | EEPROM | 0             | 400         | N
