@@ -374,6 +374,9 @@ void RobotisController::initializeDevice(const std::string init_file_path)
       if (DEBUG_PRINT)
         ROS_INFO("JOINT_NAME: %s", joint_name.c_str());
 
+      uint8_t torque_enabled = 0;
+      read1Byte(joint_name, dxl->torque_enable_item_->address_, &torque_enabled);
+
       for (YAML::const_iterator it_joint = joint_node.begin(); it_joint != joint_node.end(); it_joint++)
       {
         std::string item_name = it_joint->first.as<std::string>();
@@ -415,6 +418,12 @@ void RobotisController::initializeDevice(const std::string init_file_path)
             break;
           default:
             break;
+          }
+
+          if (torque_enabled == 1)
+          {
+              ROS_ERROR("################\nThe initial value of the EEPROM area has been changed. \nTurn off Torque Enable and try again.");
+              exit(-1);
           }
         }
 
@@ -469,6 +478,9 @@ void RobotisController::initializeDevice(const std::string init_file_path)
 //        bulkread_data_length   = dxl->present_position_item->data_length;
 //    }
 
+    uint8_t torque_enabled = 0;
+    read1Byte(joint_name, dxl->torque_enable_item_->address_, &torque_enabled);
+
     // calculate bulk read start address & data length
     auto indirect_addr_it = dxl->ctrl_table_.find(INDIRECT_ADDRESS_1);
     if (indirect_addr_it != dxl->ctrl_table_.end()) // INDIRECT_ADDRESS_1 exist
@@ -494,6 +506,11 @@ void RobotisController::initializeDevice(const std::string init_file_path)
             read2Byte(joint_name, indirect_addr, &data16);
             if (data16 != dxl->ctrl_table_[dxl->bulk_read_items_[i]->item_name_]->address_ + l)
             {
+              if (torque_enabled == 1)
+              {
+                ROS_ERROR("################\nThe indirect address of the EEPROM area has been changed. \nTurn off Torque Enable and try again.");
+                exit(-1);
+              }
               write2Byte(joint_name, indirect_addr, dxl->ctrl_table_[dxl->bulk_read_items_[i]->item_name_]->address_ + l);
             }
             indirect_addr += 2;
@@ -908,7 +925,11 @@ void RobotisController::process()
       for (auto& it : port_to_bulk_read_)
       {
         robot_->ports_[it.first]->setPacketTimeout(0.0);
-        it.second->rxPacket();
+        //it.second->rxPacket();
+
+        int result = it.second->rxPacket();
+        if(result != COMM_SUCCESS)
+          ROS_ERROR_STREAM("Bulk Read Fail : " << it.first);
       }
 
       // -> save to robot->dxls_[]->dxl_state_
