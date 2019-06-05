@@ -925,11 +925,14 @@ void RobotisController::process()
       for (auto& it : port_to_bulk_read_)
       {
         robot_->ports_[it.first]->setPacketTimeout(0.0);
-        //it.second->rxPacket();
-
-        int result = it.second->rxPacket();
-        if(result != COMM_SUCCESS)
-          ROS_ERROR_STREAM("Bulk Read Fail : " << it.first);
+        if(DEBUG_PRINT)
+        {
+          int result = it.second->rxPacket();
+          if(result != COMM_SUCCESS)
+            ROS_ERROR_STREAM("Bulk Read Fail : " << it.first);
+        }
+        else
+          it.second->rxPacket();
       }
 
       // -> save to robot->dxls_[]->dxl_state_
