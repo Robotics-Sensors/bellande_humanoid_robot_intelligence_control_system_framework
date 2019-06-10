@@ -1,9 +1,10 @@
 [device info]
-model_name  = XM-430
+model_name  = XM540-W270
 device_type = dynamixel
 
 [type info]
-torque_to_current_value_ratio   = 149.795386991
+torque_to_current_value_ratio   = 156.133829
+velocity_to_value_ratio 	      = 41.707853
 
 value_of_0_radian_position      = 2048
 value_of_min_radian_position    = 0
@@ -45,6 +46,9 @@ velocity_p_gain_item_name       = velocity_p_gain
    44  | velocity_limit           | 4      | RW     | EEPROM | 0             | 1023        | N
    48  | max_position_limit       | 4      | RW     | EEPROM | 0             | 4095        | N
    52  | min_position_limit       | 4      | RW     | EEPROM | 0             | 4095        | N
+   56  | external_port_mod_1      | 1      | RW     | EEPROM | 0             | 3           | N
+   57  | external_port_mod_2      | 1      | RW     | EEPROM | 0             | 3           | N
+   58  | external_port_mod_3      | 1      | RW     | EEPROM | 0             | 3           | N
    63  | shutdown                 | 1      | RW     | EEPROM | 0             | 255         | N
    64  | torque_enable            | 1      | RW     | RAM    | 0             | 1           | N
    65  | LED                      | 1      | RW     | RAM    | 0             | 1           | N
@@ -76,6 +80,9 @@ velocity_p_gain_item_name       = velocity_p_gain
    140 | position_trajectory      | 4      | R      | RAM    | 0             | 4095        | N
    144 | present_input_voltage    | 2      | R      | RAM    | 95            | 160         | N
    146 | present_temperature      | 1      | R      | RAM    | 0             | 100         | N
+   152 | external_port_data_1     | 2      | RW     | RAM    | 0             | 4095        | N
+   154 | external_port_data_2     | 2      | RW     | RAM    | 0             | 4095        | N
+   156 | external_port_data_3     | 2      | RW     | RAM    | 0             | 4095        | N
    168 | indirect_address_1       | 2      | RW     | RAM    | 0             | 65535       | N
    224 | indirect_data_1          | 1      | RW     | RAM    | 0             | 255         | N
    578 | indirect_address_29      | 2      | RW     | RAM    | 0             | 65535       | N

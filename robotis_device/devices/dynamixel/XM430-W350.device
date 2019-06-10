@@ -1,9 +1,10 @@
 [device info]
-model_name  = XM-430
+model_name  = XM430-W350
 device_type = dynamixel
 
 [type info]
 torque_to_current_value_ratio   = 149.795386991
+velocity_to_value_ratio 	= 41.707853
 
 value_of_0_radian_position      = 2048
 value_of_min_radian_position    = 0

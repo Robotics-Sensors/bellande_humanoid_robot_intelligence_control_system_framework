@@ -1,9 +1,9 @@
 [device info]
-model_name  = XM-430-W350
+model_name  = XM430-W210
 device_type = dynamixel
 
 [type info]
-torque_to_current_value_ratio   = 149.795386991
+torque_to_current_value_ratio   = 235.53647082
 velocity_to_value_ratio 	= 41.707853
 
 value_of_0_radian_position      = 2048
@@ -33,7 +33,9 @@ velocity_p_gain_item_name       = velocity_p_gain
    7   | ID                       | 1      | RW     | EEPROM | 0             | 252         | N
    8   | baudrate                 | 1      | RW     | EEPROM | 0             | 7           | N
    9   | return_delay_time        | 1      | RW     | EEPROM | 0             | 254         | N
+   10  | drive_mode               | 1      | RW     | EEPROM | 0             | 1           | N
    11  | operating_mode           | 1      | RW     | EEPROM | 0             | 16          | N
+   12  | secondary_id             | 1      | RW     | EEPROM | 0             | 255         | N
    20  | homing_offset            | 4      | RW     | EEPROM | -1044479      | 1044479     | Y
    24  | moving_threshold         | 4      | RW     | EEPROM | 0             | 1023        | N
    31  | max_temperature_limit    | 1      | RW     | EEPROM | 0             | 100         | N
@@ -41,7 +43,6 @@ velocity_p_gain_item_name       = velocity_p_gain
    34  | min_voltage_limit        | 2      | RW     | EEPROM | 95            | 160         | N
    36  | pwm_limit                | 2      | RW     | EEPROM | 0             | 885         | N
    38  | current_limit            | 2      | RW     | EEPROM | 0             | 1193        | N
-   40  | acceleration_limit       | 4      | RW     | EEPROM | 0             | 32767       | N
    44  | velocity_limit           | 4      | RW     | EEPROM | 0             | 1023        | N
    48  | max_position_limit       | 4      | RW     | EEPROM | 0             | 4095        | N
    52  | min_position_limit       | 4      | RW     | EEPROM | 0             | 4095        | N
@@ -58,6 +59,7 @@ velocity_p_gain_item_name       = velocity_p_gain
    84  | position_p_gain          | 2      | RW     | RAM    | 0             | 32767       | N
    88  | feedforward_2nd_gain     | 2      | RW     | RAM    | 0             | 32767       | N
    90  | feedforward_1st_gain     | 2      | RW     | RAM    | 0             | 32767       | N
+   98  | bus_watchdog             | 1      | RW     | RAM    | -1            | 127         | Y
    100 | goal_pwm                 | 2      | RW     | RAM    | 0             | 885         | N
    102 | goal_current             | 2      | RW     | RAM    | 0             | 1193        | N
    104 | goal_velocity            | 4      | RW     | RAM    | 0             | 1023        | N
