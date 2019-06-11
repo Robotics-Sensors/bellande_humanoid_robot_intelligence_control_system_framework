@@ -86,6 +86,7 @@ private:
   void initializeSyncWrite();
 
 public:
+  const int         NONE_GAIN = -1;
   bool              DEBUG_PRINT;
   Robot            *robot_;
 
