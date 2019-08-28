@@ -67,6 +67,7 @@ private:
   bool            init_pose_loaded_;
   bool            is_timer_running_;
   bool            is_offset_enabled_;
+  double          offset_ratio_;
   bool            stop_timer_;
   pthread_t       timer_thread_;
   ControllerMode  controller_mode_;
@@ -86,7 +87,7 @@ private:
   void initializeSyncWrite();
 
 public:
-  const int         NONE_GAIN = -1;
+  const int         NONE_GAIN = 65535;
   bool              DEBUG_PRINT;
   Robot            *robot_;
 
