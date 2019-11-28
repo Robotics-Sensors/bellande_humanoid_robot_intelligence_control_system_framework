@@ -132,7 +132,7 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
 
           Dynamixel *dxl = dxls_[dev_name];
           std::vector<std::string> sub_tokens = split(tokens[6], ',');
-          if (sub_tokens.size() > 0)
+          if (sub_tokens.size() > 0 && sub_tokens[0] != "")
           {
             std::map<std::string, ControlTableItem *>::iterator indirect_it = dxl->ctrl_table_.find(INDIRECT_ADDRESS_1);
             if (indirect_it != dxl->ctrl_table_.end())    // INDIRECT_ADDRESS_1 exist
@@ -185,7 +185,7 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
 
           Sensor *sensor = sensors_[dev_name];
           std::vector<std::string> sub_tokens = split(tokens[6], ',');
-          if (sub_tokens.size() > 0)
+          if (sub_tokens.size() > 0 && sub_tokens[0] != "")
           {
             std::map<std::string, ControlTableItem *>::iterator indirect_it = sensor->ctrl_table_.find(INDIRECT_ADDRESS_1);
             if (indirect_it != sensor->ctrl_table_.end())    // INDIRECT_ADDRESS_1 exist
