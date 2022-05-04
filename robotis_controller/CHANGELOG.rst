@@ -2,6 +2,11 @@
 Changelog for package robotis_controller
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.0 (2021-05-03)
+------------------
+* Update package.xml and CMakeList.txt for noetic branch
+* Contributors: Ronaldson Bellande
+
 0.2.9 (2018-03-22)
 ------------------
 * added serivce for setting module
