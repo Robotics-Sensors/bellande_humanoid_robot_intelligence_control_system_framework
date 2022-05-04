@@ -1,7 +1,7 @@
 ################################################################################
 # Set minimum required version of cmake, project name and compile options
 ################################################################################
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(robotis_controller)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -60,7 +60,16 @@ endif(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES robotis_controller
-  CATKIN_DEPENDS roscpp roslib std_msgs sensor_msgs robotis_controller_msgs dynamixel_sdk robotis_device robotis_framework_common cmake_modules
+  CATKIN_DEPENDS 
+  roscpp 
+  roslib 
+  std_msgs 
+  sensor_msgs 
+  robotis_controller_msgs 
+  dynamixel_sdk 
+  robotis_device 
+  robotis_framework_common 
+  cmake_modules
   DEPENDS Boost
 )
 
