@@ -1,1 +1,1 @@
-- git: {local-name: robotis_controller_msgs, uri: 'https://github.com/ROBOTIS-GIT/ROBOTIS-Framework-msgs.git', version: master}
+- git: {local-name: robotis_controller_msgs, uri: 'https://github.com/Robotics-Sensors/ROBOTIS-Framework-msgs.git', version: noetic}
