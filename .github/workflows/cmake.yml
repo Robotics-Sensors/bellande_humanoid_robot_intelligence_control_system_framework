@@ -2,36 +2,65 @@ name: CMake
 
 on:
   push:
-    branches: [ noetic ]
+    branches: [ master ]
   pull_request:
-    branches: [ noetic ]
+    branches: [ master ]
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
-
-    - name: Build
-      # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
+    - name: Configure CMake 1
+      run: cmake -E make_directory ${{runner.workspace}}/robotis_controller/build
       
+    - name: Configure CMake 2
+      run: cmake -E make_directory ${{runner.workspace}}/robotis_device/build
+      
+    - name: Configure CMake 3
+      run: cmake -E make_directory ${{runner.workspace}}/robotis_framework/build
+      
+    - name: Configure CMake 4
+      run: cmake -E make_directory ${{runner.workspace}}/robotis_framework_common/build
+      
+      
+          
+    - name: Install dependencies
+      shell: bash
+      run: sudo apt-get update ; sudo apt-get install <system_requirements.txt ; sudo apt-get install <ros_requirements.txt ;
+        python3 -m pip install -r requirements.txt
+            
+
+    - name: Build 1
+      run: cmake -E  make_directory --build ${{runner.workspace}}/robotis_controller/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Build 2
+      run: cmake -E  make_directory --build ${{runner.workspace}}/robotis_device/build --config ${{env.BUILD_TYPE}}
+
+    - name: Build 3
+      run: cmake -E  make_directory --build ${{runner.workspace}}/robotis_framework/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Build 4
+      run: cmake -E  make_directory --build ${{runner.workspace}}/robotis_framework_common/build --config ${{env.BUILD_TYPE}}
+
+ 
+ 
+    - name: Test 1
+      working-directory: ${{runner.workspace}}/robotis_controller/build
+      run: ctest -C $BUILD_TYPE --output-on-failure
+      
+    - name: Test 2
+      working-directory: ${{runner.workspace}}/robotis_device/build
+      run: ctest -C $BUILD_TYPE --output-on-failure
+      
+    - name: Test 3
+      working-directory: ${{runner.workspace}}/robotis_framework/build
+      run: ctest -C $BUILD_TYPE --output-on-failure
+      
+    - name: Test 4
+      working-directory: ${{runner.workspace}}/robotis_framework_common/build
+      run: ctest -C $BUILD_TYPE --output-on-failure
