@@ -1,22 +1,19 @@
-## ROS Packages for ROBOTIS Framework
-|Version|Kinetic + Ubuntu Xenial|Melodic + Ubuntu Bionic|
-|:---:|:---:|:---:|
-|[![GitHub version](https://badge.fury.io/gh/ROBOTIS-GIT%2FROBOTIS-Framework.svg)](https://badge.fury.io/gh/ROBOTIS-GIT%2FROBOTIS-Framework)|[![Build Status](https://travis-ci.org/ROBOTIS-GIT/ROBOTIS-Framework.svg?branch=master)](https://travis-ci.org/ROBOTIS-GIT/ROBOTIS-Framework)|-|
+# ROS/ROS2 Humanoid Robot Framework
 
-## ROBOTIS e-Manual for ROBOTIS Framework
-- [ROBOTIS e-Manual for ROBOTIS Framework](http://emanual.robotis.com/docs/en/software/robotis_framework_packages)
+--------------------------------------------------------------------------------------------------------
+Updated Version [humanoid_robot_module](https://github.com/Robotics-Sensors/humanoid_robot_framework) readme.
 
-## Wiki for robotis_framework Packages
-- http://wiki.ros.org/robotis_framework (metapackage)
-- http://wiki.ros.org/robotis_controller
-- http://wiki.ros.org/robotis_device
-- http://wiki.ros.org/robotis_framework_common
+--------------------------------------------------------------------------------------------------------
+## Important
+The repository has diverged, as the old commits and codes are under the previous License and
+the new commits and codes are under New License
 
-## Open Source related to ROBOTIS Framework
-- [robotis_framework](https://github.com/ROBOTIS-GIT/ROBOTIS-Framework)
-- [robotis_controller_msgs](https://github.com/ROBOTIS-GIT/ROBOTIS-Framework-msgs)
-- [dynamixel_sdk](https://github.com/ROBOTIS-GIT/DynamixelSDK)
+--------------------------------------------------------------------------------------------------------
+Latest versions and Maintainer is on organization https://github.com/Robotics-Sensors
 
-## Documents and Videos related to ROBOTIS Framework
-- [ROBOTIS e-Manual for ROBOTIS Framework](http://emanual.robotis.com/docs/en/software/robotis_framework_packages/)
-- [ROBOTIS e-Manual for Dynamixel SDK](http://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_sdk/overview/)
+
+### Maintainer
+* Ronaldson Bellande
+
+## License
+This SDK is distributed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0), see [LICENSE](https://github.com/Robotics-Sensors/humanoid_robot_framework/blob/main/LICENSE) and [NOTICE](https://github.com/Robotics-Sensors/humanoid_robot_framework/blob/main/LICENSE) for more information.
