@@ -1,7 +1,7 @@
 # ROS/ROS2 Humanoid Robot Framework
 
 --------------------------------------------------------------------------------------------------------
-Updated Version [humanoid_robot_module](https://github.com/Robotics-Sensors/humanoid_robot_framework) readme.
+Updated Version [humanoid_robot_framework](https://github.com/Robotics-Sensors/humanoid_robot_framework) readme.
 
 --------------------------------------------------------------------------------------------------------
 ## Important
