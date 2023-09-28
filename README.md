@@ -3,6 +3,8 @@
 --------------------------------------------------------------------------------------------------------
 Updated Version [humanoid_robot_framework](https://github.com/Robotics-Sensors/humanoid_robot_framework) readme.
 
+Old Version/Previous Used for Different Context [ROBOTIS-Framework](https://github.com/ROBOTIS-GIT/ROBOTIS-Framework) readme.
+
 --------------------------------------------------------------------------------------------------------
 ## Important
 The repository has diverged, as the old commits and codes are under the previous License and
