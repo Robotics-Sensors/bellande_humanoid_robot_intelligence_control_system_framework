@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>humanoid_robot_controller</name>
+  <version>0.3.0</version>
+  <description>humanoid_robot_controller package for ROBOTIS's platform like Manipulator-H, THORMANG and OP series</description>
+  <license>Apache 2.0</license>
+  <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>humanoid_robot_controller_msgs</build_depend>
+  <build_depend>dynamixel_sdk</build_depend>
+  <build_depend>humanoid_robot_device</build_depend>
+  <build_depend>humanoid_robot_framework_common</build_depend>
+  <build_depend>cmake_modules</build_depend>
+  <build_depend>yaml-cpp</build_depend>
+
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>roslib</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>humanoid_robot_controller_msgs</build_export_depend>
+  <build_export_depend>dynamixel_sdk</build_export_depend>
+  <build_export_depend>humanoid_robot_device</build_export_depend>
+  <build_export_depend>humanoid_robot_framework_common</build_export_depend>
+  <build_export_depend>cmake_modules</build_export_depend>
+  <build_export_depend>yaml-cpp</build_export_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>roslib</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>humanoid_robot_controller_msgs</exec_depend>
+  <exec_depend>dynamixel_sdk</exec_depend>
+  <exec_depend>humanoid_robot_device</exec_depend>
+  <exec_depend>humanoid_robot_framework_common</exec_depend>
+  <exec_depend>cmake_modules</exec_depend>
+  <exec_depend>yaml-cpp</exec_depend>
+
+</package>
