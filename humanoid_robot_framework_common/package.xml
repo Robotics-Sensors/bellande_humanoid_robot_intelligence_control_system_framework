@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>humanoid_robot_framework_common</name>
   <version>0.2.9</version>
   <description>The package contains commonly used Headers for the ROBOTIS Framework.</description>

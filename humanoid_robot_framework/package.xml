@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>humanoid_robot_framework</name>
   <version>0.3.0</version>
   <description>ROS packages for the humanoid_robot_framework (meta package)</description>
