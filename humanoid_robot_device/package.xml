@@ -14,12 +14,28 @@
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>dynamixel_sdk</build_depend>
+  <condition if="$ROS_VERSION == 1">
+    <build_depend>roscpp</build_depend>
+    <build_depend>dynamixel_sdk</build_depend>
 
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>dynamixel_sdk</build_export_depend>
+    <build_export_depend>roscpp</build_export_depend>
+    <build_export_depend>dynamixel_sdk</build_export_depend>
 
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>dynamixel_sdk</exec_depend>
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>dynamixel_sdk</exec_depend>
+  </condition>
+
+
+  <condition if="$ROS_VERSION == 2">
+    <build_depend>roscpp</build_depend>
+    <build_depend>dynamixel_sdk</build_depend>
+
+    <build_export_depend>roscpp</build_export_depend>
+    <build_export_depend>dynamixel_sdk</build_export_depend>
+
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>dynamixel_sdk</exec_depend>
+  </condition>
+
+
 </package>
