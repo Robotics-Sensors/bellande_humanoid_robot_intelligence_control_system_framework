@@ -12,7 +12,6 @@ Changelog for package humanoid_robot_device
 * Update package.xml and CMakeList.txt for to the latest versions
 * Contributors & Maintainer: Ronaldson Bellande
 
-
 0.3.0 (2021-05-03)
 ------------------
 * Update package.xml and CMakeList.txt for noetic branch

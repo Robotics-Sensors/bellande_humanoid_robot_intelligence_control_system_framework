@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package format="2">
+<package format="3">
   <name>humanoid_robot_device</name>
   <version>0.3.0</version>
   <description>
@@ -10,14 +10,32 @@
   <license>Apache 2.0</license>
   <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
-  <build_depend>roscpp</build_depend>
-  <build_depend>dynamixel_sdk</build_depend>
 
-  <build_export_depend>roscpp</build_export_depend>
-  <build_export_depend>dynamixel_sdk</build_export_depend>
+  <condition if="$ROS_VERSION == 1">
+    <build_depend>roscpp</build_depend>
+    <build_depend>dynamixel_sdk</build_depend>
 
-  <exec_depend>roscpp</exec_depend>
-  <exec_depend>dynamixel_sdk</exec_depend>
+    <build_export_depend>roscpp</build_export_depend>
+    <build_export_depend>dynamixel_sdk</build_export_depend>
+
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>dynamixel_sdk</exec_depend>
+  </condition>
+
+
+  <condition if="$ROS_VERSION == 2">
+    <build_depend>roscpp</build_depend>
+    <build_depend>dynamixel_sdk</build_depend>
+
+    <build_export_depend>roscpp</build_export_depend>
+    <build_export_depend>dynamixel_sdk</build_export_depend>
+
+    <exec_depend>roscpp</exec_depend>
+    <exec_depend>dynamixel_sdk</exec_depend>
+  </condition>
+
+
 </package>
