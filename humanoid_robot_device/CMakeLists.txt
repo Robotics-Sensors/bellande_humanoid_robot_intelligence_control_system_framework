@@ -1,43 +1,30 @@
-################################################################################
-# Set minimum required version of cmake, project name and compile options
-################################################################################
 cmake_minimum_required(VERSION 3.8)
 project(humanoid_robot_device)
 
-################################################################################
-# Find catkin packages and libraries for catkin and system dependencies
-################################################################################
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  dynamixel_sdk
-)
 
-################################################################################
-# Setup for python modules and scripts
-################################################################################
+if($ENV{ROS_VERSION} EQUAL 1)
+  find_package(catkin REQUIRED COMPONENTS
+    roscpp
+    dynamixel_sdk
+  )
+else()
+  find_package(ament_cmake REQUIRED)
+endif()
 
-################################################################################
-# Declare ROS messages, services and actions
-################################################################################
 
-################################################################################
-# Declare ROS dynamic reconfigure parameters
-################################################################################
+if($ENV{ROS_VERSION} EQUAL 1)
+  catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES humanoid_robot_device
+    CATKIN_DEPENDS 
+    roscpp 
+    dynamixel_sdk
+  )
+else()
+  ament_package()
+endif()
 
-################################################################################
-# Declare catkin specific configuration to be passed to dependent projects
-################################################################################
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES humanoid_robot_device
-  CATKIN_DEPENDS 
-  roscpp 
-  dynamixel_sdk
-)
 
-################################################################################
-# Build
-################################################################################
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
@@ -51,9 +38,6 @@ add_library(humanoid_robot_device
 add_dependencies(humanoid_robot_device ${catkin_EXPORTED_TARGETS})
 target_link_libraries(humanoid_robot_device ${catkin_LIBRARIES})
 
-################################################################################
-# Install
-################################################################################
 install(TARGETS humanoid_robot_device
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -67,7 +51,3 @@ install(DIRECTORY include/${PROJECT_NAME}/
 install(DIRECTORY devices
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
-################################################################################
-# Test
-################################################################################

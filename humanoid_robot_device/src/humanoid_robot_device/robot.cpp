@@ -1,17 +1,17 @@
-/*******************************************************************************
- * Copyright 2018 ROBOTIS CO., LTD.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/*******************************************************************************
+ * Copyright 2018 ROBOTIS CO., LTD.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *******************************************************************************/
 
 /*
@@ -21,30 +21,30 @@
  *      Author: zerom
  */
 
-#include <algorithm>
-#include <fstream>
-#include <iostream>
+#include <algorithm>
+#include <fstream>
+#include <iostream>
 
 #include "humanoid_robot_device/robot.h"
 
 using namespace humanoid_robot_framework;
 
 static inline std::string &ltrim(std::string &s) {
-  s.erase(s.begin(),
-          std::find_if(s.begin(), s.end(),
+  s.erase(s.begin(),
+          std::find_if(s.begin(), s.end(),
                        std::not1(std::ptr_fun<int, int>(std::isspace))));
   return s;
 }
 static inline std::string &rtrim(std::string &s) {
-  s.erase(std::find_if(s.rbegin(), s.rend(),
-                       std::not1(std::ptr_fun<int, int>(std::isspace)))
-              .base(),
+  s.erase(std::find_if(s.rbegin(), s.rend(),
+                       std::not1(std::ptr_fun<int, int>(std::isspace)))
+              .base(),
           s.end());
   return s;
 }
 static inline std::string &trim(std::string &s) { return ltrim(rtrim(s)); }
 
-static inline std::vector<std::string> split(const std::string &text,
+static inline std::vector<std::string> split(const std::string &text,
                                              char sep) {
   std::vector<std::string> tokens;
   std::size_t start = 0, end = 0;
@@ -60,7 +60,7 @@ static inline std::vector<std::string> split(const std::string &text,
   return tokens;
 }
 
-Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
+Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
     : control_cycle_msec_(DEFAULT_CONTROL_CYCLE) {
   if (dev_desc_dir_path.compare(dev_desc_dir_path.size() - 1, 1, "/") != 0)
     dev_desc_dir_path += "/";
@@ -81,10 +81,10 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
       input_str = trim(input_str);
 
       // find session
-      if (!input_str.compare(0, 1, "[") &&
+      if (!input_str.compare(0, 1, "[") &&
           !input_str.compare(input_str.size() - 1, 1, "]")) {
         input_str = input_str.substr(1, input_str.size() - 2);
-        std::transform(input_str.begin(), input_str.end(), input_str.begin(),
+        std::transform(input_str.begin(), input_str.end(), input_str.begin(),
                        ::tolower);
         session = trim(input_str);
         continue;
@@ -102,10 +102,10 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
         if (tokens.size() != 3)
           continue;
 
-        std::cout << tokens[0] << " added. (baudrate: " << tokens[1] << ")"
+        std::cout << tokens[0] << " added. (baudrate: " << tokens[1] << ")"
                   << std::endl;
 
-        ports_[tokens[0]] =
+        ports_[tokens[0]] =
             dynamixel::PortHandler::getPortHandler(tokens[0].c_str());
         ports_[tokens[0]]->setBaudRate(std::atoi(tokens[1].c_str()));
         port_default_device_[tokens[0]] = tokens[2];
@@ -115,7 +115,7 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
           continue;
 
         if (tokens[0] == DYNAMIXEL) {
-          std::string file_path =
+          std::string file_path =
               dev_desc_dir_path + tokens[0] + "/" + tokens[3] + ".device";
           int id = std::atoi(tokens[2].c_str());
           std::string port = tokens[1];
@@ -127,20 +127,20 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
           Dynamixel *dxl = dxls_[dev_name];
           std::vector<std::string> sub_tokens = split(tokens[6], ',');
           if (sub_tokens.size() > 0 && sub_tokens[0] != "") {
-            std::map<std::string, ControlTableItem *>::iterator indirect_it =
+            std::map<std::string, ControlTableItem *>::iterator indirect_it =
                 dxl->ctrl_table_.find(INDIRECT_ADDRESS_1);
-            if (indirect_it !=
+            if (indirect_it !=
                 dxl->ctrl_table_.end()) // INDIRECT_ADDRESS_1 exist
             {
-              uint16_t indirect_data_addr =
+              uint16_t indirect_data_addr =
                   dxl->ctrl_table_[INDIRECT_DATA_1]->address_;
               for (int _i = 0; _i < sub_tokens.size(); _i++) {
-                std::map<std::string, ControlTableItem *>::iterator
+                std::map<std::string, ControlTableItem *>::iterator
                     bulkread_it = dxl->ctrl_table_.find(sub_tokens[_i]);
                 if (bulkread_it == dxl->ctrl_table_.end()) {
-                  fprintf(
-                      stderr,
-                      "\n  ##### BULK READ ITEM [ %s ] NOT FOUND!! #####\n\n",
+                  fprintf(
+                      stderr,
+                      "\n  ##### BULK READ ITEM [ %s ] NOT FOUND!! #####\n\n",
                       sub_tokens[_i].c_str());
                   continue;
                 }
@@ -164,13 +164,13 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
             {
               for (int i = 0; i < sub_tokens.size(); i++) {
                 if (dxl->ctrl_table_[sub_tokens[i]] != NULL)
-                  dxl->bulk_read_items_.push_back(
+                  dxl->bulk_read_items_.push_back(
                       dxl->ctrl_table_[sub_tokens[i]]);
               }
             }
           }
         } else if (tokens[0] == SENSOR) {
-          std::string file_path =
+          std::string file_path =
               dev_desc_dir_path + tokens[0] + "/" + tokens[3] + ".device";
           int id = std::atoi(tokens[2].c_str());
           std::string port = tokens[1];
@@ -182,12 +182,12 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
           Sensor *sensor = sensors_[dev_name];
           std::vector<std::string> sub_tokens = split(tokens[6], ',');
           if (sub_tokens.size() > 0 && sub_tokens[0] != "") {
-            std::map<std::string, ControlTableItem *>::iterator indirect_it =
+            std::map<std::string, ControlTableItem *>::iterator indirect_it =
                 sensor->ctrl_table_.find(INDIRECT_ADDRESS_1);
-            if (indirect_it !=
+            if (indirect_it !=
                 sensor->ctrl_table_.end()) // INDIRECT_ADDRESS_1 exist
             {
-              uint16_t indirect_data_addr =
+              uint16_t indirect_data_addr =
                   sensor->ctrl_table_[INDIRECT_DATA_1]->address_;
               for (int i = 0; i < sub_tokens.size(); i++) {
                 sensor->bulk_read_items_.push_back(new ControlTableItem());
@@ -208,7 +208,7 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
             } else // INDIRECT_ADDRESS_1 exist
             {
               for (int i = 0; i < sub_tokens.size(); i++)
-                sensor->bulk_read_items_.push_back(
+                sensor->bulk_read_items_.push_back(
                     sensor->ctrl_table_[sub_tokens[i]]);
             }
           }
@@ -221,7 +221,7 @@ Robot::Robot(std::string robot_file_path, std::string dev_desc_dir_path)
   }
 }
 
-Sensor *Robot::getSensor(std::string path, int id, std::string port,
+Sensor *Robot::getSensor(std::string path, int id, std::string port,
                          float protocol_version) {
   Sensor *sensor;
 
@@ -245,10 +245,10 @@ Sensor *Robot::getSensor(std::string path, int id, std::string port,
         continue;
 
       // find _session
-      if (!input_str.compare(0, 1, "[") &&
+      if (!input_str.compare(0, 1, "[") &&
           !input_str.compare(input_str.size() - 1, 1, "]")) {
         input_str = input_str.substr(1, input_str.size() - 2);
-        std::transform(input_str.begin(), input_str.end(), input_str.begin(),
+        std::transform(input_str.begin(), input_str.end(), input_str.begin(),
                        ::tolower);
         session = trim(input_str);
         continue;
@@ -293,9 +293,9 @@ Sensor *Robot::getSensor(std::string path, int id, std::string port,
     }
     sensor->port_name_ = port;
 
-    fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), sensor->id_,
+    fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), sensor->id_,
             sensor->model_name_.c_str());
-    // std::cout << "[ID:" << (int)(_sensor->id) << "] " << _sensor->model_name
+    // std::cout << "[ID:" << (int)(_sensor->id) << "] " << _sensor->model_name
     // << " added. (" << port << ")" << std::endl;
     file.close();
   } else
@@ -304,7 +304,7 @@ Sensor *Robot::getSensor(std::string path, int id, std::string port,
   return sensor;
 }
 
-Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port,
+Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port,
                                float protocol_version) {
   Dynamixel *dxl;
 
@@ -342,10 +342,10 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port,
         continue;
 
       // find session
-      if (!input_str.compare(0, 1, "[") &&
+      if (!input_str.compare(0, 1, "[") &&
           !input_str.compare(input_str.size() - 1, 1, "]")) {
         input_str = input_str.substr(1, input_str.size() - 2);
-        std::transform(input_str.begin(), input_str.end(), input_str.begin(),
+        std::transform(input_str.begin(), input_str.end(), input_str.begin(),
                        ::tolower);
         session = trim(input_str);
         continue;
@@ -440,10 +440,10 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port,
     if (dxl->ctrl_table_[torque_enable_item_name] != NULL)
       dxl->torque_enable_item_ = dxl->ctrl_table_[torque_enable_item_name];
     if (dxl->ctrl_table_[present_position_item_name] != NULL)
-      dxl->present_position_item_ =
+      dxl->present_position_item_ =
           dxl->ctrl_table_[present_position_item_name];
     if (dxl->ctrl_table_[present_velocity_item_name] != NULL)
-      dxl->present_velocity_item_ =
+      dxl->present_velocity_item_ =
           dxl->ctrl_table_[present_velocity_item_name];
     if (dxl->ctrl_table_[present_current_item_name] != NULL)
       dxl->present_current_item_ = dxl->ctrl_table_[present_current_item_name];
@@ -466,9 +466,9 @@ Dynamixel *Robot::getDynamixel(std::string path, int id, std::string port,
     if (dxl->ctrl_table_[velocity_p_gain_item_name] != NULL)
       dxl->velocity_p_gain_item_ = dxl->ctrl_table_[velocity_p_gain_item_name];
 
-    fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), dxl->id_,
+    fprintf(stderr, "(%s) [ID:%3d] %14s added. \n", port.c_str(), dxl->id_,
             dxl->model_name_.c_str());
-    // std::cout << "[ID:" << (int)(_dxl->id) << "] " << _dxl->model_name << "
+    // std::cout << "[ID:" << (int)(_dxl->id) << "] " << _dxl->model_name << "
     // added. (" << port << ")" << std::endl;
     file.close();
   } else
