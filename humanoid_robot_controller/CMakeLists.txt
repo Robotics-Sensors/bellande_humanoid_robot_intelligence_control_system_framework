@@ -58,8 +58,6 @@ if($ENV{ROS_VERSION} EQUAL 1)
     cmake_modules
     DEPENDS Boost
   )
-else()
-  ament_package()
 endif()
 
 

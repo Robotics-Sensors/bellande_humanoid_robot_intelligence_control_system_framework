@@ -20,8 +20,6 @@ if($ENV{ROS_VERSION} EQUAL 1)
     roscpp 
     humanoid_robot_device
   )
-else()
-  ament_package()
 endif()
 
 
