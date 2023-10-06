@@ -1,44 +1,40 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>humanoid_robot_framework</name>
-  <version>0.3.0</version>
+  <version>0.3.2</version>
   <description>ROS packages for the humanoid_robot_framework (meta package)</description>
   <license>Apache 2.0</license>
   <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
 
+
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+
+  <build_depend condition="$ROS_VERSION == 1">humanoid_robot_controller</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">humanoid_robot_device</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">humanoid_robot_framework_common</build_depend>
+
+  <build_export_depend condition="$ROS_VERSION == 1">humanoid_robot_controller</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">humanoid_robot_device</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">humanoid_robot_framework_common</build_export_depend>
+
+  <exec_depend condition="$ROS_VERSION == 1">humanoid_robot_controller</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">humanoid_robot_device</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">humanoid_robot_framework_common</exec_depend>
+
+
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
+  <build_depend condition="$ROS_VERSION == 2">humanoid_robot_controller</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">humanoid_robot_device</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">humanoid_robot_framework_common</build_depend>
 
-  <condition if="$ROS_VERSION == 1">
-    <build_depend>humanoid_robot_controller</build_depend>
-    <build_depend>humanoid_robot_device</build_depend>
-    <build_depend>humanoid_robot_framework_common</build_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">humanoid_robot_controller</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">humanoid_robot_device</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">humanoid_robot_framework_common</build_export_depend>
 
-    <build_export_depend>humanoid_robot_controller</build_export_depend>
-    <build_export_depend>humanoid_robot_device</build_export_depend>
-    <build_export_depend>humanoid_robot_framework_common</build_export_depend>
-
-    <exec_depend>humanoid_robot_controller</exec_depend>
-    <exec_depend>humanoid_robot_device</exec_depend>
-    <exec_depend>humanoid_robot_framework_common</exec_depend>
-  </condition>
-
-
-  <condition if="$ROS_VERSION == 2">
-    <build_depend>humanoid_robot_controller</build_depend>
-    <build_depend>humanoid_robot_device</build_depend>
-    <build_depend>humanoid_robot_framework_common</build_depend>
-
-    <build_export_depend>humanoid_robot_controller</build_export_depend>
-    <build_export_depend>humanoid_robot_device</build_export_depend>
-    <build_export_depend>humanoid_robot_framework_common</build_export_depend>
-
-    <exec_depend>humanoid_robot_controller</exec_depend>
-    <exec_depend>humanoid_robot_device</exec_depend>
-    <exec_depend>humanoid_robot_framework_common</exec_depend>
-  </condition>
-
+  <exec_depend condition="$ROS_VERSION == 2">humanoid_robot_controller</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">humanoid_robot_device</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">humanoid_robot_framework_common</exec_depend>
 
   <export>
     <metapackage />

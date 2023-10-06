@@ -1,37 +1,33 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>humanoid_robot_framework_common</name>
-  <version>0.2.9</version>
-  <description>The package contains commonly used Headers for the ROBOTIS Framework.</description>
+  <version>0.3.2</version>
+  <description>The package contains commonly used headers for the humanoid_robot_framework</description>
   <license>Apache 2.0</license>
   <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
 
+
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+
+  <build_depend condition="$ROS_VERSION == 1">roscpp</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">humanoid_robot_device</build_depend>
+
+  <build_export_depend condition="$ROS_VERSION == 1">roscpp</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">humanoid_robot_device</build_export_depend>
+
+  <exec_depend condition="$ROS_VERSION == 1">roscpp</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">humanoid_robot_device</exec_depend>
+
+
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
+  <build_depend condition="$ROS_VERSION == 2">roscpp</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">humanoid_robot_device</build_depend>
 
-  <condition if="$ROS_VERSION == 1">
-    <build_depend>roscpp</build_depend>
-    <build_depend>humanoid_robot_device</build_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">roscpp</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">humanoid_robot_device</build_export_depend>
 
-    <build_export_depend>roscpp</build_export_depend>
-    <build_export_depend>humanoid_robot_device</build_export_depend>
-
-    <exec_depend>roscpp</exec_depend>
-    <exec_depend>humanoid_robot_device</exec_depend>
-  </condition>
-
-
-  <condition if="$ROS_VERSION == 2">
-    <build_depend>roscpp</build_depend>
-    <build_depend>humanoid_robot_device</build_depend>
-
-    <build_export_depend>roscpp</build_export_depend>
-    <build_export_depend>humanoid_robot_device</build_export_depend>
-
-    <exec_depend>roscpp</exec_depend>
-    <exec_depend>humanoid_robot_device</exec_depend>
-  </condition>
-
+  <exec_depend condition="$ROS_VERSION == 2">roscpp</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">humanoid_robot_device</exec_depend>
 
 </package>

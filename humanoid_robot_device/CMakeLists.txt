@@ -20,8 +20,6 @@ if($ENV{ROS_VERSION} EQUAL 1)
     roscpp 
     dynamixel_sdk
   )
-else()
-  ament_package()
 endif()
 
 
