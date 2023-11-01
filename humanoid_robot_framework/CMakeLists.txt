@@ -10,5 +10,3 @@ endif()
 if($ENV{ROS_VERSION} EQUAL 1)
   catkin_package()
 endif()
-
-catkin_metapackage()
