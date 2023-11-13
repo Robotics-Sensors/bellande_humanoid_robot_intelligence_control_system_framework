@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>humanoid_robot_intelligence_control_system_framework_common</name>
+  <version>0.3.2</version>
+  <description>The package contains commonly used headers for the humanoid_robot_intelligence_control_system_framework</description>
+  <license>Apache 2.0</license>
+  <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
+
+
+  <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+
+  <build_depend condition="$ROS_VERSION == 1">roscpp</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">humanoid_robot_intelligence_control_system_device</build_depend>
+
+  <build_export_depend condition="$ROS_VERSION == 1">roscpp</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">humanoid_robot_intelligence_control_system_device</build_export_depend>
+
+  <exec_depend condition="$ROS_VERSION == 1">roscpp</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">humanoid_robot_intelligence_control_system_device</exec_depend>
+
+
+  <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
+
+  <build_depend condition="$ROS_VERSION == 2">roscpp</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">humanoid_robot_intelligence_control_system_device</build_depend>
+
+  <build_export_depend condition="$ROS_VERSION == 2">roscpp</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">humanoid_robot_intelligence_control_system_device</build_export_depend>
+
+  <exec_depend condition="$ROS_VERSION == 2">roscpp</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">humanoid_robot_intelligence_control_system_device</exec_depend>
+
+</package>
