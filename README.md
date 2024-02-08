@@ -8,6 +8,10 @@
 
 Welcome to the {BR&SRI} Humanoid Robot Intelligence Control System framework repository! Here, we invite you to delve into the fascinating world of humanoid robotics, showcasing the innovative capabilities of our intelligent control system.
 
+## 💻 Functionality To Switch from ROS to ROS2 Checkout The Below Repository
+
+[![Toggle ROS Versions](https://img.shields.io/badge/Toggle%20ROS%20Versions-Explore%20ROS%20and%20ROS2%20migration-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/ros_extension/)
+
 ### 🚀 Key Repository Stats
 
 - ![GitHub stars](https://img.shields.io/github/stars/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework.svg?style=social) Starred by the community
