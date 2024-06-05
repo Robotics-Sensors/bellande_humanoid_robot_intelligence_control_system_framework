@@ -1,5 +1,6 @@
+<?xml version="1.0"?>
 <!--
-Copyright (C) <year> Bellande Robotics Sensors Research Innovation Center, Ronaldson Bellande
+Copyright (C) 2024 Bellande Robotics Sensors Research Innovation Center, Ronaldson Bellande
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
@@ -14,7 +15,6 @@ License for the specific language governing permissions and limitations under
 the License.
 -->
 
-<?xml version="1.0"?>
 <package format="3">
   <name>humanoid_robot_intelligence_control_system_controller</name>
   <version>0.3.2</version>
