@@ -13,16 +13,24 @@
 # the License.
 
 cmake_minimum_required(VERSION 3.0.2)
-project(humanoid_robot_intelligence_control_system_controller)
+project(humanoid_robot_intelligence_control_system_object_detector)
 
 if($ENV{ROS_VERSION} EQUAL 1)
   find_package(catkin REQUIRED COMPONENTS
     rospy
+    std_msgs
+    sensor_msgs
+    geometry_msgs
+    cv_bridge
   )
 
   catkin_package(
     CATKIN_DEPENDS
       rospy
+      std_msgs
+      sensor_msgs
+      geometry_msgs
+      cv_bridge
   )
 
 else()
@@ -30,13 +38,16 @@ else()
   find_package(ament_cmake_python REQUIRED)
   find_package(rclpy REQUIRED)
   find_package(std_msgs REQUIRED)
+  find_package(sensor_msgs REQUIRED)
+  find_package(geometry_msgs REQUIRED)
+  find_package(cv_bridge REQUIRED)
 endif()
 
 if($ENV{ROS_VERSION} EQUAL 1)
   catkin_python_setup()
 
   catkin_install_python(PROGRAMS
-    src/PIDController.py
+    src/object_detection_processor.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
@@ -48,7 +59,7 @@ else()
   ament_python_install_package(${PROJECT_NAME})
 
   install(PROGRAMS
-    src/PIDController.py
+    src/object_detection_processor.py
     DESTINATION lib/${PROJECT_NAME}
   )
 
