@@ -16,7 +16,7 @@ the License.
 -->
 
 <package format="3">
-  <name>humanoid_robot_intelligence_control_system_internal_sensors</name>
+  <name>humanoid_robot_intelligence_control_system_structure_sensors</name>
   <version>0.0.1</version>
   <description>
     This Package is for Internal Sensors
