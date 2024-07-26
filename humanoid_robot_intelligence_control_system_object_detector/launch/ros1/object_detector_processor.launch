@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) 2024 Bellande Robotics Sensors Research Innovation Center, Ronaldson Bellande
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<launch>
+  <!-- Launch USB camera -->
+  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+    <param name="video_device" value="/dev/video0" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="io_method" value="mmap"/>
+  </node>
+
+  <!-- Launch object detection node -->
+  <node name="object_detection_node" pkg="ros_web_api_bellande_2d_computer_vision" type="bellande_2d_computer_vision_object_detection.py" output="screen">
+    <remap from="camera/image_raw" to="/usb_cam/image_raw"/>
+  </node>
+
+  <!-- Launch object detection processor node -->
+  <node name="object_detection_processor_node" pkg="humanoid_robot_intelligence_control_system_ball_detector" type="object_detection_processor.py" output="screen">
+    <param name="yaml_path" value="$(find ros_web_api_bellande_2d_computer_vision)/yaml/object_detection_params.yaml"/>
+  </node>
+
+  <!-- Launch RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ros_web_api_bellande_2d_computer_vision)/rviz/visualization.rviz" />
+</launch>
