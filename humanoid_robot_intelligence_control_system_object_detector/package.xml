@@ -16,10 +16,10 @@ the License.
 -->
 
 <package format="3">
-  <name>humanoid_robot_intelligence_control_system_controller</name>
+  <name>humanoid_robot_intelligence_control_system_object_detector</name>
   <version>0.0.1</version>
   <description>
-    This Package is for Detection Math
+    This Package is for Object Detection, detecting objects like tools, or utilities
   </description>
   <license>Apache 2.0</license>
   <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
@@ -30,9 +30,24 @@ the License.
 
   <!-- ROS 1 dependencies -->
   <depend condition="$ROS_VERSION == 1">rospy</depend>
+  <depend condition="$ROS_VERSION == 1">std_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">sensor_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">geometry_msgs</depend>
+  <depend condition="$ROS_VERSION == 1">cv_bridge</depend>
+  <depend condition="$ROS_VERSION == 1">image_transport</depend>
+  <depend condition="$ROS_VERSION == 1">dynamic_reconfigure</depend>
+  <depend condition="$ROS_VERSION == 1">message_generation</depend>
+  <depend condition="$ROS_VERSION == 1">message_runtime</depend>
 
   <!-- ROS 2 dependencies -->
   <depend condition="$ROS_VERSION == 2">rclpy</depend>
+  <depend condition="$ROS_VERSION == 2">std_msgs</depend>
+  <depend condition="$ROS_VERSION == 2">sensor_msgs</depend>
+  <depend condition="$ROS_VERSION == 2">geometry_msgs</depend>
+  <depend condition="$ROS_VERSION == 2">cv_bridge</depend>
+  <depend condition="$ROS_VERSION == 2">image_transport</depend>
+  <depend condition="$ROS_VERSION == 2">rosidl_default_generators</depend>
+  <depend condition="$ROS_VERSION == 2">rosidl_default_runtime</depend>
 
   <!-- Common dependencies -->
   <depend>python3-opencv</depend>
