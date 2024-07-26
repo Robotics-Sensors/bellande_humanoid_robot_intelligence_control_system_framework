@@ -42,26 +42,26 @@ Welcome to the {BR&SRI} Humanoid Robot Intelligence Control System framework rep
 - ![GitHub license](https://img.shields.io/github/license/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework.svg) Licensed under Apache 2.0
 
 - ![GitHub last commit](https://img.shields.io/github/last-commit/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework.svg) Latest updates
-- ![Visitor & Github Clones](https://img.shields.io/badge/dynamic/json?color=2e8b57&label=Visitor%20%26%20GitHub%20Clones&query=$.count&url=https://api.github.com/repos/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework/traffic) Engaging with the community
+- ![Visitor & Github Clones](https://img.shields.io/badge/dynamic/json?color=2e8b57&label=Visitor%20%26%20GitHub%20Clones&query=$.count&url=https://api.github.com/repos/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_framework/traffic) Engaging with the community
 
 ---
 
 ## 🌐 Repository Website
 
-Explore our [repository website](https://robotics-sensors.github.io/humanoid_robot_intelligence_control_system_framework) for detailed documentation, tutorials, and additional information about our humanoid robot intelligence control system.
+Explore our [repository website](https://robotics-sensors.github.io/bellande_humanoid_robot_intelligence_control_system_framework) for detailed documentation, tutorials, and additional information about our humanoid robot intelligence control system.
 
 ---
 
 ### 🔄 Updates and Versions
 
-- **Updated Version:** [humanoid_robot_intelligence_control_system_module](https://github.com/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework)
+- **Updated Version:** [humanoid_robot_intelligence_control_system_module](https://github.com/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_framework)
 - **Old Version/Previous Used for Different Context:** [ROBOTIS-Framework](https://github.com/ROBOTIS-GIT/ROBOTIS-Framework)
 
 ---
 
 # 🎉 Latest Release
 
-[![Latest Release](https://img.shields.io/github/v/release/Robotics-Sensors/humanoid_robot_intelligence_control_system_tools?style=for-the-badge&color=yellow)](https://github.com/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework/releases/)
+[![Latest Release](https://img.shields.io/github/v/release/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_tools?style=for-the-badge&color=yellow)](https://github.com/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_framework/releases/)
 
 ---
 
@@ -81,4 +81,4 @@ Meet our dedicated author & maintainer, **Ronaldson Bellande**.
 
 ## 📄 License
 
-This SDK is distributed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). For detailed information, refer to [LICENSE](https://github.com/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework/blob/main/LICENSE) and [NOTICE](https://github.com/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework/blob/main/LICENSE).
+This SDK is distributed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). For detailed information, refer to [LICENSE](https://github.com/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework/blob/main/LICENSE) and [NOTICE](https://github.com/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_framework/blob/main/LICENSE).
