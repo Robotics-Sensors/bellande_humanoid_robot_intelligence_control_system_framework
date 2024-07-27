@@ -16,10 +16,10 @@ the License.
 -->
 
 <package format="3">
-  <name>humanoid_robot_intelligence_control_system_controller</name>
+  <name>humanoid_robot_intelligence_control_system_external_sensors</name>
   <version>0.0.1</version>
   <description>
-    This Package is for Detection Math
+    This Package is for External Sensors
   </description>
   <license>Apache 2.0</license>
   <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>

@@ -19,7 +19,7 @@ from catkin_pkg.python_setup import generate_distutils_setup
 # fetch values from package.xml
 setup_args = generate_distutils_setup(
     scripts=['src/PIDController.py'],
-    packages=['humanoid_robot_intelligence_control_system_controller'],
+    packages=['humanoid_robot_intelligence_control_system_internal_sensors'],
     package_dir={'': 'src'},
 )
 
