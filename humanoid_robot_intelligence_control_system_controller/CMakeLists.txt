@@ -37,6 +37,7 @@ if($ENV{ROS_VERSION} EQUAL 1)
 
   catkin_install_python(PROGRAMS
     src/PIDController.py
+    src/BellandeController.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 
@@ -49,6 +50,7 @@ else()
 
   install(PROGRAMS
     src/PIDController.py
+    src/BellandeController.py
     DESTINATION lib/${PROJECT_NAME}
   )
 
