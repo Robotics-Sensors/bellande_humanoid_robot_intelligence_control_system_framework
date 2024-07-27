@@ -1,36 +1,36 @@
 # Welcome to the {BR&SRI} Humanoid Robot Intelligence Control System framework
 
+## 🤖 Explore Humanoid Robot Intelligence with Us!
+Welcome to the {BR&SRI} Humanoid Robot Intelligence Control System architecture repository! Here, we invite you to delve into the fascinating world of humanoid robotics, showcasing the innovative capabilities of our intelligent control system.
+
+
 [![Website](https://img.shields.io/badge/Visit%20our-Website-0099cc?style=for-the-badge)](https://robotics-sensors.github.io)
 [![Discord](https://img.shields.io/badge/Join%20our-Discord-7289DA?logo=discord&style=for-the-badge)](https://discord.gg/Yc72nd4w)
 [![Sponsor](https://img.shields.io/badge/Sponsor-Robotics%20Sensors%20Research-red?style=for-the-badge&logo=github)](https://github.com/sponsors/Robotics-Sensors)
 
-## 🤖 Explore Humanoid Robot Intelligence with Us!
 
-Welcome to the {BR&SRI} Humanoid Robot Intelligence Control System framework repository! Here, we invite you to delve into the fascinating world of humanoid robotics, showcasing the innovative capabilities of our intelligent control system.
+## 📢 Mobile and ROS Control System
+- [![Bellande's Internal Sensor Mobile iOS API](https://img.shields.io/badge/Bellande's%20Internal%20Sensor%20Mobile%20iOS%20API-Bellande%20API-blue?style=for-the-badge&logo=swift&color=blue)](https://github.com/Application-UI-UX/bellande_internal_sensor_mobile_ios_api)
+- [![Bellande's External Sensor Mobile iOS API](https://img.shields.io/badge/Bellande's%20External%20Sensor%20Mobile%20iOS%20API-Bellande%20API-blue?style=for-the-badge&logo=swift&color=blue)](https://github.com/Application-UI-UX/bellande_external_sensor_mobile_ios_api)
+- [![Bellande's Functionality Mobile iOS API](https://img.shields.io/badge/Bellande's%20Functionality%20Mobile%20iOS%20API-Bellande%20API-blue?style=for-the-badge&logo=swift&color=blue)](https://github.com/Application-UI-UX/bellande_functionality_mobile_ios_api)
+- [![Bellande's Internal Sensor Mobile Android API](https://img.shields.io/badge/Bellande's%20Internal%20Sensor%20Mobile%20Android%20API-Bellande%20API-blue?style=for-the-badge&logo=android&color=blue)](https://github.com/Application-UI-UX/bellande_internal_sensor_mobile_android_api)
+- [![Bellande's External Sensor Mobile Android API](https://img.shields.io/badge/Bellande's%20External%20Sensor%20Mobile%20Android%20API-Bellande%20API-blue?style=for-the-badge&logo=android&color=blue)](https://github.com/Application-UI-UX/bellande_external_sensor_mobile_android_api)
+- [![Bellande's Functionality Mobile Android API](https://img.shields.io/badge/Bellande's%20Functionality%20Mobile%20Android%20API-Bellande%20API-blue?style=for-the-badge&logo=android&color=blue)](https://github.com/Application-UI-UX/bellande_functionality_mobile_android_api)
+- [![Bellande's Internal Sensor Web API](https://img.shields.io/badge/Bellande's%20Internal%20Sensor%20Web%20API-Bellande%20API-blue?style=for-the-badge&logo=javascript&color=blue)](https://github.com/Application-UI-UX/bellande_internal_sensor_web_api)
+- [![Bellande's External Sensor Web API](https://img.shields.io/badge/Bellande's%20External%20Sensor%20Web%20API-Bellande%20API-blue?style=for-the-badge&logo=javascript&color=blue)](https://github.com/Application-UI-UX/bellande_external_sensor_web_api)
+- [![Bellande's Functionality Web API](https://img.shields.io/badge/Bellande's%20Functionality%20Web%20API-Bellande%20API-blue?style=for-the-badge&logo=javascript&color=blue)](https://github.com/Application-UI-UX/bellande_functionality_web_api)
+- [![Bellande's Algorithm through Bellande API](https://img.shields.io/badge/Bellande's%20Algorithm%20through%20Bellande's%20API-Bellande%20API-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/bellande_functionality_ros_api)
+- [![Bellande's Algorithm through Bellande MODELS](https://img.shields.io/badge/Bellande's%20Algorithm%20through%20Bellande's%20API-Bellande%20MODELS-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/bellande_ros_models)
+
 
 ## 🔄 Run and Experiment with the build Bellande's Humanoid Robot
-
 [![Bellande's Humanoid](https://img.shields.io/badge/Bellande's-Humanoid%20Robot%20Package-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/bellande_humanoid_robotics_package)
 
 
-## 📢 Work with Bellande Algorithms and Models through Bellande's API!
-
-[![Bellande's Algorithm through Bellande API](https://img.shields.io/badge/Bellande's%20Algorithm%20through%20Bellande's%20API-Bellande%20API-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/Web-ROS-API)
-
----
-
-## 🧑‍💼 Work with Bellande Models through Bellande Framework!
-
-[![Bellande's Algorithm through Bellande API](https://img.shields.io/badge/Bellande's%20Models%20through%20Bellande's%20Framework-Bellande%20Framework-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/ROS-MODELS)
-
----
-
 ## 💻 Functionality To Switch from ROS to ROS2 Checkout The Below Repository
-
-[![Toggle ROS Versions](https://img.shields.io/badge/Toggle%20ROS%20Versions-Explore%20ROS%20and%20ROS2%20migration-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/ros_extension/)
+[![Toggle ROS Versions](https://img.shields.io/badge/Toggle%20ROS%20Versions-Explore%20ROS%20and%20ROS2%20migration-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/ros_extension)
 
 ---
-
 ### 🚀 Key Repository Stats
 
 - ![GitHub stars](https://img.shields.io/github/stars/Robotics-Sensors/humanoid_robot_intelligence_control_system_framework.svg?style=social) Starred by the community
@@ -52,15 +52,7 @@ Explore our [repository website](https://robotics-sensors.github.io/bellande_hum
 
 ---
 
-### 🔄 Updates and Versions
-
-- **Updated Version:** [humanoid_robot_intelligence_control_system_module](https://github.com/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_framework)
-- **Old Version/Previous Used for Different Context:** [ROBOTIS-Framework](https://github.com/ROBOTIS-GIT/ROBOTIS-Framework)
-
----
-
 # 🎉 Latest Release
-
 [![Latest Release](https://img.shields.io/github/v/release/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_tools?style=for-the-badge&color=yellow)](https://github.com/Robotics-Sensors/bellande_humanoid_robot_intelligence_control_system_framework/releases/)
 
 ---
@@ -73,7 +65,7 @@ The repository has recently undergone significant updates. Older commits and cod
 
 🚀 For the latest versions and updates, visit our organization: [Robotics-Sensors](https://github.com/Robotics-Sensors).
 
-### 🧑‍💼 Maintainer
+### 🧑‍💼 Maintainer & Author
 
 Meet our dedicated author & maintainer, **Ronaldson Bellande**.
 
