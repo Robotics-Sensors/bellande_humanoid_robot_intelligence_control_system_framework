@@ -9,7 +9,7 @@ Welcome to the {BR&SRI} Humanoid Robot Intelligence Control System architecture 
 [![Sponsor](https://img.shields.io/badge/Sponsor-Robotics%20Sensors%20Research-red?style=for-the-badge&logo=github)](https://github.com/sponsors/Robotics-Sensors)
 
 
-## 🧑‍💼 Work with Bellande Models through Bellande Framework!
+## 🧑‍💼 Work with Bellande Models, Algorithms, Systems, Architectures through Bellande Framework!
 [![Bellande's Framework through Bellande API](https://img.shields.io/badge/Bellande's%20Framework%20through%20Bellande's%20API-Bellande%20Framework-blue?style=for-the-badge&logo=ros&color=blue)](https://github.com/Robotics-Sensors/bellande_framework)
 
 
