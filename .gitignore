@@ -12,10 +12,7 @@ qtcreator-build
 
 # Scripts
 init_setup.sh
-repository_recal.sh
-push.sh
 publish.sh
 ros_publish.sh
 prerelease_test.sh
-fix_errors.sh
 replace_add_index.sh
