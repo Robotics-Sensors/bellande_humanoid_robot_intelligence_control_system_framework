@@ -24,7 +24,6 @@ the License.
     from the humanoid_robot_intelligence_control_system_controller package.
   </description>
   <license>Apache 2.0</license>
-
   <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
 
 
@@ -42,13 +41,13 @@ the License.
 
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
 
-  <build_depend condition="$ROS_VERSION == 2">roscpp</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">rclcpp</build_depend>
   <build_depend condition="$ROS_VERSION == 2">dynamixel_sdk</build_depend>
 
-  <build_export_depend condition="$ROS_VERSION == 2">roscpp</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">rclcpp</build_export_depend>
   <build_export_depend condition="$ROS_VERSION == 2">dynamixel_sdk</build_export_depend>
 
-  <exec_depend condition="$ROS_VERSION == 2">roscpp</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">rclcpp</exec_depend>
   <exec_depend condition="$ROS_VERSION == 2">dynamixel_sdk</exec_depend>
 
 </package>

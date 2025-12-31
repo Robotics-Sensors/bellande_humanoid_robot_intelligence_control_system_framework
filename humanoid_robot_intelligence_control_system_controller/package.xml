@@ -24,23 +24,41 @@ the License.
   <license>Apache 2.0</license>
   <maintainer email="ronaldsonbellande@gmail.com">Ronaldson Bellande</maintainer>
 
+
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
+
+  <build_depend condition="$ROS_VERSION == 1">rospy</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">python3-opencv</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">python3-yaml</build_depend>
+  <build_depend condition="$ROS_VERSION == 1">usb_cam</build_depend>
+
+  <build_export_depend condition="$ROS_VERSION == 1">rospy</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">python3-opencv</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">python3-yaml</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 1">usb_cam</build_export_depend>
+
+  <exec_depend condition="$ROS_VERSION == 1">rospy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">python3-opencv</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">python3-yaml</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 1">usb_cam</exec_depend>
+
+
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake</buildtool_depend>
   <buildtool_depend condition="$ROS_VERSION == 2">ament_cmake_python</buildtool_depend>
 
-  <!-- ROS 1 dependencies -->
-  <depend condition="$ROS_VERSION == 1">rospy</depend>
+  <build_depend condition="$ROS_VERSION == 2">rclpy</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">python3-opencv</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">python3-yaml</build_depend>
+  <build_depend condition="$ROS_VERSION == 2">usb_cam</build_depend>
 
-  <!-- ROS 2 dependencies -->
-  <depend condition="$ROS_VERSION == 2">rclpy</depend>
+  <build_export_depend condition="$ROS_VERSION == 2">rclpy</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">python3-opencv</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">python3-yaml</build_export_depend>
+  <build_export_depend condition="$ROS_VERSION == 2">usb_cam</build_export_depend>
 
-  <!-- Common dependencies -->
-  <depend>python3-opencv</depend>
-  <depend>python3-yaml</depend>
-  <depend>usb_cam</depend>
+  <exec_depend condition="$ROS_VERSION == 2">rclpy</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">python3-opencv</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">python3-yaml</exec_depend>
+  <exec_depend condition="$ROS_VERSION == 2">usb_cam</exec_depend>
 
-  <export>
-    <build_type condition="$ROS_VERSION == 1">catkin</build_type>
-    <build_type condition="$ROS_VERSION == 2">ament_cmake</build_type>
-  </export>
 </package>
